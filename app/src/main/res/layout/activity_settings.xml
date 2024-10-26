@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,58 +9,52 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/settings_back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="4dp"
+        android:layout_marginHorizontal="4dp"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="24dp"
         android:gravity="center_vertical"
 
         android:text="@string/settings"
-        style="@style/LargeText"
+
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_large"
+        android:fontFamily="@font/ys_text_medium"
 
         app:drawableStartCompat="@drawable/btn_back"
-        android:drawableTint="@color/black"
-        android:drawablePadding="@dimen/icon_padding"/>
-
+        android:drawablePadding="@dimen/icon_padding"
+        app:drawableTint="@color/black" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="12dp"
-        android:paddingVertical="21dp">
+        style="@style/SettingsItem">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="44dp"
-            style="@style/MainText"
-            android:text="@string/dark_theme"
-            android:layout_gravity="center_vertical"
-            />
+            style="@style/SettingsText"
+            android:text="@string/dark_theme"/>
 
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="-10dp"/>
+            android:layout_gravity="end"/>
     </FrameLayout>
 
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="12dp"
-        android:paddingVertical="21dp">
+        style="@style/SettingsItem">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="44dp"
-            style="@style/MainText"
-            android:text="@string/share_app"
-            android:layout_gravity="center_vertical"/>
+            style="@style/SettingsText"
+            android:text="@string/share_app"/>
 
         <ImageView
             android:layout_width="wrap_content"
@@ -73,17 +68,13 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="12dp"
-        android:paddingVertical="21dp">
+        style="@style/SettingsItem">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="44dp"
-            style="@style/MainText"
-            android:text="@string/ask_support"
-            android:layout_gravity="center_vertical"/>
+            style="@style/SettingsText"
+            android:text="@string/ask_support"/>
 
         <ImageView
             android:layout_width="wrap_content"
@@ -97,15 +88,12 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="12dp"
-        android:paddingVertical="21dp">
+        style="@style/SettingsItem">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="44dp"
-            style="@style/MainText"
+            style="@style/SettingsText"
             android:text="@string/agreement"
             android:layout_gravity="center_vertical"/>
 
