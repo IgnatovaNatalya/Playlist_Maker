@@ -8,10 +8,9 @@
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
 
-
     <style name="MainButtons">
-        <item name="android:layout_marginHorizontal">16dp</item>
-        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginHorizontal">@dimen/item_padding</item>
+        <item name="android:layout_marginBottom">@dimen/item_padding</item>
         <item name="background">@drawable/bg_rounded</item>
         <item name="android:background">@drawable/bg_rounded</item>
 
@@ -29,8 +28,8 @@
     </style>
 
     <style name="SettingsItem">
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_marginStart">@dimen/item_padding</item>
+        <item name="android:layout_marginEnd">@dimen/item_padding</item>
         <item name="android:layout_marginVertical">21dp</item>
         <item name="android:layout_gravity">center_vertical</item>
     </style>
@@ -40,6 +39,5 @@
         <item name="android:textSize">@dimen/text_med</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
 
 </resources>
