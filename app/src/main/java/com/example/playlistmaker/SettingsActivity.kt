@@ -1,6 +1,5 @@
 package com.example.playlistmaker
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -22,7 +21,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val btnBack= findViewById<TextView>(R.id.settings_back_button)
         btnBack.setOnClickListener{
-            startActivity(Intent(this,MainActivity::class.java))
+            finish()
         }
     }
 }
