@@ -5,4 +5,8 @@
     <color name="blue">#3772E7</color>
     <color name="dark_blue">#1A1B22</color>
     <color name="light_grey">#AEAFB4</color>
+    <color name ="extra_light_grey">#E6E8EB</color>
+    <color name="transparent_blue">#489FBBF3</color>
+
 </resources>
+

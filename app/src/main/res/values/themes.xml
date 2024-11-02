@@ -1,43 +1,20 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+    <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
+
         <item name="colorPrimary">@color/white</item>
-        <item name="colorAccent">@color/blue</item>
-    </style>
+        <item name="colorOnPrimary">@color/dark_blue</item>
+        <item name="colorSecondaryContainer">@color/extra_light_grey</item>
 
-    <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
-
-    <style name="MainButtons">
-        <item name="android:layout_marginHorizontal">@dimen/item_padding</item>
-        <item name="android:layout_marginBottom">@dimen/item_padding</item>
-        <item name="background">@drawable/bg_rounded</item>
-        <item name="android:background">@drawable/bg_rounded</item>
-
-        <item name="android:elegantTextHeight">true</item>
-        <item name="android:textColor">@color/dark_blue</item>
-        <item name="android:textSize">@dimen/text_large</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:letterSpacing">0</item>
-        <item name="fontFamily">@font/ys_text_regular</item>
-
-        <item name="iconPadding">@dimen/icon_padding</item>
-        <item name="iconGravity">textStart</item>
-        <item name="iconTint">@color/dark_blue</item>
-    </style>
-
-    <style name="SettingsItem">
-        <item name="android:layout_marginStart">@dimen/item_padding</item>
-        <item name="android:layout_marginEnd">@dimen/item_padding</item>
-        <item name="android:layout_marginVertical">21dp</item>
-        <item name="android:layout_gravity">center_vertical</item>
-    </style>
-
-    <style name="SettingsText">
-        <item name="fontFamily">@font/ys_text_regular</item>
-        <item name="android:textSize">@dimen/text_med</item>
+        <item name="android:colorBackground">@color/white</item>
         <item name="android:textColor">@color/black</item>
+
+        <item name="background">@color/blue</item>
+
+
     </style>
+
 
 </resources>
