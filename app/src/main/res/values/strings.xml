@@ -8,4 +8,12 @@
     <string name="share_app">Поделиться приложением</string>
     <string name="ask_support">Написать в техподдержку</string>
     <string name="agreement">Пользовательское соглашение</string>
+
+    <string name="share_link">Курс «Android-разработчик» - онлайн-обучение разработке мобильных приложений под Андроид https://practicum.yandex.ru/android-developer/</string>
+
+    <string name="support_email">anannat@ya.ru</string>
+    <string name="support_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="support_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+
+    <string name="agreement_link">https://yandex.ru/legal/practicum_offer/</string>
 </resources>

@@ -24,14 +24,12 @@
         <item name="android:layout_marginEnd">@dimen/item_padding</item>
         <item name="android:layout_marginVertical">21dp</item>
         <item name="android:layout_gravity">center_vertical</item>
-        <item name="tint">?attr/colorOnBackground</item>
     </style>
 
     <style name="SettingsSwitch"  parent = "Widget.AppCompat.CompoundButton.Switch">
         <item name="thumbTint">@color/selector_switch_thumb</item>
         <item name="trackTint">?attr/colorSecondaryContainer</item>
     </style>
-
 
     <style name="SettingsTextStyle">
         <item name="fontFamily">@font/ys_text_regular</item>
