@@ -4,8 +4,8 @@
     <style name="MainButtonsStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_marginHorizontal">@dimen/item_padding</item>
         <item name="android:layout_marginBottom">@dimen/item_padding</item>
-        <item name="background">@drawable/bg_rounded</item>
-        <item name="android:background">@drawable/bg_rounded</item>
+        <item name="background">@drawable/bg_rounded_radius_l</item>
+        <item name="android:background">@drawable/bg_rounded_radius_l</item>
 
         <item name="android:elegantTextHeight">true</item>
         <item name="android:textSize">@dimen/text_large</item>
