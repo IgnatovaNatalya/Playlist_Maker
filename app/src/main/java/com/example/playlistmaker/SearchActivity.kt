@@ -34,7 +34,7 @@ class SearchActivity : AppCompatActivity() {
         val clearButton = findViewById<ImageView>(R.id.search_clear_button)
 
         clearButton.setOnClickListener {
-            searchField.setText("")
+            searchField.setText(DEFAULT_TEXT)
 
             //hide keyboard
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -46,12 +46,10 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // if (s.isNotEmpty()) {   val input = s.toString()  }
+                enteredText = s.toString()
                 clearButton.visibility = clearButtonVisibility(s)
-
             }
         }
-
         searchField.addTextChangedListener(simpleTextWatcher)
     }
 
@@ -61,27 +59,21 @@ class SearchActivity : AppCompatActivity() {
         else View.VISIBLE
     }
 
-    private fun closeKeyboard() {
-        // this will give us the view
-        // which is currently focus
-        // in this layout
-        val view = this.currentFocus
+    private var enteredText: String = DEFAULT_TEXT
 
-
-        // if nothing is currently
-        // focus then this will protect
-        // the app from crash
-        if (view != null) {
-            // now assign the system
-            // service to InputMethodManager
-
-            val manager = getSystemService(
-                INPUT_METHOD_SERVICE
-            ) as InputMethodManager
-            manager
-                .hideSoftInputFromWindow(
-                    view.windowToken, 0
-                )
-        }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(ENTERED_TEXT, enteredText)
     }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
+    }
+
+    companion object {
+        const val ENTERED_TEXT = "ENTERED_TEXT"
+        const val DEFAULT_TEXT = ""
+    }
+
 }
