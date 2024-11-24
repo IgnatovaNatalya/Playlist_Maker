@@ -7,23 +7,18 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/settings_back_button"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="24dp"
-        android:gravity="center_vertical"
+        app:navigationIcon="@drawable/btn_back"
+        app:title="@string/settings"
+        app:titleTextColor="@color/black"
+        app:titleTextAppearance="@style/ToolbarTitleStyle"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:titleMarginStart="8dp"
+        />
 
-        android:text="@string/settings"
-
-        android:textSize="@dimen/text_large"
-        android:fontFamily="@font/ys_text_medium"
-
-        app:drawableStartCompat="@drawable/btn_back"
-        android:drawablePadding="@dimen/icon_padding"
-        app:drawableTint="?attr/android:textColor"/>
 
     <FrameLayout
         style="@style/SettingsItemStyle"
