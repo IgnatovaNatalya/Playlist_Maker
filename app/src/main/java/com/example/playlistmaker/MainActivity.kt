@@ -15,27 +15,26 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-       ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
         val btnSearch = findViewById<Button>(R.id.main_search_button)
-        val btnMedia = findViewById<Button>(R.id.main_media_button)
-        val btnSettings = findViewById<Button>(R.id.main_settings_button)
-
 
         btnSearch.setOnClickListener {
-            startActivity(Intent(this,SearchActivity::class.java))
+            startActivity(Intent(this, SearchActivity::class.java))
         }
 
+        val btnMedia = findViewById<Button>(R.id.main_media_button)
         btnMedia.setOnClickListener {
-            startActivity(Intent(this,MediaActivity::class.java))
+            startActivity(Intent(this, MediaActivity::class.java))
         }
 
+        val btnSettings = findViewById<Button>(R.id.main_settings_button)
         btnSettings.setOnClickListener {
-            startActivity(Intent(this,SettingsActivity::class.java))
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
 }
