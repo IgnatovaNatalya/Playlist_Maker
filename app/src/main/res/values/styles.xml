@@ -44,6 +44,16 @@
         <item name="android:contentInsetStartWithNavigation">0dp</item>
     </style>
 
+    <style name="SongTitleStyle">
+        <item name="fontFamily">@font/ys_text_regular</item>
+        <item name="android:textSize">@dimen/text_med</item>
+    </style>
+
+    <style name="BandNameStyle">
+        <item name="fontFamily">@font/ys_text_regular</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
 
 
 </resources>

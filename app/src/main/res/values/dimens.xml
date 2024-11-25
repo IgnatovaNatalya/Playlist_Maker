@@ -2,8 +2,10 @@
 <resources>
     <dimen name="icon_padding">12dp</dimen>
     <dimen name="item_padding">16dp</dimen>
+    <dimen name="text_padding">8dp</dimen>
     <dimen name="radius_large">16dp</dimen>
     <dimen name="radius_med">8dp</dimen>
     <dimen name="text_large">22sp</dimen>
     <dimen name="text_med">16sp</dimen>
+    <dimen name="picture_size">45dp</dimen>
 </resources>

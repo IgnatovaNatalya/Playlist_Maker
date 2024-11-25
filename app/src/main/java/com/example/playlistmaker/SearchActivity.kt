@@ -7,11 +7,12 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.MaterialToolbar
 
 
 class SearchActivity : AppCompatActivity() {
@@ -25,18 +26,16 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        val btnBack = findViewById<TextView>(R.id.search_back_button)
-        btnBack.setOnClickListener {
-            finish()
-        }
 
+        val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
+        toolbar.setNavigationOnClickListener {  finish() }
+
+        //search field
         val searchField = findViewById<EditText>(R.id.search_inpit_text)
         val clearButton = findViewById<ImageView>(R.id.search_clear_button)
 
         clearButton.setOnClickListener {
             searchField.setText(DEFAULT_TEXT)
-
-            //hide keyboard
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(clearButton.windowToken, 0)
         }
@@ -75,5 +74,9 @@ class SearchActivity : AppCompatActivity() {
         const val ENTERED_TEXT = "ENTERED_TEXT"
         const val DEFAULT_TEXT = ""
     }
+
+    //recycler
+    val recycler = findViewById<RecyclerView>(R.id.search_recycler)
+
 
 }

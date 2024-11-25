@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.appbar.MaterialToolbar
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,10 +23,8 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        val btnBack= findViewById<TextView>(R.id.settings_back_button)
-        btnBack.setOnClickListener{
-            finish()
-        }
+        val toolbar = findViewById<MaterialToolbar>(R.id.settings_toolbar)
+        toolbar.setNavigationOnClickListener {  finish() }
 
         val btnShare = findViewById<FrameLayout>(R.id.settings_share_button)
         btnShare.setOnClickListener {
