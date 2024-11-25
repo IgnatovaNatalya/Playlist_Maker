@@ -52,6 +52,7 @@
             android:id="@+id/search_clear_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
             android:src="@drawable/clear"
             android:layout_gravity="center_vertical|end"
             android:paddingEnd="14dp"
@@ -65,6 +66,6 @@
         android:layout_height="match_parent"
         android:layout_marginHorizontal="@dimen/item_padding"
         android:layout_marginVertical="@dimen/item_padding"
-        tools:listitem="@layout/item_search"
+        tools:listitem="@layout/item_track"
         />
 </LinearLayout>
