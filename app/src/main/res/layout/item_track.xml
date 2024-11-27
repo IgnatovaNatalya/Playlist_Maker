@@ -10,15 +10,16 @@
         android:id="@+id/album_picture"
         android:layout_width="@dimen/picture_size"
         android:layout_height="@dimen/picture_size"
+        android:layout_weight="0"
         android:layout_marginEnd="@dimen/text_padding"
         android:importantForAccessibility="no"
-        android:src="@color/extra_light_grey"/>
+        android:src="@drawable/album_placeholder"/>
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_gravity="center"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1">
 
         <TextView
@@ -26,8 +27,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/SongTitleStyle"
-            android:importantForAccessibility="no"
-            tools:text="Название песни"/>
+            android:maxLines="1"
+            android:ellipsize = "end"
+            tools:text="Название песни" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -38,13 +40,18 @@
                 android:id="@+id/band_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 style="@style/BandNameStyle"
                 android:textColor="?attr/colorSecondaryVariant"
-                tools:text="Название группы"/>
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Название группыНазНазвание группыНазНазвание группыНазвание группы"/>
 
             <ImageView
+                android:id="@+id/ic_dot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="0"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_dot"/>
 
@@ -52,10 +59,11 @@
                 android:id="@+id/song_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="0"
                 style="@style/BandNameStyle"
                 android:textColor="?attr/colorSecondaryVariant"
-                tools:text="1:11" />
-
+                android:maxLines="1"
+                tools:text="5:11" />
         </LinearLayout>
 
     </LinearLayout>
@@ -63,9 +71,9 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="0"
         android:src="@drawable/arrow_forward"
         android:layout_gravity="center_vertical|end"
+        android:layout_marginStart="@dimen/text_padding"
         tools:ignore="ContentDescription"/>
-
-
 </LinearLayout>

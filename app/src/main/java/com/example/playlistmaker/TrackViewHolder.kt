@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
+
 class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val albumPicture: ImageView = itemView.findViewById(R.id.album_picture)
@@ -20,13 +21,14 @@ class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         songDuration.text = track.trackTime
         bandName.text = track.artistName
 
-        val radiusDp = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 2F, itemView.resources.displayMetrics).toInt()
+        val radiusPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 2F, itemView.resources.displayMetrics
+        ).toInt()
 
         Glide.with(itemView)
             .load(track.artworkUrl100)
             .centerInside()
-            .transform(RoundedCorners(radiusDp))
+            .transform(RoundedCorners(radiusPx))
             .placeholder(R.drawable.album_placeholder)
             .into(albumPicture)
     }

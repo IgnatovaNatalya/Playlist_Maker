@@ -51,7 +51,7 @@
 
     <style name="BandNameStyle">
         <item name="fontFamily">@font/ys_text_regular</item>
-        <item name="android:textSize">11sp</item>
+        <item name="android:textSize">@dimen/text_small</item>
     </style>
 
 

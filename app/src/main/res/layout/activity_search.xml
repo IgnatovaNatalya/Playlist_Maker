@@ -12,7 +12,7 @@
         android:id="@+id/search_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/btn_back"
+        app:navigationIcon="@drawable/arrow_back"
         app:title="@string/search"
         app:titleTextAppearance="@style/ToolbarTitleStyle"
         app:contentInsetStart="0dp"
