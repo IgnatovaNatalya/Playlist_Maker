@@ -32,7 +32,7 @@ class SearchActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener {  finish() }
 
         //search field
-        val searchField = findViewById<EditText>(R.id.search_inpit_text)
+        val searchField = findViewById<EditText>(R.id.search_input_text)
         val clearButton = findViewById<ImageView>(R.id.search_clear_button)
 
         clearButton.setOnClickListener {

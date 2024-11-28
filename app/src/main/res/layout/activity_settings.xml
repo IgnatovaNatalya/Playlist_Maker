@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -19,8 +18,18 @@
         app:titleMarginStart="8dp"
         />
 
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/SettingsSwitch"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/text_med"
+        android:paddingVertical="20dp"
+        android:text="@string/dark_theme"
+        android:textSize="@dimen/text_med" />
 
-    <FrameLayout
+
+    <!--FrameLayout
         style="@style/SettingsItemStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -37,10 +46,19 @@
             android:layout_height="@dimen/text_med"
             android:layout_gravity="end"
             android:checked="false" />
-    </FrameLayout>
+    </FrameLayout-->
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/settings_share_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/share"
+        android:paddingHorizontal="@dimen/text_med"
+        android:paddingVertical="20dp"
+        android:text="@string/share_app"
+        android:textSize="@dimen/text_med" />
 
-    <FrameLayout
+    <!--FrameLayout
         android:id="@+id/settings_share_button"
         style="@style/SettingsItemStyle"
         android:layout_width="match_parent"
@@ -50,7 +68,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/SettingsTextStyle"
-            android:text="@string/share_app"/>
+            android:text="@string/share_app"
+            />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -58,9 +77,20 @@
             android:layout_gravity="end"
             android:src="@drawable/share"
             tools:ignore="ContentDescription" />
-    </FrameLayout>
+    </FrameLayout-->
 
-    <FrameLayout
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/settings_support_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/support"
+        android:paddingHorizontal="@dimen/text_med"
+        android:paddingVertical="20dp"
+        android:text="@string/ask_support"
+        android:textSize="@dimen/text_med" />
+
+
+    <!--FrameLayout
 
         android:id="@+id/settings_support_button"
         style="@style/SettingsItemStyle"
@@ -80,9 +110,20 @@
             app:tint="@color/light_grey"
             android:layout_gravity="end"
             tools:ignore="ContentDescription"/>
-    </FrameLayout>
+    </FrameLayout-->
 
-    <FrameLayout
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/settings_agreement_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/arrow_forward"
+        android:paddingHorizontal="@dimen/text_med"
+        android:paddingVertical="20dp"
+        android:text="@string/agreement"
+        android:textSize="@dimen/text_med" />
+
+    <!--FrameLayout
         android:id="@+id/settings_agreement_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -101,8 +142,6 @@
             android:src="@drawable/arrow_forward"
             android:layout_gravity="end"
             tools:ignore="ContentDescription"/>
-    </FrameLayout>
-
-
+    </FrameLayout-->
 
 </LinearLayout>

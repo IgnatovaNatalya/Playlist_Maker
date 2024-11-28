@@ -5,7 +5,7 @@
         <!-- Customize your light theme here. -->
 
         <item name="colorPrimary">@color/white</item>
-        <item name="colorOnPrimary">@color/dark_blue</item>
+        <item name="colorOnPrimary">@color/YP_Black</item>
         <item name="colorPrimaryContainer">@color/white</item>
 
         <item name="colorAccent">@color/blue</item>
@@ -13,13 +13,14 @@
         <item name="colorSecondaryContainer">@color/extra_light_grey</item>
 
         <item name="android:colorBackground">@color/white</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/YP_Black</item>
         <item name="colorSecondaryVariant">@color/light_grey</item>
+        <item name="colorOnSurfaceVariant">@color/black</item>
 
         <item name="background">@color/blue</item>
 
         <item name="android:textColorHint">@color/light_grey</item>
-        <item name="android:editTextColor">@color/black</item>
+        <item name="android:editTextColor">@color/YP_Black</item>
         <item name="android:editTextBackground">@color/extra_light_grey</item>
         <item name="cursorColor">@color/blue</item>
 

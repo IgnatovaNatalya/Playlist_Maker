@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/search_toolbar"
         android:layout_width="match_parent"
@@ -22,13 +21,13 @@
 
     <FrameLayout
 
-        android:layout_marginHorizontal="@dimen/item_padding"
+        android:layout_marginHorizontal="@dimen/horizontal_padding"
         android:layout_marginVertical="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/search_inpit_text"
+            android:id="@+id/search_input_text"
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:background="@drawable/bg_rounded_radius_m"
@@ -64,8 +63,7 @@
         android:id="@+id/search_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="@dimen/item_padding"
-        android:layout_marginVertical="@dimen/item_padding"
+        android:layout_margin="@dimen/horizontal_padding"
         tools:listitem="@layout/item_track"
         />
 </LinearLayout>
