@@ -3,12 +3,12 @@ package com.example.playlistmaker
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.appbar.MaterialToolbar
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,12 +22,10 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        val btnBack= findViewById<TextView>(R.id.settings_back_button)
-        btnBack.setOnClickListener{
-            finish()
-        }
+        val toolbar = findViewById<MaterialToolbar>(R.id.settings_toolbar)
+        toolbar.setNavigationOnClickListener {  finish() }
 
-        val btnShare = findViewById<FrameLayout>(R.id.settings_share_button)
+        val btnShare = findViewById<TextView>(R.id.settings_share_button)
         btnShare.setOnClickListener {
 
             val shareIntent = Intent(Intent.ACTION_SEND)
@@ -39,7 +37,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(chosenIntent)
         }
 
-        val btnSupport = findViewById<FrameLayout>(R.id.settings_support_button)
+        val btnSupport = findViewById<TextView>(R.id.settings_support_button)
         btnSupport.setOnClickListener {
             val supportIntent = Intent(Intent.ACTION_SENDTO)
             supportIntent.data = Uri.parse("mailto:")
@@ -48,7 +46,7 @@ class SettingsActivity : AppCompatActivity() {
             supportIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.support_text))
             startActivity(supportIntent)
         }
-        val btnAgreement = findViewById<FrameLayout>(R.id.settings_agreement_button)
+        val btnAgreement = findViewById<TextView>(R.id.settings_agreement_button)
         btnAgreement.setOnClickListener {
             val agreementIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
             startActivity(agreementIntent)

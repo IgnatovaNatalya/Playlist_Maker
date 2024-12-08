@@ -7,33 +7,27 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
-<TextView
-        android:id="@+id/search_back_button"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/search_toolbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="24dp"
-        android:gravity="center_vertical"
-
-        android:text="@string/search"
-
-        android:textSize="@dimen/text_large"
-        android:fontFamily="@font/ys_text_medium"
-
-        app:drawableStartCompat="@drawable/btn_back"
-        android:drawablePadding="@dimen/icon_padding"
-        app:drawableTint="?attr/android:textColor"/>
+        app:navigationIcon="@drawable/arrow_back"
+        app:title="@string/search"
+        app:titleTextAppearance="@style/ToolbarTitleStyle"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:titleMarginStart="8dp"
+        />
 
     <FrameLayout
 
-        android:layout_marginHorizontal="@dimen/item_padding"
+        android:layout_marginHorizontal="@dimen/horizontal_padding"
+        android:layout_marginVertical="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/search_inpit_text"
+            android:id="@+id/search_input_text"
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:background="@drawable/bg_rounded_radius_m"
@@ -57,6 +51,7 @@
             android:id="@+id/search_clear_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
             android:src="@drawable/clear"
             android:layout_gravity="center_vertical|end"
             android:paddingEnd="14dp"
@@ -64,4 +59,11 @@
 
     </FrameLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/horizontal_padding"
+        tools:listitem="@layout/item_track"
+        />
 </LinearLayout>

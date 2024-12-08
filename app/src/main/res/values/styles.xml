@@ -2,8 +2,8 @@
 <resources>
 
     <style name="MainButtonsStyle" parent="Widget.MaterialComponents.Button.UnelevatedButton">
-        <item name="android:layout_marginHorizontal">@dimen/item_padding</item>
-        <item name="android:layout_marginBottom">@dimen/item_padding</item>
+        <item name="android:layout_marginHorizontal">@dimen/horizontal_padding</item>
+        <item name="android:layout_marginVertical">@dimen/vertical_padding</item>
         <item name="background">@drawable/bg_rounded_radius_l</item>
         <item name="android:background">@drawable/bg_rounded_radius_l</item>
 
@@ -20,9 +20,8 @@
     </style>
 
     <style name="SettingsItemStyle">
-        <item name="android:layout_marginStart">@dimen/item_padding</item>
-        <item name="android:layout_marginEnd">@dimen/item_padding</item>
-        <item name="android:layout_marginVertical">21dp</item>
+        <item name="itemHorizontalPadding">@dimen/horizontal_padding</item>
+        <item name="android:layout_marginVertical">@dimen/vertical_padding</item>
         <item name="android:layout_gravity">center_vertical</item>
     </style>
 
@@ -34,6 +33,25 @@
     <style name="SettingsTextStyle">
         <item name="fontFamily">@font/ys_text_regular</item>
         <item name="android:textSize">@dimen/text_med</item>
+    </style>
+
+    <style name="ToolbarTitleStyle">
+        <item name="fontFamily">@font/ys_text_medium</item>
+        <item name="android:textSize">@dimen/text_large</item>
+        <item name="titleTextColor">?attr/android:textColor</item>
+        <item name="titleMarginStart">8dp</item>
+        <item name="android:contentInsetStartWithNavigation">0dp</item>
+    </style>
+
+    <style name="SongTitleStyle">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="fontFamily">@font/ys_text_regular</item>
+        <item name="android:textSize">@dimen/text_med</item>
+    </style>
+
+    <style name="BandNameStyle">
+        <item name="fontFamily">@font/ys_text_regular</item>
+        <item name="android:textSize">@dimen/text_small</item>
     </style>
 
 
