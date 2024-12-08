@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/search_toolbar"
         android:layout_width="match_parent"
@@ -27,7 +28,7 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/search_input_text"
+            android:id="@+id/search_inpit_text"
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:background="@drawable/bg_rounded_radius_m"
@@ -59,11 +60,27 @@
 
     </FrameLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/search_recycler"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="@dimen/horizontal_padding"
-        tools:listitem="@layout/item_track"
-        />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/horizontal_padding"
+            tools:listitem="@layout/item_track" />
+
+        <TextView
+            android:id="@+id/placeholderMessage"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+    </FrameLayout>
+
 </LinearLayout>

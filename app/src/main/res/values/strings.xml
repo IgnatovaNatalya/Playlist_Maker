@@ -16,4 +16,8 @@
     <string name="support_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
 
     <string name="agreement_link">https://yandex.ru/legal/practicum_offer/</string>
+
+
+    <string name="something_went_wrong">Что-то пошло не так</string>
+    <string name="nothing_found">Ничего не найдено</string>
 </resources>
