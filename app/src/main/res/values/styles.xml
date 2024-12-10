@@ -19,6 +19,19 @@
         <item name="iconTint">?attr/colorOnPrimary</item>
     </style>
 
+    <style name="UsualButtonsStyle" >
+        <item name="cornerRadius">54dp</item>
+        <item name="android:backgroundTint">?attr/android:textColor</item>
+        <item name="android:textColor">?attr/android:colorBackground</item>
+
+        <item name="android:elegantTextHeight">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="fontFamily">@font/ys_text_medium</item>
+    </style>
+
+
     <style name="SettingsItemStyle">
         <item name="itemHorizontalPadding">@dimen/horizontal_padding</item>
         <item name="android:layout_marginVertical">@dimen/vertical_padding</item>

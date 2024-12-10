@@ -1,15 +1,16 @@
 package com.example.playlistmaker
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -20,27 +21,17 @@ import com.google.android.material.appbar.MaterialToolbar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-
 
 class SearchActivity : AppCompatActivity() {
-
 
     private lateinit var clearButton: ImageView
     private lateinit var searchField: EditText
     private lateinit var placeholderMessage: TextView
-    private lateinit var recyclerTracks : RecyclerView
-
-    private val baseUrl = "https://itunes.apple.com"
+    private lateinit var placeholderButton: Button
+    private lateinit var recyclerTracks: RecyclerView
 
     private val trackList = ArrayList<Track>()
     private var trackAdapter = TrackAdapter()
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,16 +44,21 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-
         val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
-        toolbar.setNavigationOnClickListener {  finish() }
+        toolbar.setNavigationOnClickListener { finish() }
 
-        val iTunesService = retrofit.create(iTunesApi::class.java)
+        placeholderMessage = findViewById(R.id.placeholderMessage)
+        placeholderButton = findViewById(R.id.search_reload_button)
 
         //search field
-        searchField = findViewById<EditText>(R.id.search_inpit_text)
-        clearButton = findViewById<ImageView>(R.id.search_clear_button)
-        placeholderMessage = findViewById(R.id.placeholderMessage)
+        searchField = findViewById(R.id.search_input_text)
+
+//        if (savedInstanceState != null) {
+//            searchField.setText(enteredText)
+//            search(enteredText)
+//        }
+
+        clearButton = findViewById(R.id.search_clear_button)
 
         clearButton.setOnClickListener {
             searchField.setText(DEFAULT_TEXT)
@@ -77,6 +73,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 enteredText = s.toString()
                 clearButton.visibility = clearButtonVisibility(s)
+                setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
             }
         }
         searchField.addTextChangedListener(simpleTextWatcher)
@@ -88,53 +85,65 @@ class SearchActivity : AppCompatActivity() {
         trackAdapter.tracks = trackList
         recyclerTracks.adapter = trackAdapter
 
-        fun search() {
-            iTunesService.search( searchField.text.toString())
-                .enqueue(object : Callback<TracksResponse> {
-                    override fun onResponse(call: Call<TracksResponse>,
-                                            response: Response<TracksResponse>
-                    ) {
-                        when (response.code()) {
-                            200 -> {
-                                if (response.body()?.results?.isNotEmpty() == true) {
-                                    trackList.clear()
-                                    trackList.addAll(response.body()?.results!!)
-                                    trackAdapter.notifyDataSetChanged()
-                                    showMessage("", "")
-                                } else {
-                                    showMessage(getString(R.string.nothing_found), "")
-                                }
-                            }
-                            else -> showMessage(getString(R.string.something_went_wrong), response.code().toString())
-                        }
-                    }
-                    override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                        showMessage(getString(R.string.something_went_wrong), t.message.toString())
-                    }
-
-                })
-        }
-
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                search()
+                search(searchField.text.toString())
             }
             false
         }
     }
 
-    private fun showMessage(text: String, additionalMessage: String) {
-        if (text.isNotEmpty()) {
-            placeholderMessage.visibility = View.VISIBLE
-            trackList.clear()
-            trackAdapter.notifyDataSetChanged()
-            placeholderMessage.text = text
-            if (additionalMessage.isNotEmpty()) {
-                Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG)
-                    .show()
+    private fun search(request: String) {
+
+        RetrofitInstance.apiService.search(request)
+            .enqueue(object : Callback<TracksResponse> {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onResponse(
+                    call: Call<TracksResponse>,
+                    response: Response<TracksResponse>
+                ) {
+                    when (response.code()) {
+                        200 -> {
+                            if (response.body()?.results?.isNotEmpty() == true) {
+                                trackList.clear()
+                                trackList.addAll(response.body()?.results!!)
+                                trackAdapter.notifyDataSetChanged()
+                                setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+                            } else {
+                                setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
+                            }
+                        }
+
+                        else -> setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
+                    }
+                }
+
+                override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+                    setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
+                }
+
+            })
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+
+    private fun setPlaceHolder(message: PlaceholderMessage) {
+        when (message) {
+            PlaceholderMessage.MESSAGE_CLEAR -> {
+                placeholderMessage.visibility = View.GONE
+                placeholderButton.visibility = View.GONE
             }
-        } else {
-            placeholderMessage.visibility = View.GONE
+
+            PlaceholderMessage.MESSAGE_NO_INTERNET,
+            PlaceholderMessage.MESSAGE_NOT_FOUND -> {
+                placeholderMessage.visibility = View.VISIBLE
+                if (message == PlaceholderMessage.MESSAGE_NO_INTERNET)
+                    placeholderButton.visibility = View.VISIBLE
+                trackList.clear()
+                trackAdapter.notifyDataSetChanged()
+                placeholderMessage.text = message.text
+                placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(0, message.image, 0, 0)
+            }
         }
     }
 
@@ -144,8 +153,6 @@ class SearchActivity : AppCompatActivity() {
         else View.VISIBLE
     }
 
-    private var enteredText: String = DEFAULT_TEXT
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(ENTERED_TEXT, enteredText)
@@ -154,10 +161,15 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
+        searchField.setText(enteredText)
+        search(enteredText)
     }
+
+    private var enteredText: String = DEFAULT_TEXT
 
     companion object {
         const val ENTERED_TEXT = "ENTERED_TEXT"
         const val DEFAULT_TEXT = ""
     }
 }
+

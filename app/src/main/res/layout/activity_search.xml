@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/search_toolbar"
         android:layout_width="match_parent"
@@ -17,18 +16,16 @@
         app:titleTextAppearance="@style/ToolbarTitleStyle"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
-        app:titleMarginStart="8dp"
-        />
+        app:titleMarginStart="8dp"/>
 
     <FrameLayout
-
         android:layout_marginHorizontal="@dimen/horizontal_padding"
         android:layout_marginVertical="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/search_inpit_text"
+            android:id="@+id/search_input_text"
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:background="@drawable/bg_rounded_radius_m"
@@ -42,7 +39,7 @@
             android:maxLines="1"
             android:imeOptions="actionDone"
 
-            android:paddingStart="12dp"
+            android:paddingHorizontal="@dimen/icon_padding"
             android:drawableStart="@drawable/search_m"
             android:drawablePadding="8dp"
             android:drawableTint="?attr/android:textColorHint"
@@ -60,27 +57,47 @@
 
     </FrameLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/horizontal_padding"
-            tools:listitem="@layout/item_track" />
+            tools:listitem="@layout/item_track"/>
 
         <TextView
             android:id="@+id/placeholderMessage"
-            android:layout_width="300dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="top"
             android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="32sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="102dp"
+            android:textColor="?attr/android:textColor"
+            android:textSize="19sp"
+            android:fontFamily="@font/ys_text_medium"
+            android:textStyle="bold"
 
-    </FrameLayout>
+            app:drawableTopCompat="@drawable/no_internet"
+            android:text="@string/no_internet"
+
+            android:visibility="gone"
+            tools:ignore="RtlCompat" />
+
+        <Button
+            android:id="@+id/search_reload_button"
+            style="@style/UsualButtonsStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center"
+            android:paddingVertical="0dp"
+            android:text="@string/reload"
+            android:visibility="gone"/>
+
+    </LinearLayout>
 
 </LinearLayout>
