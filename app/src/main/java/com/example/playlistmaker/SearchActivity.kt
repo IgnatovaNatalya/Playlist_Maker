@@ -27,13 +27,14 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var clearButton: ImageView
     private lateinit var searchField: EditText
     private lateinit var placeholderMessage: TextView
-    private lateinit var placeholderButton: Button
+    private lateinit var reloadButton: Button
     private lateinit var recyclerTracks: RecyclerView
 
     private val trackList = ArrayList<Track>()
     private var trackAdapter = TrackAdapter()
 
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -48,25 +49,21 @@ class SearchActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
 
         placeholderMessage = findViewById(R.id.placeholderMessage)
-        placeholderButton = findViewById(R.id.search_reload_button)
+        reloadButton = findViewById(R.id.search_reload_button)
 
-        //search field
         searchField = findViewById(R.id.search_input_text)
-
-//        if (savedInstanceState != null) {
-//            searchField.setText(enteredText)
-//            search(enteredText)
-//        }
 
         clearButton = findViewById(R.id.search_clear_button)
 
         clearButton.setOnClickListener {
             searchField.setText(DEFAULT_TEXT)
+            trackList.clear()
+            trackAdapter.notifyDataSetChanged()
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(clearButton.windowToken, 0)
         }
 
-        val simpleTextWatcher = object : TextWatcher {
+        searchField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun afterTextChanged(s: Editable?) {}
 
@@ -75,8 +72,7 @@ class SearchActivity : AppCompatActivity() {
                 clearButton.visibility = clearButtonVisibility(s)
                 setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
             }
-        }
-        searchField.addTextChangedListener(simpleTextWatcher)
+        })
 
         //recycler
         recyclerTracks = findViewById(R.id.search_recycler)
@@ -91,6 +87,9 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
+        reloadButton.setOnClickListener( {
+            search(enteredText)
+        })
     }
 
     private fun search(request: String) {
@@ -110,6 +109,8 @@ class SearchActivity : AppCompatActivity() {
                                 trackAdapter.notifyDataSetChanged()
                                 setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
                             } else {
+//                                trackList.clear()
+//                                trackAdapter.notifyDataSetChanged()
                                 setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
                             }
                         }
@@ -131,14 +132,14 @@ class SearchActivity : AppCompatActivity() {
         when (message) {
             PlaceholderMessage.MESSAGE_CLEAR -> {
                 placeholderMessage.visibility = View.GONE
-                placeholderButton.visibility = View.GONE
+                reloadButton.visibility = View.GONE
             }
 
             PlaceholderMessage.MESSAGE_NO_INTERNET,
             PlaceholderMessage.MESSAGE_NOT_FOUND -> {
                 placeholderMessage.visibility = View.VISIBLE
                 if (message == PlaceholderMessage.MESSAGE_NO_INTERNET)
-                    placeholderButton.visibility = View.VISIBLE
+                    reloadButton.visibility = View.VISIBLE
                 trackList.clear()
                 trackAdapter.notifyDataSetChanged()
                 placeholderMessage.text = message.text
@@ -158,6 +159,7 @@ class SearchActivity : AppCompatActivity() {
         outState.putString(ENTERED_TEXT, enteredText)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
