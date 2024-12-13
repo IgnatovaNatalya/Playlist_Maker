@@ -87,62 +87,61 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
-        reloadButton.setOnClickListener( {
+        reloadButton.setOnClickListener({
             search(enteredText)
         })
     }
 
     private fun search(request: String) {
-
         RetrofitInstance.apiService.search(request)
             .enqueue(object : Callback<TracksResponse> {
-                @SuppressLint("NotifyDataSetChanged")
                 override fun onResponse(
                     call: Call<TracksResponse>,
                     response: Response<TracksResponse>
                 ) {
-                    when (response.code()) {
-                        200 -> {
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                trackList.clear()
-                                trackList.addAll(response.body()?.results!!)
-                                trackAdapter.notifyDataSetChanged()
-                                setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
-                            } else {
-//                                trackList.clear()
-//                                trackAdapter.notifyDataSetChanged()
-                                setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
-                            }
-                        }
-
-                        else -> setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
-                    }
+                    setTracks(response)
                 }
-
                 override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
                     setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
                 }
-
             })
     }
 
     @SuppressLint("NotifyDataSetChanged")
+    private fun setTracks(response: Response<TracksResponse>) {
+        when (response.code()) {
+            200 -> {
+                if (response.body()?.results?.isNotEmpty() == true) {
+                    trackList.clear()
+                    trackList.addAll(response.body()?.results!!)
+                    trackAdapter.notifyDataSetChanged()
+                    setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+                } else
+                    setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
+            }
 
+            else -> setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
     private fun setPlaceHolder(message: PlaceholderMessage) {
         when (message) {
             PlaceholderMessage.MESSAGE_CLEAR -> {
                 placeholderMessage.visibility = View.GONE
                 reloadButton.visibility = View.GONE
             }
-
             PlaceholderMessage.MESSAGE_NO_INTERNET,
             PlaceholderMessage.MESSAGE_NOT_FOUND -> {
                 placeholderMessage.visibility = View.VISIBLE
+
                 if (message == PlaceholderMessage.MESSAGE_NO_INTERNET)
                     reloadButton.visibility = View.VISIBLE
+                else reloadButton.visibility = View.GONE
+
                 trackList.clear()
                 trackAdapter.notifyDataSetChanged()
-                placeholderMessage.text = message.text
+                placeholderMessage.text = this.getString(message.resText)
                 placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(0, message.image, 0, 0)
             }
         }
