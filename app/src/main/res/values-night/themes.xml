@@ -6,8 +6,8 @@
         <item name="colorOnPrimary">@color/YP_Black</item>
         <item name="colorPrimaryContainer">@color/white</item>
 
-        <item name="colorAccent">@color/blue</item>
-        <item name="colorControlActivated">@color/blue</item>
+        <item name="colorAccent">@color/YP_Blue</item>
+        <item name="colorControlActivated">@color/YP_Blue</item>
 
         <item name="colorSecondaryContainer">@color/transparent_blue</item>
 
@@ -23,7 +23,7 @@
         <item name="android:editTextBackground">@color/white</item>
         <item name="colorOnSurfaceVariant">@color/white</item>
 
-        <item name="cursorColor">@color/blue</item>
+        <item name="cursorColor">@color/YP_Blue</item>
 
     </style>
 

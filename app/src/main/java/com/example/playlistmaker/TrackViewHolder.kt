@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -18,7 +20,7 @@ class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(track: Track) {
         songTitle.text = track.trackName
-        songDuration.text = track.trackTime
+
         bandName.text = track.artistName
 
         val radiusPx = TypedValue.applyDimension(
@@ -31,6 +33,9 @@ class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .transform(RoundedCorners(radiusPx))
             .placeholder(R.drawable.album_placeholder)
             .into(albumPicture)
+
+        songDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
+
     }
 }
 
