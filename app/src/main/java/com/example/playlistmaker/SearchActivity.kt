@@ -55,6 +55,10 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
+        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+        searchHistory.getSavedHistory()
+
         val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
         toolbar.setNavigationOnClickListener { finish() }
 
@@ -94,29 +98,28 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-//        searchField.setOnFocusChangeListener { view, hasFocus ->
-//            if (hasFocus && searchHistory.getTracks().isNotEmpty()) {
-//                setHistoryVisibility(hasFocus)
-//            }
-//        }
+        searchField.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && searchHistory.getTracks().isNotEmpty()) {
+                setHistoryVisibility(hasFocus)
+            }
+        }
 
-        //recycler
+        //recycler search
         recyclerTracks = findViewById(R.id.search_recycler)
         recyclerTracks.layoutManager = LinearLayoutManager(this)
 
         searchAdapter.tracks = trackListSearch
         recyclerTracks.adapter = searchAdapter
 
-
-
         reloadButton.setOnClickListener {
             search(enteredText)
         }
 
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPrefs)
-
-
+        historyClearButton.setOnClickListener{
+            searchHistory.clearHistory()
+            historyAdapter.notifyDataSetChanged()
+            setHistoryVisibility(false)
+        }
     }
 
     fun setHistoryVisibility(searchFieldEmpty:Boolean) {
@@ -215,8 +218,11 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
-        searchField.setText(enteredText)
-        search(enteredText)
+
+        if (enteredText!="") {
+            searchField.setText(enteredText)
+            search(enteredText)
+        }
     }
 
     private var enteredText: String = DEFAULT_TEXT
