@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,15 +25,20 @@ import retrofit2.Response
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var clearButton: ImageView
+    private lateinit var clearSearchButton: ImageView
     private lateinit var searchField: EditText
     private lateinit var placeholderMessage: TextView
     private lateinit var reloadButton: Button
     private lateinit var recyclerTracks: RecyclerView
+    private lateinit var historyHeader: TextView
+    private lateinit var historyClearButton: Button
 
-    private val trackList = ArrayList<Track>()
-    private var trackAdapter = TrackAdapter()
+    private val trackListSearch = mutableListOf<Track>()
+    private var searchAdapter = TrackAdapter { addToHistory(it) }
+    private var historyAdapter = TrackAdapter {}
 
+    private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var searchHistory: SearchHistory
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +51,10 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
+        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+        searchHistory.getSavedHistory()
+
         val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
         toolbar.setNavigationOnClickListener { finish() }
 
@@ -52,15 +62,17 @@ class SearchActivity : AppCompatActivity() {
         reloadButton = findViewById(R.id.search_reload_button)
 
         searchField = findViewById(R.id.search_input_text)
+        clearSearchButton = findViewById(R.id.search_clear_button)
 
-        clearButton = findViewById(R.id.search_clear_button)
+        historyHeader = findViewById(R.id.history_header)
+        historyClearButton = findViewById(R.id.clear_history_button)
 
-        clearButton.setOnClickListener {
+        clearSearchButton.setOnClickListener {
             searchField.setText(DEFAULT_TEXT)
-            trackList.clear()
-            trackAdapter.notifyDataSetChanged()
+            trackListSearch.clear()
+            searchAdapter.notifyDataSetChanged()
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            manager.hideSoftInputFromWindow(clearButton.windowToken, 0)
+            manager.hideSoftInputFromWindow(clearSearchButton.windowToken, 0)
         }
 
         searchField.addTextChangedListener(object : TextWatcher {
@@ -69,17 +81,11 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 enteredText = s.toString()
-                clearButton.visibility = clearButtonVisibility(s)
+                clearSearchButton.visibility = clearButtonVisibility(s)
                 setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+                setHistoryVisibility(searchField.hasFocus() && s?.isEmpty() == true)
             }
         })
-
-        //recycler
-        recyclerTracks = findViewById(R.id.search_recycler)
-        recyclerTracks.layoutManager = LinearLayoutManager(this)
-
-        trackAdapter.tracks = trackList
-        recyclerTracks.adapter = trackAdapter
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -87,9 +93,52 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
-        reloadButton.setOnClickListener({
+
+        searchField.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && searchHistory.getTracks().isNotEmpty()) {
+                setHistoryVisibility(hasFocus)
+            }
+        }
+
+        //recycler search
+        recyclerTracks = findViewById(R.id.search_recycler)
+        recyclerTracks.layoutManager = LinearLayoutManager(this)
+
+        searchAdapter.tracks = trackListSearch
+        recyclerTracks.adapter = searchAdapter
+
+        reloadButton.setOnClickListener {
             search(enteredText)
-        })
+        }
+
+        historyClearButton.setOnClickListener {
+            searchHistory.clearHistory()
+            historyAdapter.notifyDataSetChanged()
+            setHistoryVisibility(false)
+        }
+    }
+
+    fun setHistoryVisibility(searchFieldEmpty: Boolean) {
+        if (searchFieldEmpty) {
+            historyHeader.visibility = View.VISIBLE
+            historyClearButton.visibility = View.VISIBLE
+            historyAdapter.tracks = searchHistory.getTracks()
+            recyclerTracks.adapter = historyAdapter
+        } else {
+            historyHeader.visibility = View.GONE
+            historyClearButton.visibility = View.GONE
+            historyAdapter.tracks = trackListSearch
+            recyclerTracks.adapter = searchAdapter
+        }
+    }
+
+    override fun onPause() {
+        searchHistory.saveHistory()
+        super.onPause()
+    }
+
+    private fun addToHistory(track: Track) {
+        searchHistory.addTrackToHistory(track)
     }
 
     private fun search(request: String) {
@@ -101,6 +150,7 @@ class SearchActivity : AppCompatActivity() {
                 ) {
                     setTracks(response)
                 }
+
                 override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
                     setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
                 }
@@ -112,9 +162,9 @@ class SearchActivity : AppCompatActivity() {
         when (response.code()) {
             200 -> {
                 if (response.body()?.results?.isNotEmpty() == true) {
-                    trackList.clear()
-                    trackList.addAll(response.body()?.results!!)
-                    trackAdapter.notifyDataSetChanged()
+                    trackListSearch.clear()
+                    trackListSearch.addAll(response.body()?.results!!)
+                    searchAdapter.notifyDataSetChanged()
                     setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
                 } else
                     setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
@@ -131,6 +181,7 @@ class SearchActivity : AppCompatActivity() {
                 placeholderMessage.visibility = View.GONE
                 reloadButton.visibility = View.GONE
             }
+
             PlaceholderMessage.MESSAGE_NO_INTERNET,
             PlaceholderMessage.MESSAGE_NOT_FOUND -> {
                 placeholderMessage.visibility = View.VISIBLE
@@ -139,8 +190,8 @@ class SearchActivity : AppCompatActivity() {
                     reloadButton.visibility = View.VISIBLE
                 else reloadButton.visibility = View.GONE
 
-                trackList.clear()
-                trackAdapter.notifyDataSetChanged()
+                trackListSearch.clear()
+                searchAdapter.notifyDataSetChanged()
                 placeholderMessage.text = this.getString(message.resText)
                 placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(0, message.image, 0, 0)
             }
@@ -162,8 +213,11 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
-        searchField.setText(enteredText)
-        search(enteredText)
+
+        if (enteredText != "") {
+            searchField.setText(enteredText)
+            search(enteredText)
+        }
     }
 
     private var enteredText: String = DEFAULT_TEXT
@@ -173,4 +227,3 @@ class SearchActivity : AppCompatActivity() {
         const val DEFAULT_TEXT = ""
     }
 }
-

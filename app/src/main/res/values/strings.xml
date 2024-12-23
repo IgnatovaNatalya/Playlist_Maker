@@ -21,6 +21,8 @@
     <string name="not_found">Ничего не нашлось</string>
 
     <string name="reload">Обновить</string>
+    <string name="clear_history">Очистить историю</string>
+    <string name="history_header">Вы искали</string>
 
 
 </resources>
