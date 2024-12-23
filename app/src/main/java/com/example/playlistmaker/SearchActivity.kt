@@ -12,7 +12,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -34,7 +33,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyHeader: TextView
     private lateinit var historyClearButton: Button
 
-    private val trackListSearch = ArrayList<Track>()
+    private val trackListSearch = mutableListOf<Track>()
     private var searchAdapter = TrackAdapter { addToHistory(it) }
     private var historyAdapter = TrackAdapter {}
 
@@ -134,7 +133,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show()
         searchHistory.saveHistory()
         super.onPause()
     }
@@ -229,4 +227,3 @@ class SearchActivity : AppCompatActivity() {
         const val DEFAULT_TEXT = ""
     }
 }
-

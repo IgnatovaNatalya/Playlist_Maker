@@ -6,11 +6,12 @@ import com.google.gson.Gson
 const val PLAYLIST_MAKER_HISTORY = "playlist_maker_history"
 const val HISTORY_LIMIT = 10
 
-class SearchHistory(val prefs: SharedPreferences) {
+class SearchHistory(private val prefs: SharedPreferences) {
 
-    private var trackList = ArrayList<Track>()
+    private var trackList = mutableListOf<Track>()
+    private val gson = Gson()
 
-    fun getSavedHistory(): ArrayList<Track> {
+    fun getSavedHistory(): MutableList<Track> {
         val str = prefs.getString(PLAYLIST_MAKER_HISTORY, null)
         if (str != null) trackList = createTracksListFromJson(str)
         return trackList
@@ -39,7 +40,7 @@ class SearchHistory(val prefs: SharedPreferences) {
             .apply()
     }
 
-    fun getTracks(): ArrayList<Track> {
+    fun getTracks(): MutableList<Track>{
         return trackList
     }
 
@@ -50,12 +51,13 @@ class SearchHistory(val prefs: SharedPreferences) {
         return null
     }
 
-    private fun createJsonFromTrackList(facts: ArrayList<Track>): String {
-        return Gson().toJson(facts)
+    private fun createJsonFromTrackList(facts: MutableList<Track>): String {
+        return gson.toJson(facts)
     }
 
-    private fun createTracksListFromJson(json: String): ArrayList<Track> {
-        return Gson().fromJson(json, Array<Track>::class.java).toCollection(ArrayList())
+    private fun createTracksListFromJson(json: String): MutableList<Track> {
+        return mutableListOf<Track>().apply {
+            addAll( gson.fromJson(json,Array<Track>::class.java )
+            )}
     }
-
 }

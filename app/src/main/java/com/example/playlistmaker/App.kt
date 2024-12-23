@@ -9,9 +9,11 @@ const val PLAYLIST_MAKER_PREFS = "playlist_maker_prefs"
 const val DARK_THEME = "dark_theme"
 
 class App : Application() {
-    var darkTheme = false
 
-    private lateinit var sharedPreferences: SharedPreferences // = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE)
+    var darkTheme = false
+        private set
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate() {
         super.onCreate()
@@ -29,11 +31,8 @@ class App : Application() {
                     AppCompatDelegate.MODE_NIGHT_YES
                 else
                     AppCompatDelegate.MODE_NIGHT_NO
-
             )
-
         }
-
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
@@ -43,8 +42,7 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_YES
             } else {
                 AppCompatDelegate.MODE_NIGHT_NO
-            }
-        )
+            })
 
         sharedPreferences.edit()
             .putBoolean(DARK_THEME, darkTheme)
