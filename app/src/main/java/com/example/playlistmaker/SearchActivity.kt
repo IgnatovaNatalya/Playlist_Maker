@@ -32,14 +32,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var reloadButton: Button
     private lateinit var recyclerTracks: RecyclerView
     private lateinit var historyHeader: TextView
-    private lateinit var historyClearButton:Button
+    private lateinit var historyClearButton: Button
 
     private val trackListSearch = ArrayList<Track>()
     private var searchAdapter = TrackAdapter { addToHistory(it) }
-
-    private val trackListHistory = ArrayList<Track>()
-    private var historyAdapter = TrackAdapter{}
-
+    private var historyAdapter = TrackAdapter {}
 
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var searchHistory: SearchHistory
@@ -87,7 +84,7 @@ class SearchActivity : AppCompatActivity() {
                 enteredText = s.toString()
                 clearSearchButton.visibility = clearButtonVisibility(s)
                 setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
-                setHistoryVisibility(searchField.hasFocus() && s?.isEmpty() == true )
+                setHistoryVisibility(searchField.hasFocus() && s?.isEmpty() == true)
             }
         })
 
@@ -115,29 +112,29 @@ class SearchActivity : AppCompatActivity() {
             search(enteredText)
         }
 
-        historyClearButton.setOnClickListener{
+        historyClearButton.setOnClickListener {
             searchHistory.clearHistory()
             historyAdapter.notifyDataSetChanged()
             setHistoryVisibility(false)
         }
     }
 
-    fun setHistoryVisibility(searchFieldEmpty:Boolean) {
+    fun setHistoryVisibility(searchFieldEmpty: Boolean) {
         if (searchFieldEmpty) {
             historyHeader.visibility = View.VISIBLE
             historyClearButton.visibility = View.VISIBLE
             historyAdapter.tracks = searchHistory.getTracks()
             recyclerTracks.adapter = historyAdapter
-        }
-        else {
+        } else {
             historyHeader.visibility = View.GONE
             historyClearButton.visibility = View.GONE
             historyAdapter.tracks = trackListSearch
             recyclerTracks.adapter = searchAdapter
         }
     }
+
     override fun onPause() {
-        Toast.makeText(this,"onPause" , Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show()
         searchHistory.saveHistory()
         super.onPause()
     }
@@ -219,7 +216,7 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
 
-        if (enteredText!="") {
+        if (enteredText != "") {
             searchField.setText(enteredText)
             search(enteredText)
         }

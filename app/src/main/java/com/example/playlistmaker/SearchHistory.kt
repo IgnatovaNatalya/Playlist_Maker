@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 
 const val PLAYLIST_MAKER_HISTORY = "playlist_maker_history"
-const val HISTORY_LIMIT = 3 // todo 10
+const val HISTORY_LIMIT = 10
 
 class SearchHistory(val prefs: SharedPreferences) {
 
