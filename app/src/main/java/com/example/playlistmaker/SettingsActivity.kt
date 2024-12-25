@@ -43,11 +43,15 @@ class SettingsActivity : AppCompatActivity() {
 
         val btnSupport = findViewById<TextView>(R.id.settings_support_button)
         btnSupport.setOnClickListener {
-            val supportIntent = Intent(Intent.ACTION_SENDTO)
-            supportIntent.data = Uri.parse("mailto:")
-            supportIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
-            supportIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
-            supportIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.support_text))
+            val supportIntent = Intent(Intent.ACTION_SENDTO). apply {
+                data = Uri.parse("mailto:")
+                putExtra(
+                    Intent.EXTRA_EMAIL,
+                    arrayOf(getString(R.string.support_email))
+                )
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.support_text))
+            }
             startActivity(supportIntent)
         }
 
