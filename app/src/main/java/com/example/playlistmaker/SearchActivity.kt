@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
@@ -19,9 +20,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
+const val EXTRA_TRACK_STR = "EXTRA_TRACK_STR"
 
 class SearchActivity : AppCompatActivity() {
 
@@ -34,8 +38,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyClearButton: Button
 
     private val trackListSearch = mutableListOf<Track>()
-    private var searchAdapter = TrackAdapter { addToHistory(it) }
-    private var historyAdapter = TrackAdapter {}
+    private var searchAdapter = TrackAdapter { openPlayer(it) } //TrackAdapter { addToHistory(it) }
+    private var historyAdapter = TrackAdapter { openPlayer(it) }
 
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var searchHistory: SearchHistory
@@ -139,6 +143,15 @@ class SearchActivity : AppCompatActivity() {
 
     private fun addToHistory(track: Track) {
         searchHistory.addTrackToHistory(track)
+    }
+
+    private fun openPlayer(track:Track) {
+        searchHistory.addTrackToHistory(track)
+        val gson = Gson()
+        val trackStr = gson.toJson(track)
+        val intent = Intent(this, PlayerActivity::class.java)
+        intent.putExtra(EXTRA_TRACK_STR,trackStr)
+        startActivity(intent)
     }
 
     private fun search(request: String) {

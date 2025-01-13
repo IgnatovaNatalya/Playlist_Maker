@@ -74,5 +74,27 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="PlayerTitleStyle">
+        <item name="android:textColor">?attr/android:textColor</item>
+        <item name="android:textSize">22sp</item>
+        <item name="fontFamily">@font/ys_text_medium</item>
+    </style>
+
+    <style name="PlayerBandStyle">
+        <item name="android:textColor">?attr/android:textColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">@font/ys_text_medium</item>
+    </style>
+
+    <style name="PlayerTextInfo">
+        <item name="android:textColor">?attr/android:textColor</item>
+        <item name="android:textSize">13sp</item>
+        <item name="fontFamily">@font/ys_text_regular</item>
+    </style>
+    
+    <style name="PlayerTextGrey" parent = "PlayerTextInfo">
+        <item name="android:textColor">@color/light_grey</item>
+
+    </style>
 
 </resources>
