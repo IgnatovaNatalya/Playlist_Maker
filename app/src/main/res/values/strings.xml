@@ -31,6 +31,7 @@
     <string name="year">Год</string>
     <string name="genre">Жанр</string>
     <string name="country">Страна</string>
+    <string name="playback_control_time">0:30</string>
 
 
 </resources>

@@ -39,10 +39,10 @@ class PlayerActivity : AppCompatActivity() {
 
         val albumPicture = findViewById<ImageView>(R.id.player_album_picture)
         val radiusPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 4F, albumPicture.resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, 8F, albumPicture.resources.displayMetrics
         ).toInt()
 
-        val pictureUrl = track.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+        val pictureUrl = track.artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg")
 
         Glide.with(albumPicture)
             .load(pictureUrl)
