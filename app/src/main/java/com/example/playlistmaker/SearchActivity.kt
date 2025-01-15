@@ -38,7 +38,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyClearButton: Button
 
     private val trackListSearch = mutableListOf<Track>()
-    private var searchAdapter = TrackAdapter { openPlayer(it) } //TrackAdapter { addToHistory(it) }
+    private var searchAdapter = TrackAdapter { openPlayer(it) }
     private var historyAdapter = TrackAdapter { openPlayer(it) }
 
     private lateinit var sharedPrefs: SharedPreferences
@@ -139,10 +139,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onPause() {
         searchHistory.saveHistory()
         super.onPause()
-    }
-
-    private fun addToHistory(track: Track) {
-        searchHistory.addTrackToHistory(track)
     }
 
     private fun openPlayer(track:Track) {

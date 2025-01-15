@@ -65,7 +65,7 @@ class PlayerActivity : AppCompatActivity() {
         tvAlbum.text = track.collectionName
 
         val tvYear = findViewById<TextView>(R.id.player_year)
-        tvYear.text = track.releaseDate.substring(0,4)
+        tvYear.text = with(track)  {if (releaseDate.length>4) releaseDate.substring(0,4) else releaseDate}
 
         val tvGenre = findViewById<TextView>(R.id.player_genre)
         tvGenre.text = track.primaryGenreName

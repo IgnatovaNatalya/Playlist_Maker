@@ -60,7 +60,7 @@
             app:layout_constraintEnd_toEndOf="@id/rightBorder"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
             app:layout_constraintTop_toBottomOf="@+id/player_album_picture"
-            tools:text="Yesterday and Forever Yesterday and Forever" />
+            tools:text="Yesterday (Remastered 2009)" />
 
         <TextView
             android:id="@+id/player_band"
@@ -73,7 +73,7 @@
             app:layout_constraintEnd_toEndOf="@id/rightBorder"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
             app:layout_constraintTop_toBottomOf="@+id/player_title"
-            tools:text="The Skiers and the Skis The Skiers and the Skis The Skiers and the Skis" />
+            tools:text="The Beatles" />
 
         <ImageView
             android:id="@+id/button_play_pause"
@@ -175,7 +175,7 @@
             app:layout_constraintTop_toTopOf="@id/album_label"
             android:ellipsize="end"
             android:maxLines="1"
-            tools:text="Yesterday and Forever Yesterday and Forever"
+            tools:text="Yesterday (Remastered 2009)"
             tools:ignore="RtlSymmetry" />
 
         <TextView
@@ -197,7 +197,7 @@
             app:layout_constraintEnd_toEndOf="@id/rightBorder2"
             app:layout_constraintStart_toEndOf="@id/year_label"
             app:layout_constraintTop_toTopOf="@id/year_label"
-            tools:text="2025" />
+            tools:text="1965" />
 
         <TextView
             android:id="@+id/genre_label"
@@ -239,6 +239,6 @@
             app:layout_constraintEnd_toEndOf="@id/rightBorder2"
             app:layout_constraintStart_toEndOf="@id/country_label"
             app:layout_constraintTop_toTopOf="@id/country_label"
-            tools:text="Россия" />
+            tools:text="Великобритания" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -1,6 +1,8 @@
 package com.example.playlistmaker
+import kotlinx.parcelize.Parcelize
 
-data class Track (
+@Parcelize
+data class Track(
     val trackId: Int,
     val trackName: String,
     val artistName: String,
@@ -10,7 +12,8 @@ data class Track (
     val releaseDate: String,
     val primaryGenreName: String,
     val country:String
-)
+): Parcelable
+
 data class TracksResponse (
     val resultCount:Int,
     val results: List<Track>
