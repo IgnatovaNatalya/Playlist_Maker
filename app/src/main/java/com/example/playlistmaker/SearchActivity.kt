@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
@@ -23,6 +24,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+const val EXTRA_TRACK = "EXTRA_TRACK_STR"
+
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var clearSearchButton: ImageView
@@ -34,8 +37,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyClearButton: Button
 
     private val trackListSearch = mutableListOf<Track>()
-    private var searchAdapter = TrackAdapter { addToHistory(it) }
-    private var historyAdapter = TrackAdapter {}
+    private var searchAdapter = TrackAdapter { openPlayer(it) }
+    private var historyAdapter = TrackAdapter { openPlayer(it) }
 
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var searchHistory: SearchHistory
@@ -137,8 +140,11 @@ class SearchActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun addToHistory(track: Track) {
+    private fun openPlayer(track:Track) {
         searchHistory.addTrackToHistory(track)
+        val intent = Intent(this, PlayerActivity::class.java)
+        intent.putExtra(EXTRA_TRACK,track)
+        startActivity(intent)
     }
 
     private fun search(request: String) {
