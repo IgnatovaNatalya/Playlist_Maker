@@ -12,7 +12,6 @@ constraintlayout = "2.1.4"
 glide = "4.16.0"
 gson = "2.10.1"
 retrofit = "2.9.0"
-parcelize = "2.1.20"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,4 +31,3 @@ retrofit_converter = { module = "com.squareup.retrofit2:converter-gson", version
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "parcelize" }

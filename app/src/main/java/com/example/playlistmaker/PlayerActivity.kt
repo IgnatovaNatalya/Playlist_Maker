@@ -11,7 +11,6 @@ import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -31,18 +30,16 @@ class PlayerActivity : AppCompatActivity() {
 
 
         val intent = intent
-        val trackStr = intent.getStringExtra(EXTRA_TRACK_STR)
-        val gson = Gson()
-        val track = gson.fromJson(trackStr, Track::class.java)
 
-        //toolbar.title = track.trackName
+        @Suppress("DEPRECATION")
+        val track = intent.getParcelableExtra<Track>(EXTRA_TRACK)
 
         val albumPicture = findViewById<ImageView>(R.id.player_album_picture)
         val radiusPx = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, 8F, albumPicture.resources.displayMetrics
         ).toInt()
 
-        val pictureUrl = track.artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg")
+        val pictureUrl = track?.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
 
         Glide.with(albumPicture)
             .load(pictureUrl)
@@ -52,27 +49,26 @@ class PlayerActivity : AppCompatActivity() {
             .into(albumPicture)
 
         val tvTitle = findViewById<TextView>(R.id.player_title)
-        tvTitle.text = track.trackName
+        tvTitle.text = track?.trackName
 
         val tvBand = findViewById<TextView>(R.id.player_band)
-        tvBand.text = track.artistName
+        tvBand.text = track?.artistName
 
         val tvDuration = findViewById<TextView>(R.id.player_duration)
         tvDuration.text =
-            SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
+            SimpleDateFormat("mm:ss", Locale.getDefault()).format(track?.trackTimeMillis)
 
         val tvAlbum = findViewById<TextView>(R.id.player_album)
-        tvAlbum.text = track.collectionName
+        tvAlbum.text = track?.collectionName
 
         val tvYear = findViewById<TextView>(R.id.player_year)
-        tvYear.text = with(track)  {if (releaseDate.length>4) releaseDate.substring(0,4) else releaseDate}
+        if (track != null) tvYear.text =
+            with(track) { if (releaseDate.length > 4) releaseDate.substring(0, 4) else releaseDate }
 
         val tvGenre = findViewById<TextView>(R.id.player_genre)
-        tvGenre.text = track.primaryGenreName
+        tvGenre.text = track?.primaryGenreName
 
         val tvCountry = findViewById<TextView>(R.id.player_country)
-        tvCountry.text = track.country
+        tvCountry.text = track?.country
     }
-
-
 }

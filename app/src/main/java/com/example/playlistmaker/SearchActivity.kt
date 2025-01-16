@@ -20,12 +20,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-const val EXTRA_TRACK_STR = "EXTRA_TRACK_STR"
+const val EXTRA_TRACK = "EXTRA_TRACK_STR"
 
 class SearchActivity : AppCompatActivity() {
 
@@ -143,10 +142,8 @@ class SearchActivity : AppCompatActivity() {
 
     private fun openPlayer(track:Track) {
         searchHistory.addTrackToHistory(track)
-        val gson = Gson()
-        val trackStr = gson.toJson(track)
         val intent = Intent(this, PlayerActivity::class.java)
-        intent.putExtra(EXTRA_TRACK_STR,trackStr)
+        intent.putExtra(EXTRA_TRACK,track)
         startActivity(intent)
     }
 
