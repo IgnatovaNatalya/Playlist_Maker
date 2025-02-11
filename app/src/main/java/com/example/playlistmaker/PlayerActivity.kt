@@ -1,6 +1,9 @@
 package com.example.playlistmaker
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.widget.ImageView
 import android.widget.TextView
@@ -14,7 +17,24 @@ import com.google.android.material.appbar.MaterialToolbar
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+const val START_TIME = 1
+
 class PlayerActivity : AppCompatActivity() {
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+    }
+
+    private var playerState = STATE_DEFAULT
+    private lateinit var play: ImageView
+    private var mediaPlayer = MediaPlayer()
+    private var time = START_TIME
+    private var mainThreadHandler: Handler? = null
+    private lateinit var txTimer: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,11 +48,14 @@ class PlayerActivity : AppCompatActivity() {
         val toolbar = findViewById<MaterialToolbar>(R.id.player_toolbar)
         toolbar.setNavigationOnClickListener { finish() }
 
-
         val intent = intent
 
         @Suppress("DEPRECATION")
         val track = intent.getParcelableExtra<Track>(EXTRA_TRACK)
+
+        play = findViewById(R.id.button_play_pause)
+        preparePlayer(track?.previewUrl)
+        play.setOnClickListener { playbackControl() }
 
         val albumPicture = findViewById<ImageView>(R.id.player_album_picture)
         val radiusPx = TypedValue.applyDimension(
@@ -70,5 +93,79 @@ class PlayerActivity : AppCompatActivity() {
 
         val tvCountry = findViewById<TextView>(R.id.player_country)
         tvCountry.text = track?.country
+
+        txTimer = findViewById(R.id.playback_timer)
+        mainThreadHandler = Handler(Looper.getMainLooper())
     }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+    }
+
+    private fun preparePlayer(previewUrl: String?) {
+        mediaPlayer.setDataSource(previewUrl)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            play.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            play.setImageResource(R.drawable.button_play)
+            playerState = STATE_PREPARED
+            time = START_TIME
+            setTime(0)
+            mainThreadHandler?.removeCallbacksAndMessages(null)
+        }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        play.setImageResource(R.drawable.button_pause)
+        playerState = STATE_PLAYING
+        countTime()
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        play.setImageResource(R.drawable.button_play)
+        playerState = STATE_PAUSED
+        mainThreadHandler?.removeCallbacksAndMessages(null)
+    }
+
+    private fun playbackControl() {
+        when (playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+    private fun countTime() {
+        mainThreadHandler?.postDelayed(
+            object : Runnable {
+                override fun run() {
+                    setTime(time)
+                    time++
+                    mainThreadHandler?.postDelayed(this, 1000L)
+                }
+            }, 1000L
+        )
+    }
+
+    private fun setTime(time: Int) {
+        val min = time / 60
+        val sec = time % 60
+        val strTime = "%02d".format(min) + ":" + "%02d".format(sec)
+        txTimer.text = strTime
+    }
+
 }
