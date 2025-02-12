@@ -87,7 +87,7 @@
             app:layout_constraintTop_toBottomOf="@id/player_band" />
 
         <TextView
-            android:id="@+id/playback_control"
+            android:id="@+id/playback_timer"
             style="@style/PlayerBandStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

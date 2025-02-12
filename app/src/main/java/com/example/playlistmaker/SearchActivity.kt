@@ -4,14 +4,16 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +27,8 @@ import retrofit2.Callback
 import retrofit2.Response
 
 const val EXTRA_TRACK = "EXTRA_TRACK_STR"
+const val CLICK_DEBOUNCE_DELAY = 1000L
+const val SEARCH_DEBOUNCE_DELAY = 2000L
 
 class SearchActivity : AppCompatActivity() {
 
@@ -34,7 +38,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var reloadButton: Button
     private lateinit var recyclerTracks: RecyclerView
     private lateinit var historyHeader: TextView
-    private lateinit var historyClearButton: Button
+    private lateinit var clearHistoryButton: Button
+    private lateinit var progressBar: ProgressBar
 
     private val trackListSearch = mutableListOf<Track>()
     private var searchAdapter = TrackAdapter { openPlayer(it) }
@@ -42,6 +47,11 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var searchHistory: SearchHistory
+
+    private var isClickAllowed = true
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val searchRunnable = Runnable { search() }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,19 +73,19 @@ class SearchActivity : AppCompatActivity() {
 
         placeholderMessage = findViewById(R.id.placeholderMessage)
         reloadButton = findViewById(R.id.search_reload_button)
-
         searchField = findViewById(R.id.search_input_text)
-        clearSearchButton = findViewById(R.id.search_clear_button)
-
+        clearSearchButton = findViewById(R.id.clear_search_button)
         historyHeader = findViewById(R.id.history_header)
-        historyClearButton = findViewById(R.id.clear_history_button)
+        clearHistoryButton = findViewById(R.id.clear_history_button)
+        progressBar = findViewById(R.id.progress_bar)
 
-        clearSearchButton.setOnClickListener {
+        clearSearchButton.setOnClickListener {//ToDo
             searchField.setText(DEFAULT_TEXT)
             trackListSearch.clear()
             searchAdapter.notifyDataSetChanged()
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(clearSearchButton.windowToken, 0)
+            setHistoryVisibility(true)
         }
 
         searchField.addTextChangedListener(object : TextWatcher {
@@ -85,17 +95,12 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 enteredText = s.toString()
                 clearSearchButton.visibility = clearButtonVisibility(s)
+                recyclerTracks.visibility = View.GONE
                 setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
                 setHistoryVisibility(searchField.hasFocus() && s?.isEmpty() == true)
+                searchDebounce()
             }
         })
-
-        searchField.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                search(searchField.text.toString())
-            }
-            false
-        }
 
         searchField.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus && searchHistory.getTracks().isNotEmpty()) {
@@ -103,7 +108,6 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        //recycler search
         recyclerTracks = findViewById(R.id.search_recycler)
         recyclerTracks.layoutManager = LinearLayoutManager(this)
 
@@ -111,10 +115,10 @@ class SearchActivity : AppCompatActivity() {
         recyclerTracks.adapter = searchAdapter
 
         reloadButton.setOnClickListener {
-            search(enteredText)
+            searchDebounce()
         }
 
-        historyClearButton.setOnClickListener {
+        clearHistoryButton.setOnClickListener {
             searchHistory.clearHistory()
             historyAdapter.notifyDataSetChanged()
             setHistoryVisibility(false)
@@ -124,12 +128,13 @@ class SearchActivity : AppCompatActivity() {
     fun setHistoryVisibility(searchFieldEmpty: Boolean) {
         if (searchFieldEmpty) {
             historyHeader.visibility = View.VISIBLE
-            historyClearButton.visibility = View.VISIBLE
+            clearHistoryButton.visibility = View.VISIBLE
             historyAdapter.tracks = searchHistory.getTracks()
             recyclerTracks.adapter = historyAdapter
+            recyclerTracks.visibility = View.VISIBLE
         } else {
             historyHeader.visibility = View.GONE
-            historyClearButton.visibility = View.GONE
+            clearHistoryButton.visibility = View.GONE
             historyAdapter.tracks = trackListSearch
             recyclerTracks.adapter = searchAdapter
         }
@@ -140,24 +145,33 @@ class SearchActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun openPlayer(track:Track) {
-        searchHistory.addTrackToHistory(track)
-        val intent = Intent(this, PlayerActivity::class.java)
-        intent.putExtra(EXTRA_TRACK,track)
-        startActivity(intent)
+    private fun openPlayer(track: Track) {
+        if (clickDebounce()) {
+            searchHistory.addTrackToHistory(track)
+            val intent = Intent(this, PlayerActivity::class.java)
+            intent.putExtra(EXTRA_TRACK, track)
+            startActivity(intent)
+        }
     }
 
-    private fun search(request: String) {
-        RetrofitInstance.apiService.search(request)
+    private fun search() {
+        if (enteredText == "") return
+
+        progressBar.visibility = View.VISIBLE
+
+        RetrofitInstance.apiService.search(enteredText)
             .enqueue(object : Callback<TracksResponse> {
                 override fun onResponse(
                     call: Call<TracksResponse>,
                     response: Response<TracksResponse>
                 ) {
+                    progressBar.visibility = View.GONE
+                    recyclerTracks.visibility = View.VISIBLE
                     setTracks(response)
                 }
 
                 override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+                    progressBar.visibility = View.GONE
                     setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
                 }
             })
@@ -222,8 +236,23 @@ class SearchActivity : AppCompatActivity() {
 
         if (enteredText != "") {
             searchField.setText(enteredText)
-            search(enteredText)
+            //search(enteredText)
+            search()
         }
+    }
+
+    private fun searchDebounce() { //дебаунс в поисковой строке
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun clickDebounce(): Boolean { //дебаунс для нажатия на обложку
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
     }
 
     private var enteredText: String = DEFAULT_TEXT
@@ -232,4 +261,5 @@ class SearchActivity : AppCompatActivity() {
         const val ENTERED_TEXT = "ENTERED_TEXT"
         const val DEFAULT_TEXT = ""
     }
+
 }
