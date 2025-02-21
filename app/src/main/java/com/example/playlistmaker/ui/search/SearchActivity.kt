@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -21,10 +21,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+
+import com.example.playlistmaker.PLAYLIST_MAKER_PREFS
+import com.example.playlistmaker.R
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
+import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.ui.player.PlayerActivity
+
 import com.google.android.material.appbar.MaterialToolbar
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 const val EXTRA_TRACK = "EXTRA_TRACK_STR"
 const val CLICK_DEBOUNCE_DELAY = 1000L
@@ -41,7 +46,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var clearHistoryButton: Button
     private lateinit var progressBar: ProgressBar
 
-    private val trackListSearch = mutableListOf<Track>()
+    private var trackListSearch = listOf<Track>()
     private var searchAdapter = TrackAdapter { openPlayer(it) }
     private var historyAdapter = TrackAdapter { openPlayer(it) }
 
@@ -51,7 +56,9 @@ class SearchActivity : AppCompatActivity() {
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
 
-    private val searchRunnable = Runnable { search() }
+    private val searchRunnable = Runnable { searchTracks() }
+
+    private lateinit var tracksInteractor: SearchTracksInteractor
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +71,7 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE)
+        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE) //todo
         searchHistory = SearchHistory(sharedPrefs)
         searchHistory.getSavedHistory()
 
@@ -81,7 +88,7 @@ class SearchActivity : AppCompatActivity() {
 
         clearSearchButton.setOnClickListener {//ToDo
             searchField.setText(DEFAULT_TEXT)
-            trackListSearch.clear()
+            trackListSearch = listOf()
             searchAdapter.notifyDataSetChanged()
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(clearSearchButton.windowToken, 0)
@@ -114,6 +121,7 @@ class SearchActivity : AppCompatActivity() {
         searchAdapter.tracks = trackListSearch
         recyclerTracks.adapter = searchAdapter
 
+        tracksInteractor = Creator.provideTracksInteractor()
         reloadButton.setOnClickListener {
             searchDebounce()
         }
@@ -124,6 +132,20 @@ class SearchActivity : AppCompatActivity() {
             setHistoryVisibility(false)
         }
     }
+
+    private fun searchTracks() {
+        tracksInteractor.searchTracks(enteredText, object : SearchTracksInteractor.TracksConsumer {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun consume(foundTracks: List<Track>) {
+                runOnUiThread {
+                    searchAdapter.tracks = foundTracks
+                    recyclerTracks.visibility = View.VISIBLE
+                    searchAdapter.notifyDataSetChanged()
+                }
+            }
+        })
+    }
+
 
     fun setHistoryVisibility(searchFieldEmpty: Boolean) {
         if (searchFieldEmpty) {
@@ -154,45 +176,45 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun search() {
-        if (enteredText == "") return
+//    private fun search() {
+//        if (enteredText == "") return
+//
+//        progressBar.visibility = View.VISIBLE
+//
+//        RetrofitNetworkClient.apiService.search(enteredText)
+//            .enqueue(object : Callback<TracksResponse> {
+//                override fun onResponse(
+//                    call: Call<TracksResponse>,
+//                    response: Response<TracksResponse>
+//                ) {
+//                    progressBar.visibility = View.GONE
+//                    recyclerTracks.visibility = View.VISIBLE
+//                    setTracks(response)
+//                }
+//
+//                override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
+//                    progressBar.visibility = View.GONE
+//                    setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
+//                }
+//            })
+//    }
 
-        progressBar.visibility = View.VISIBLE
-
-        RetrofitInstance.apiService.search(enteredText)
-            .enqueue(object : Callback<TracksResponse> {
-                override fun onResponse(
-                    call: Call<TracksResponse>,
-                    response: Response<TracksResponse>
-                ) {
-                    progressBar.visibility = View.GONE
-                    recyclerTracks.visibility = View.VISIBLE
-                    setTracks(response)
-                }
-
-                override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                    progressBar.visibility = View.GONE
-                    setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
-                }
-            })
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun setTracks(response: Response<TracksResponse>) {
-        when (response.code()) {
-            200 -> {
-                if (response.body()?.results?.isNotEmpty() == true) {
-                    trackListSearch.clear()
-                    trackListSearch.addAll(response.body()?.results!!)
-                    searchAdapter.notifyDataSetChanged()
-                    setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
-                } else
-                    setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
-            }
-
-            else -> setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
-        }
-    }
+//    @SuppressLint("NotifyDataSetChanged")
+//    private fun setTracks(response: Response<TracksResponse>) {
+//        when (response.code()) {
+//            200 -> {
+//                if (response.body()?.results?.isNotEmpty() == true) {
+//                    trackListSearch.clear()
+//                    trackListSearch.addAll(response.body()?.results!!)
+//                    searchAdapter.notifyDataSetChanged()
+//                    setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+//                } else
+//                    setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
+//            }
+//
+//            else -> setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
+//        }
+//    }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setPlaceHolder(message: PlaceholderMessage) {
@@ -210,7 +232,7 @@ class SearchActivity : AppCompatActivity() {
                     reloadButton.visibility = View.VISIBLE
                 else reloadButton.visibility = View.GONE
 
-                trackListSearch.clear()
+                trackListSearch = listOf()
                 searchAdapter.notifyDataSetChanged()
                 placeholderMessage.text = this.getString(message.resText)
                 placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(0, message.image, 0, 0)
@@ -237,7 +259,7 @@ class SearchActivity : AppCompatActivity() {
         if (enteredText != "") {
             searchField.setText(enteredText)
             //search(enteredText)
-            search()
+            searchTracks()
         }
     }
 

@@ -1,6 +1,7 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import androidx.annotation.StringRes
+import com.example.playlistmaker.R
 
 enum class PlaceholderMessage(@StringRes val resText: Int, val image:Int) {
 

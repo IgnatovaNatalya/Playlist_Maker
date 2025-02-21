@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.player
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -13,9 +13,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.ui.search.EXTRA_TRACK
+
 import com.google.android.material.appbar.MaterialToolbar
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 const val START_TIME = 1
 
@@ -78,8 +81,7 @@ class PlayerActivity : AppCompatActivity() {
         tvBand.text = track?.artistName
 
         val tvDuration = findViewById<TextView>(R.id.player_duration)
-        tvDuration.text =
-            SimpleDateFormat("mm:ss", Locale.getDefault()).format(track?.trackTimeMillis)
+        tvDuration.text = track?.duration
 
         val tvAlbum = findViewById<TextView>(R.id.player_album)
         tvAlbum.text = track?.collectionName

@@ -1,6 +1,7 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.search
 
 import android.content.SharedPreferences
+import com.example.playlistmaker.domain.model.Track
 import com.google.gson.Gson
 
 const val PLAYLIST_MAKER_HISTORY = "playlist_maker_history"
@@ -11,10 +12,10 @@ class SearchHistory(private val prefs: SharedPreferences) {
     private var trackList = mutableListOf<Track>()
     private val gson = Gson()
 
-    fun getSavedHistory(): MutableList<Track> {
+    fun getSavedHistory(): List<Track> {
         val str = prefs.getString(PLAYLIST_MAKER_HISTORY, null)
         if (str != null) trackList = createTracksListFromJson(str)
-        return trackList
+        return trackList.toList()
     }
 
     fun addTrackToHistory(track: Track) {
