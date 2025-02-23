@@ -1,10 +1,17 @@
 package com.example.playlistmaker.creator
 
-import com.example.playlistmaker.data.TrackRepositoryImpl
-import com.example.playlistmaker.domain.repository.TracksRepository
-import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
-import com.example.playlistmaker.domain.impl.SearchTracksInteractorImpl
+import android.content.Context
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
+import com.example.playlistmaker.data.repositoryImpl.PreferencesRepositoryImpl
+import com.example.playlistmaker.data.repositoryImpl.TrackRepositoryImpl
+import com.example.playlistmaker.domain.impl.SavedHistoryInteractorImpl
+import com.example.playlistmaker.domain.impl.SavedThemeInteractorImpl
+import com.example.playlistmaker.domain.impl.SearchTracksInteractorImpl
+import com.example.playlistmaker.domain.interactor.SavedHistoryInteractor
+import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
+import com.example.playlistmaker.domain.interactor.SavedThemeInteractor
+import com.example.playlistmaker.domain.repository.PreferencesRepository
+import com.example.playlistmaker.domain.repository.TracksRepository
 
 
 object Creator {
@@ -14,5 +21,17 @@ object Creator {
 
     fun provideTracksInteractor(): SearchTracksInteractor {
         return SearchTracksInteractorImpl(getTracksRepository())
+    }
+
+    private fun getPreferencesRepository(context: Context): PreferencesRepository {
+        return PreferencesRepositoryImpl(context)
+    }
+
+    fun provideHistoryInteractor(context: Context): SavedHistoryInteractor {
+        return SavedHistoryInteractorImpl(getPreferencesRepository(context))
+    }
+
+    fun provideThemeInteractor(context:Context): SavedThemeInteractor {
+        return SavedThemeInteractorImpl(getPreferencesRepository(context))
     }
 }

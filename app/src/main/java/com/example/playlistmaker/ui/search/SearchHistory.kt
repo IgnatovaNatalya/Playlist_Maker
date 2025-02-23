@@ -1,21 +1,17 @@
 package com.example.playlistmaker.ui.search
 
-import android.content.SharedPreferences
+import com.example.playlistmaker.domain.interactor.SavedHistoryInteractor
 import com.example.playlistmaker.domain.model.Track
-import com.google.gson.Gson
 
-const val PLAYLIST_MAKER_HISTORY = "playlist_maker_history"
 const val HISTORY_LIMIT = 10
 
-class SearchHistory(private val prefs: SharedPreferences) {
+class SearchHistory(private val historyInteractor: SavedHistoryInteractor) {
 
     private var trackList = mutableListOf<Track>()
-    private val gson = Gson()
 
     fun getSavedHistory(): List<Track> {
-        val str = prefs.getString(PLAYLIST_MAKER_HISTORY, null)
-        if (str != null) trackList = createTracksListFromJson(str)
-        return trackList.toList()
+        trackList.addAll(historyInteractor.getSavedHistory())
+        return trackList
     }
 
     fun addTrackToHistory(track: Track) {
@@ -29,16 +25,11 @@ class SearchHistory(private val prefs: SharedPreferences) {
 
     fun clearHistory() {
         trackList.clear()
-        prefs.edit()
-            .remove(PLAYLIST_MAKER_HISTORY)
-            .apply()
+        historyInteractor.clearHistory()
     }
 
     fun saveHistory() {
-        val str = createJsonFromTrackList(trackList)
-        prefs.edit()
-            .putString(PLAYLIST_MAKER_HISTORY, str)
-            .apply()
+        historyInteractor.saveHistory(trackList)
     }
 
     fun getTracks(): MutableList<Track>{
@@ -52,13 +43,4 @@ class SearchHistory(private val prefs: SharedPreferences) {
         return null
     }
 
-    private fun createJsonFromTrackList(facts: MutableList<Track>): String {
-        return gson.toJson(facts)
-    }
-
-    private fun createTracksListFromJson(json: String): MutableList<Track> {
-        return mutableListOf<Track>().apply {
-            addAll( gson.fromJson(json,Array<Track>::class.java )
-            )}
-    }
 }

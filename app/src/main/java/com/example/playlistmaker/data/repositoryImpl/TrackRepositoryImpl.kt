@@ -1,5 +1,6 @@
-package com.example.playlistmaker.data
+package com.example.playlistmaker.data.repositoryImpl
 
+import com.example.playlistmaker.data.NetworkClient
 import com.example.playlistmaker.data.dto.TracksSearchRequest
 import com.example.playlistmaker.data.dto.TracksSearchResponse
 import com.example.playlistmaker.domain.repository.TracksRepository
@@ -12,6 +13,7 @@ class TrackRepositoryImpl (private val networkClient: NetworkClient) : TracksRep
         val response = networkClient.doRequest(TracksSearchRequest(expression))
 
         if (response.resultCode == 200) {
+
             return (response as TracksSearchResponse).results.map {
                 Track(
                     it.trackId,

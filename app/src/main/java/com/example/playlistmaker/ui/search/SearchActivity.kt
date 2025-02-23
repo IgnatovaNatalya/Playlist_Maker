@@ -2,7 +2,6 @@ package com.example.playlistmaker.ui.search
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,9 +21,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-import com.example.playlistmaker.PLAYLIST_MAKER_PREFS
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.domain.interactor.SavedHistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.ui.player.PlayerActivity
@@ -50,7 +49,6 @@ class SearchActivity : AppCompatActivity() {
     private var searchAdapter = TrackAdapter { openPlayer(it) }
     private var historyAdapter = TrackAdapter { openPlayer(it) }
 
-    private lateinit var sharedPrefs: SharedPreferences
     private lateinit var searchHistory: SearchHistory
 
     private var isClickAllowed = true
@@ -59,6 +57,7 @@ class SearchActivity : AppCompatActivity() {
     private val searchRunnable = Runnable { searchTracks() }
 
     private lateinit var tracksInteractor: SearchTracksInteractor
+    private lateinit var historyInteractor: SavedHistoryInteractor
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,13 +70,13 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFS, MODE_PRIVATE) //todo
-        searchHistory = SearchHistory(sharedPrefs)
+        historyInteractor = Creator.provideHistoryInteractor(this)
+        tracksInteractor = Creator.provideTracksInteractor()
+
+        searchHistory = SearchHistory(historyInteractor)
         searchHistory.getSavedHistory()
 
         val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
-        toolbar.setNavigationOnClickListener { finish() }
-
         placeholderMessage = findViewById(R.id.placeholderMessage)
         reloadButton = findViewById(R.id.search_reload_button)
         searchField = findViewById(R.id.search_input_text)
@@ -86,7 +85,9 @@ class SearchActivity : AppCompatActivity() {
         clearHistoryButton = findViewById(R.id.clear_history_button)
         progressBar = findViewById(R.id.progress_bar)
 
-        clearSearchButton.setOnClickListener {//ToDo
+        toolbar.setNavigationOnClickListener { finish() }
+
+        clearSearchButton.setOnClickListener {
             searchField.setText(DEFAULT_TEXT)
             trackListSearch = listOf()
             searchAdapter.notifyDataSetChanged()
@@ -109,7 +110,7 @@ class SearchActivity : AppCompatActivity() {
             }
         })
 
-        searchField.setOnFocusChangeListener { view, hasFocus ->
+        searchField.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && searchHistory.getTracks().isNotEmpty()) {
                 setHistoryVisibility(hasFocus)
             }
@@ -121,10 +122,7 @@ class SearchActivity : AppCompatActivity() {
         searchAdapter.tracks = trackListSearch
         recyclerTracks.adapter = searchAdapter
 
-        tracksInteractor = Creator.provideTracksInteractor()
-        reloadButton.setOnClickListener {
-            searchDebounce()
-        }
+        reloadButton.setOnClickListener { searchDebounce() }
 
         clearHistoryButton.setOnClickListener {
             searchHistory.clearHistory()
@@ -138,14 +136,13 @@ class SearchActivity : AppCompatActivity() {
             @SuppressLint("NotifyDataSetChanged")
             override fun consume(foundTracks: List<Track>) {
                 runOnUiThread {
-                    searchAdapter.tracks = foundTracks
+                    if (foundTracks.isNotEmpty()) searchAdapter.tracks = foundTracks
                     recyclerTracks.visibility = View.VISIBLE
                     searchAdapter.notifyDataSetChanged()
                 }
             }
         })
     }
-
 
     fun setHistoryVisibility(searchFieldEmpty: Boolean) {
         if (searchFieldEmpty) {
@@ -175,46 +172,6 @@ class SearchActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-
-//    private fun search() {
-//        if (enteredText == "") return
-//
-//        progressBar.visibility = View.VISIBLE
-//
-//        RetrofitNetworkClient.apiService.search(enteredText)
-//            .enqueue(object : Callback<TracksResponse> {
-//                override fun onResponse(
-//                    call: Call<TracksResponse>,
-//                    response: Response<TracksResponse>
-//                ) {
-//                    progressBar.visibility = View.GONE
-//                    recyclerTracks.visibility = View.VISIBLE
-//                    setTracks(response)
-//                }
-//
-//                override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-//                    progressBar.visibility = View.GONE
-//                    setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
-//                }
-//            })
-//    }
-
-//    @SuppressLint("NotifyDataSetChanged")
-//    private fun setTracks(response: Response<TracksResponse>) {
-//        when (response.code()) {
-//            200 -> {
-//                if (response.body()?.results?.isNotEmpty() == true) {
-//                    trackListSearch.clear()
-//                    trackListSearch.addAll(response.body()?.results!!)
-//                    searchAdapter.notifyDataSetChanged()
-//                    setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
-//                } else
-//                    setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
-//            }
-//
-//            else -> setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
-//        }
-//    }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setPlaceHolder(message: PlaceholderMessage) {
@@ -258,7 +215,6 @@ class SearchActivity : AppCompatActivity() {
 
         if (enteredText != "") {
             searchField.setText(enteredText)
-            //search(enteredText)
             searchTracks()
         }
     }
