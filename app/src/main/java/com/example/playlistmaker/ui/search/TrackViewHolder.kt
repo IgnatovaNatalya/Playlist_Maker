@@ -34,7 +34,7 @@ class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .placeholder(R.drawable.album_placeholder)
             .into(albumPicture)
 
-        songDuration.text =track.duration//SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
+        songDuration.text = track.duration
 
     }
 }
