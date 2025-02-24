@@ -11,7 +11,7 @@ class SearchTracksInteractorImpl(private val repository: TracksRepository) :
 
     override fun searchTracks(expression: String, consumer: SearchTracksInteractor.TracksConsumer) {
         executor.execute {
-            consumer.consume(repository.searchTracks(expression))
+            consumer.consume( repository.searchTracks(expression) )
             //здесь можно осортировать и отфильтровать результаты если надо
         }
     }

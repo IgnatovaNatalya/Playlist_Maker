@@ -17,14 +17,16 @@ class RetrofitNetworkClient : NetworkClient {
 
     private val apiService = retrofit.create(iTunesApiService::class.java)
 
-
     override fun doRequest(dto: Any): Response {
         if (dto is TracksSearchRequest) {
-            val resp = apiService.search(dto.expression).execute()
-
-            val body = resp.body() ?: Response()
-
-            return body.apply { resultCode = resp.code() }
+            try {
+                val resp = apiService.search(dto.expression).execute()
+                val body = resp.body() ?: Response()
+                return body.apply { resultCode = resp.code() }
+            }
+            catch (e: Exception) {
+                return Response().apply { resultCode = 400 }
+            }
         } else {
             return Response().apply { resultCode = 400 }
         }

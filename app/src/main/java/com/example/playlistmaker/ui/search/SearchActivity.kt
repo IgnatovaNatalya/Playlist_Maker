@@ -26,6 +26,7 @@ import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.interactor.SavedHistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.model.SearchResult
 import com.example.playlistmaker.ui.player.PlayerActivity
 
 import com.google.android.material.appbar.MaterialToolbar
@@ -122,26 +123,49 @@ class SearchActivity : AppCompatActivity() {
         searchAdapter.tracks = trackListSearch
         recyclerTracks.adapter = searchAdapter
 
-        reloadButton.setOnClickListener { searchDebounce() }
+        reloadButton.setOnClickListener {
+            setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+            searchDebounce()
+        }
 
         clearHistoryButton.setOnClickListener {
             searchHistory.clearHistory()
             historyAdapter.notifyDataSetChanged()
             setHistoryVisibility(false)
+            recyclerTracks.visibility = View.GONE
         }
     }
 
     private fun searchTracks() {
-        tracksInteractor.searchTracks(enteredText, object : SearchTracksInteractor.TracksConsumer {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun consume(foundTracks: List<Track>) {
-                runOnUiThread {
-                    if (foundTracks.isNotEmpty()) searchAdapter.tracks = foundTracks
-                    recyclerTracks.visibility = View.VISIBLE
-                    searchAdapter.notifyDataSetChanged()
-                }
-            }
-        })
+        if (enteredText != "") {
+            placeholderMessage.visibility = View.GONE
+            recyclerTracks.visibility = View.GONE
+            progressBar.visibility = View.VISIBLE
+
+            tracksInteractor.searchTracks(
+                enteredText,
+                object : SearchTracksInteractor.TracksConsumer {
+                    @SuppressLint("NotifyDataSetChanged")
+                    override fun consume(searchResult: SearchResult) {
+                        runOnUiThread {
+                            progressBar.visibility = View.GONE
+                            when (searchResult.resultCode) {
+                                200 -> {
+                                    if (searchResult.results.isNotEmpty()) {
+                                        searchAdapter.tracks = searchResult.results
+                                        recyclerTracks.visibility = View.VISIBLE
+                                        searchAdapter.notifyDataSetChanged()
+                                    } else {
+                                        setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
+                                    }
+                                }
+                                else -> { setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)}
+                            }
+
+                        }
+                    }
+                })
+        }
     }
 
     fun setHistoryVisibility(searchFieldEmpty: Boolean) {
