@@ -2,15 +2,10 @@ package com.example.playlistmaker
 
 import android.app.Application
 import android.content.res.Configuration
-import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.interactor.SavedThemeInteractor
 
-
 class App : Application() {
-
-    var darkTheme = false
-        private set
 
     private lateinit var themeInteractor: SavedThemeInteractor
 
@@ -18,32 +13,13 @@ class App : Application() {
         super.onCreate()
 
         themeInteractor = Creator.provideThemeInteractor(this)
-        val savedTheme = themeInteractor.getSavedTheme()
 
-        if (savedTheme) {
-            darkTheme = true
-            switchTheme(savedTheme)
+        if (themeInteractor.containsTheme()) {
+            themeInteractor.switchTheme(themeInteractor.getSavedTheme())
+        } else {
+            val systemNightIsOn =
+                resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+            themeInteractor.saveTheme(systemNightIsOn)
         }
-        else {
-            val nightIsOn = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-            AppCompatDelegate.setDefaultNightMode(
-                if (nightIsOn)
-                    AppCompatDelegate.MODE_NIGHT_YES
-                else
-                    AppCompatDelegate.MODE_NIGHT_NO
-            )
-        }
-    }
-
-    fun switchTheme(darkThemeEnabled: Boolean) {
-        darkTheme = darkThemeEnabled
-        AppCompatDelegate.setDefaultNightMode(
-            if (darkThemeEnabled) {
-                AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                AppCompatDelegate.MODE_NIGHT_NO
-            })
-
-        themeInteractor.setTheme(darkTheme)
     }
 }

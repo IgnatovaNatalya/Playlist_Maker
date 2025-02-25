@@ -14,11 +14,15 @@ class PreferencesRepositoryImpl(context: Context) : PreferencesRepository {
     private val gson = Gson()
     var sharedPrefs = context.getSharedPreferences(PLAYLIST_MAKER_PREFS, Context.MODE_PRIVATE)
 
+    override fun containsTheme(): Boolean {
+        return sharedPrefs.contains(DARK_THEME)
+    }
+
     override fun getSavedTheme():Boolean {
         return sharedPrefs.getBoolean(DARK_THEME, false)
     }
 
-    override fun setTheme(theme: Boolean) {
+    override fun saveTheme(theme: Boolean) {
         sharedPrefs.edit()
             .putBoolean(DARK_THEME, theme)
             .apply()

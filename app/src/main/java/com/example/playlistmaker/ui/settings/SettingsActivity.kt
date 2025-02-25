@@ -8,12 +8,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.playlistmaker.App
+
 import com.example.playlistmaker.R
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.domain.interactor.SavedThemeInteractor
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var themeInteractor: SavedThemeInteractor
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -25,13 +30,16 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
+        themeInteractor = Creator.provideThemeInteractor(this)
+
         val toolbar = findViewById<MaterialToolbar>(R.id.settings_toolbar)
         toolbar.setNavigationOnClickListener { finish() }
 
         val btnTheme = findViewById<SwitchMaterial>(R.id.theme_switcher)
-        btnTheme.isChecked = (applicationContext as App).darkTheme
+
+        btnTheme.isChecked = themeInteractor.getSavedTheme()
         btnTheme.setOnCheckedChangeListener { _, checked ->
-            (applicationContext as App).switchTheme(checked)
+            themeInteractor.switchTheme(checked)
         }
 
         val btnShare = findViewById<TextView>(R.id.settings_share_button)
@@ -45,7 +53,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val btnSupport = findViewById<TextView>(R.id.settings_support_button)
         btnSupport.setOnClickListener {
-            val supportIntent = Intent(Intent.ACTION_SENDTO). apply {
+            val supportIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(
                     Intent.EXTRA_EMAIL,
