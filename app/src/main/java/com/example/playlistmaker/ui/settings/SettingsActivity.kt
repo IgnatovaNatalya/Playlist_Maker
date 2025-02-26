@@ -1,7 +1,5 @@
 package com.example.playlistmaker.ui.settings
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -12,12 +10,14 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.interactor.SavedThemeInteractor
+import com.example.playlistmaker.domain.interactor.ShareInteractor
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var themeInteractor: SavedThemeInteractor
+    private lateinit var shareInteractor: ShareInteractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +31,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         themeInteractor = Creator.provideThemeInteractor(this)
+        shareInteractor = Creator.provideShareInteractor(this)
 
         val toolbar = findViewById<MaterialToolbar>(R.id.settings_toolbar)
         toolbar.setNavigationOnClickListener { finish() }
@@ -44,32 +45,17 @@ class SettingsActivity : AppCompatActivity() {
 
         val btnShare = findViewById<TextView>(R.id.settings_share_button)
         btnShare.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.setType("text/plain")
-            shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_link))
-            val chosenIntent = Intent.createChooser(shareIntent, getString(R.string.share_app))
-            startActivity(chosenIntent)
+            shareInteractor.sendLink()
         }
 
         val btnSupport = findViewById<TextView>(R.id.settings_support_button)
         btnSupport.setOnClickListener {
-            val supportIntent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:")
-                putExtra(
-                    Intent.EXTRA_EMAIL,
-                    arrayOf(getString(R.string.support_email))
-                )
-                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.support_text))
-            }
-            startActivity(supportIntent)
+            shareInteractor.sendEmail()
         }
 
         val btnAgreement = findViewById<TextView>(R.id.settings_agreement_button)
         btnAgreement.setOnClickListener {
-            val agreementIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.agreement_link)))
-            startActivity(agreementIntent)
+            shareInteractor.openLink()
         }
     }
 }

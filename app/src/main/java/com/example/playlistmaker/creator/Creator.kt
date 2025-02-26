@@ -8,10 +8,12 @@ import com.example.playlistmaker.domain.impl.PlaybackInteractorImpl
 import com.example.playlistmaker.domain.impl.SavedHistoryInteractorImpl
 import com.example.playlistmaker.domain.impl.SavedThemeInteractorImpl
 import com.example.playlistmaker.domain.impl.SearchTracksInteractorImpl
+import com.example.playlistmaker.domain.impl.ShareInteractorImpl
 import com.example.playlistmaker.domain.interactor.PlaybackInteractor
 import com.example.playlistmaker.domain.interactor.SavedHistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
 import com.example.playlistmaker.domain.interactor.SavedThemeInteractor
+import com.example.playlistmaker.domain.interactor.ShareInteractor
 import com.example.playlistmaker.domain.repository.PreferencesRepository
 import com.example.playlistmaker.domain.repository.TracksRepository
 
@@ -39,5 +41,9 @@ object Creator {
 
     fun providePlaybackInteractor() : PlaybackInteractor {
         return PlaybackInteractorImpl()
+    }
+
+    fun provideShareInteractor(context:Context): ShareInteractor {
+        return ShareInteractorImpl(context)
     }
 }
