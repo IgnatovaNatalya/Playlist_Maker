@@ -232,7 +232,7 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
 
-        if (enteredText != "") {
+        if (enteredText.isNotEmpty()) {
             searchField.setText(enteredText)
             searchTracks()
         }

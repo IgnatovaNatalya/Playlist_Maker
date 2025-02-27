@@ -53,6 +53,8 @@ class PlayerActivity : AppCompatActivity() {
         @Suppress("DEPRECATION")
         val track = intent.getParcelableExtra<Track>(EXTRA_TRACK)
 
+        btnPlayPause = findViewById(R.id.button_play_pause)
+
         playbackInteractor.preparePlayer(
             track?.previewUrl,
             { btnPlayPause.isEnabled = true },
@@ -63,7 +65,6 @@ class PlayerActivity : AppCompatActivity() {
                 mainThreadHandler?.removeCallbacksAndMessages(null)
             })
 
-        btnPlayPause = findViewById(R.id.button_play_pause)
 
         btnPlayPause.setOnClickListener {
             playbackInteractor.playbackControl()
