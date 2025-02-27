@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.settings
+package com.example.playlistmaker.presentation.settings
 
 import android.os.Bundle
 import android.widget.TextView
@@ -9,14 +9,14 @@ import androidx.core.view.WindowInsetsCompat
 
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.domain.interactor.SavedThemeInteractor
+import com.example.playlistmaker.domain.interactor.ThemeInteractor
 import com.example.playlistmaker.domain.interactor.ShareInteractor
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var themeInteractor: SavedThemeInteractor
+    private lateinit var themeInteractor: ThemeInteractor
     private lateinit var shareInteractor: ShareInteractor
 
     override fun onCreate(savedInstanceState: Bundle?) {

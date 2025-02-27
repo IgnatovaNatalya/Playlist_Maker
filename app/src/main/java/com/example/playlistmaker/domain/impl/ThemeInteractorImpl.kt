@@ -1,12 +1,12 @@
 package com.example.playlistmaker.domain.impl
 
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.domain.interactor.SavedThemeInteractor
+import com.example.playlistmaker.domain.interactor.ThemeInteractor
 import com.example.playlistmaker.domain.repository.PreferencesRepository
 
-class SavedThemeInteractorImpl (private val repository: PreferencesRepository):SavedThemeInteractor {
+class ThemeInteractorImpl (private val repository: PreferencesRepository):ThemeInteractor {
 
-    override fun containsTheme(): Boolean {
+    override fun isSaved(): Boolean {
         return repository.containsTheme()
     }
 

@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.search
+package com.example.playlistmaker.presentation.search
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -23,11 +23,11 @@ import androidx.recyclerview.widget.RecyclerView
 
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.domain.interactor.SavedHistoryInteractor
+import com.example.playlistmaker.domain.interactor.HistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.model.SearchResult
-import com.example.playlistmaker.ui.player.PlayerActivity
+import com.example.playlistmaker.presentation.player.PlayerActivity
 
 import com.google.android.material.appbar.MaterialToolbar
 
@@ -55,7 +55,7 @@ class SearchActivity : AppCompatActivity() {
     private val searchRunnable = Runnable { searchTracks() }
 
     private lateinit var tracksInteractor: SearchTracksInteractor
-    private lateinit var historyInteractor: SavedHistoryInteractor
+    private lateinit var historyInteractor: HistoryInteractor
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {

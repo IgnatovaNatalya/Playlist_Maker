@@ -12,7 +12,7 @@ const val DARK_THEME = "dark_theme"
 class PreferencesRepositoryImpl(context: Context) : PreferencesRepository {
 
     private val gson = Gson()
-    var sharedPrefs = context.getSharedPreferences(PLAYLIST_MAKER_PREFS, Context.MODE_PRIVATE)
+    private var sharedPrefs = context.getSharedPreferences(PLAYLIST_MAKER_PREFS, Context.MODE_PRIVATE)
 
     override fun containsTheme(): Boolean {
         return sharedPrefs.contains(DARK_THEME)

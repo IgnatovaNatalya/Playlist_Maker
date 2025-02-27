@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.player
+package com.example.playlistmaker.presentation.player
 
 import android.os.Bundle
 import android.os.Handler
@@ -17,7 +17,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.interactor.PlaybackInteractor
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.ui.search.EXTRA_TRACK
+import com.example.playlistmaker.presentation.search.EXTRA_TRACK
 
 import com.google.android.material.appbar.MaterialToolbar
 

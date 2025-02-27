@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.search
+package com.example.playlistmaker.presentation.search
 
 import androidx.annotation.StringRes
 import com.example.playlistmaker.R

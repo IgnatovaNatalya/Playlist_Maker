@@ -33,5 +33,4 @@ class ShareInteractorImpl(private val context: Context) : ShareInteractor {
             Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.agreement_link)))
         context.startActivity(agreementIntent)
     }
-
 }

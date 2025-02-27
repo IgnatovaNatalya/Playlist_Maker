@@ -2,7 +2,7 @@ package com.example.playlistmaker.domain.interactor
 
 import com.example.playlistmaker.domain.model.Track
 
-interface SavedHistoryInteractor
+interface HistoryInteractor
 {
     fun getSavedHistory() : List<Track>
     fun saveHistory()
