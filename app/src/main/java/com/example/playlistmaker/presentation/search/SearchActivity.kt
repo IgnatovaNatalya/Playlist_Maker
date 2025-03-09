@@ -9,27 +9,20 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.interactor.HistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.model.SearchResult
 import com.example.playlistmaker.presentation.player.PlayerActivity
 
-import com.google.android.material.appbar.MaterialToolbar
 
 const val EXTRA_TRACK = "EXTRA_TRACK_STR"
 const val CLICK_DEBOUNCE_DELAY = 1000L
@@ -37,14 +30,7 @@ const val SEARCH_DEBOUNCE_DELAY = 2000L
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var clearSearchButton: ImageView
-    private lateinit var searchField: EditText
-    private lateinit var placeholderMessage: TextView
-    private lateinit var reloadButton: Button
-    private lateinit var recyclerTracks: RecyclerView
-    private lateinit var historyHeader: TextView
-    private lateinit var clearHistoryButton: Button
-    private lateinit var progressBar: ProgressBar
+    private lateinit var binding: ActivitySearchBinding
 
     private var searchAdapter = TrackAdapter { openPlayer(it) }
     private var historyAdapter = TrackAdapter { openPlayer(it) }
@@ -61,7 +47,10 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_search)
+
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -73,69 +62,59 @@ class SearchActivity : AppCompatActivity() {
 
         historyInteractor.getSavedHistory()
 
-        val toolbar = findViewById<MaterialToolbar>(R.id.search_toolbar)
-        placeholderMessage = findViewById(R.id.placeholderMessage)
-        reloadButton = findViewById(R.id.search_reload_button)
-        searchField = findViewById(R.id.search_input_text)
-        clearSearchButton = findViewById(R.id.clear_search_button)
-        historyHeader = findViewById(R.id.history_header)
-        clearHistoryButton = findViewById(R.id.clear_history_button)
-        progressBar = findViewById(R.id.progress_bar)
+        binding.searchToolbar.setNavigationOnClickListener { finish() }
 
-        toolbar.setNavigationOnClickListener { finish() }
-
-        clearSearchButton.setOnClickListener {
-            searchField.setText(DEFAULT_TEXT)
-            recyclerTracks.visibility = View.GONE
+        binding.clearSearchButton.setOnClickListener {
+            binding.searchInputText.setText(DEFAULT_TEXT)
+            binding.searchRecycler.visibility = View.GONE
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            manager.hideSoftInputFromWindow(clearSearchButton.windowToken, 0)
+            manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
             setHistoryVisibility(true)
         }
 
-        searchField.addTextChangedListener(object : TextWatcher {
+        binding.searchInputText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun afterTextChanged(s: Editable?) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 enteredText = s.toString()
-                clearSearchButton.visibility = clearButtonVisibility(s)
-                recyclerTracks.visibility = View.GONE
+                binding.clearSearchButton.visibility = clearButtonVisibility(s)
+                binding.searchRecycler.visibility = View.GONE
                 setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
-                setHistoryVisibility(searchField.hasFocus() && s?.isEmpty() == true)
+                setHistoryVisibility(binding.searchInputText.hasFocus() && s?.isEmpty() == true)
                 searchDebounce()
             }
         })
 
-        searchField.setOnFocusChangeListener { _, hasFocus ->
+        binding.searchInputText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && historyInteractor.getTracks().isNotEmpty()) {
                 setHistoryVisibility(hasFocus)
             }
         }
 
-        recyclerTracks = findViewById(R.id.search_recycler)
-        recyclerTracks.layoutManager = LinearLayoutManager(this)
+        binding.searchRecycler.layoutManager = LinearLayoutManager(this)
 
-        recyclerTracks.adapter = searchAdapter
+        binding.searchRecycler.adapter = searchAdapter
 
-        reloadButton.setOnClickListener {
+        binding.searchReloadButton.setOnClickListener {
             setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
             searchDebounce()
         }
 
-        clearHistoryButton.setOnClickListener {
+        binding.clearHistoryButton.setOnClickListener {
             historyInteractor.clearHistory()
             historyAdapter.notifyDataSetChanged()
             setHistoryVisibility(false)
-            recyclerTracks.visibility = View.GONE
+            binding.searchRecycler.visibility = View.GONE
         }
     }
 
     private fun searchTracks() {
         if (enteredText != "") {
 
-            placeholderMessage.visibility = View.GONE
-            recyclerTracks.visibility = View.GONE
-            progressBar.visibility = View.VISIBLE
+            binding.placeholderMessage.visibility = View.GONE
+            binding.searchReloadButton.visibility = View.GONE
+            binding.progressBar.visibility = View.VISIBLE
 
             tracksInteractor.searchTracks(
                 enteredText,
@@ -143,12 +122,12 @@ class SearchActivity : AppCompatActivity() {
                     @SuppressLint("NotifyDataSetChanged")
                     override fun consume(searchResult: SearchResult) {
                         runOnUiThread {
-                            progressBar.visibility = View.GONE
+                            binding.progressBar.visibility = View.GONE
                             when (searchResult.resultCode) {
                                 200 -> {
                                     if (searchResult.results.isNotEmpty()) {
                                         searchAdapter.tracks = searchResult.results
-                                        recyclerTracks.visibility = View.VISIBLE
+                                        binding.searchRecycler.visibility = View.VISIBLE
                                         searchAdapter.notifyDataSetChanged()
                                     } else {
                                         setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
@@ -167,15 +146,15 @@ class SearchActivity : AppCompatActivity() {
 
     fun setHistoryVisibility(searchFieldEmpty: Boolean) {
         if (searchFieldEmpty) {
-            historyHeader.visibility = View.VISIBLE
-            clearHistoryButton.visibility = View.VISIBLE
+            binding.historyHeader.visibility = View.VISIBLE
+            binding.clearHistoryButton.visibility = View.VISIBLE
             historyAdapter.tracks = historyInteractor.getTracks()
-            recyclerTracks.adapter = historyAdapter
-            recyclerTracks.visibility = View.VISIBLE
+            binding.searchRecycler.adapter = historyAdapter
+            binding.searchRecycler.visibility = View.VISIBLE
         } else {
-            historyHeader.visibility = View.GONE
-            clearHistoryButton.visibility = View.GONE
-            recyclerTracks.adapter = searchAdapter
+            binding.historyHeader.visibility = View.GONE
+            binding.clearHistoryButton.visibility = View.GONE
+            binding.searchRecycler.adapter = searchAdapter
         }
     }
 
@@ -197,21 +176,21 @@ class SearchActivity : AppCompatActivity() {
     private fun setPlaceHolder(message: PlaceholderMessage) {
         when (message) {
             PlaceholderMessage.MESSAGE_CLEAR -> {
-                placeholderMessage.visibility = View.GONE
-                reloadButton.visibility = View.GONE
+                binding.placeholderMessage.visibility = View.GONE
+                binding.searchReloadButton.visibility = View.GONE
             }
 
             PlaceholderMessage.MESSAGE_NO_INTERNET,
             PlaceholderMessage.MESSAGE_NOT_FOUND -> {
-                placeholderMessage.visibility = View.VISIBLE
+                binding.placeholderMessage.visibility = View.VISIBLE
 
                 if (message == PlaceholderMessage.MESSAGE_NO_INTERNET)
-                    reloadButton.visibility = View.VISIBLE
-                else reloadButton.visibility = View.GONE
+                    binding.searchReloadButton.visibility = View.VISIBLE
+                else binding.searchReloadButton.visibility = View.GONE
 
-                recyclerTracks.visibility = View.GONE
-                placeholderMessage.text = this.getString(message.resText)
-                placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(0, message.image, 0, 0)
+                binding.searchRecycler.visibility = View.GONE
+                binding.placeholderMessage.text = this.getString(message.resText)
+                binding.placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(0, message.image, 0, 0)
             }
         }
     }
@@ -233,7 +212,7 @@ class SearchActivity : AppCompatActivity() {
         enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
 
         if (enteredText.isNotEmpty()) {
-            searchField.setText(enteredText)
+            binding.searchInputText.setText(enteredText)
             searchTracks()
         }
     }

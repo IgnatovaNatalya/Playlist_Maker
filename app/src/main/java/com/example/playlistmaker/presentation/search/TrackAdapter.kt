@@ -3,16 +3,17 @@ package com.example.playlistmaker.presentation.search
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.ItemTrackBinding
 import com.example.playlistmaker.domain.model.Track
 
-class TrackAdapter(val clickListener: AdapterClickListener) : RecyclerView.Adapter<TrackViewHolder> () {
+class TrackAdapter(private val clickListener: AdapterClickListener) :
+    RecyclerView.Adapter<TrackViewHolder>() {
 
     var tracks = listOf<Track>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_track, parent, false)
-        return  TrackViewHolder(v)
+        val layoutInspector = LayoutInflater.from(parent.context)
+        return TrackViewHolder(ItemTrackBinding.inflate(layoutInspector, parent, false))
     }
 
     override fun getItemCount(): Int {
