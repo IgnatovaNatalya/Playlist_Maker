@@ -1,24 +1,30 @@
 package com.example.playlistmaker.creator
 
 import android.content.Context
-import com.example.playlistmaker.data.network.RetrofitNetworkClient
-import com.example.playlistmaker.data.repositoryImpl.PreferencesRepositoryImpl
-import com.example.playlistmaker.data.repositoryImpl.TrackRepositoryImpl
-import com.example.playlistmaker.domain.impl.PlaybackInteractorImpl
-import com.example.playlistmaker.domain.impl.HistoryInteractorImpl
-import com.example.playlistmaker.domain.impl.ThemeInteractorImpl
-import com.example.playlistmaker.domain.impl.SearchTracksInteractorImpl
-import com.example.playlistmaker.domain.impl.ShareInteractorImpl
-import com.example.playlistmaker.domain.interactor.PlaybackInteractor
-import com.example.playlistmaker.domain.interactor.HistoryInteractor
-import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
-import com.example.playlistmaker.domain.interactor.ThemeInteractor
-import com.example.playlistmaker.domain.interactor.ShareInteractor
-import com.example.playlistmaker.domain.repository.PreferencesRepository
-import com.example.playlistmaker.domain.repository.TracksRepository
+import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
+import com.example.playlistmaker.search.data.repositoryImpl.HistoryRepositoryImpl
+import com.example.playlistmaker.search.data.repositoryImpl.TrackRepositoryImpl
+import com.example.playlistmaker.player.domain.intractorImpl.PlaybackInteractorImpl
+import com.example.playlistmaker.search.domain.interactorImpl.HistoryInteractorImpl
+import com.example.playlistmaker.settings.domain.impl.ThemeInteractorImpl
+import com.example.playlistmaker.search.domain.interactorImpl.SearchTracksInteractorImpl
+import com.example.playlistmaker.sharing.domain.impl.SharingInteractorImpl
+import com.example.playlistmaker.player.domain.intractor.PlaybackInteractor
+import com.example.playlistmaker.search.domain.intaractor.HistoryInteractor
+import com.example.playlistmaker.search.domain.intaractor.SearchTracksInteractor
+import com.example.playlistmaker.settings.domain.ThemeInteractor
+import com.example.playlistmaker.sharing.domain.SharingInteractor
+import com.example.playlistmaker.search.data.repository.HistoryRepository
+import com.example.playlistmaker.search.data.repository.TracksRepository
+import com.example.playlistmaker.settings.data.impl.ThemeRepositoryImpl
+import com.example.playlistmaker.settings.domain.ThemeRepository
+import com.example.playlistmaker.sharing.data.ExternalNavigatorImpl
+import com.example.playlistmaker.sharing.domain.ExternalNavigator
 
 
 object Creator {
+
+    //search
     private fun getTracksRepository(): TracksRepository {
         return TrackRepositoryImpl(RetrofitNetworkClient())
     }
@@ -27,23 +33,39 @@ object Creator {
         return SearchTracksInteractorImpl(getTracksRepository())
     }
 
-    private fun getPreferencesRepository(context: Context): PreferencesRepository {
-        return PreferencesRepositoryImpl(context)
+
+    //history
+    private fun getHistoryRepository(context: Context): HistoryRepository {
+        return HistoryRepositoryImpl(context)
     }
 
     fun provideHistoryInteractor(context: Context): HistoryInteractor {
-        return HistoryInteractorImpl(getPreferencesRepository(context))
+        return HistoryInteractorImpl(getHistoryRepository(context))
     }
 
-    fun provideThemeInteractor(context:Context): ThemeInteractor {
-        return ThemeInteractorImpl(getPreferencesRepository(context))
-    }
 
-    fun providePlaybackInteractor() : PlaybackInteractor {
+    //play
+    fun providePlaybackInteractor(): PlaybackInteractor {
         return PlaybackInteractorImpl()
     }
 
-    fun provideShareInteractor(context:Context): ShareInteractor {
-        return ShareInteractorImpl(context)
+
+    //settings
+    fun provideThemeInteractor(context: Context): ThemeInteractor {
+        return ThemeInteractorImpl(getThemeRepository(context))
+    }
+
+    private fun getThemeRepository(context: Context): ThemeRepository {
+        return ThemeRepositoryImpl(context)
+    }
+
+
+    //share
+    fun provideSharingInteractor(context: Context): SharingInteractor {
+        return SharingInteractorImpl( getExternalNavigator(context))
+    }
+
+    private fun getExternalNavigator(context: Context): ExternalNavigator {
+        return ExternalNavigatorImpl(context)
     }
 }
