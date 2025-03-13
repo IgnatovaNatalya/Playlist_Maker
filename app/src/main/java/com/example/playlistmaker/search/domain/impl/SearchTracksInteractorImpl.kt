@@ -1,6 +1,6 @@
-package com.example.playlistmaker.search.domain.interactorImpl
+package com.example.playlistmaker.search.domain.impl
 
-import com.example.playlistmaker.search.domain.intaractor.SearchTracksInteractor
+import com.example.playlistmaker.search.domain.SearchTracksInteractor
 import com.example.playlistmaker.search.data.repository.TracksRepository
 import java.util.concurrent.Executors
 

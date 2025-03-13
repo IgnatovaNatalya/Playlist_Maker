@@ -17,7 +17,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.player.domain.intractor.PlaybackInteractor
 import com.example.playlistmaker.search.domain.model.Track
-import com.example.playlistmaker.search.ui.EXTRA_TRACK
+import com.example.playlistmaker.search.ui.activity.SearchActivity.Companion.EXTRA_TRACK
 
 import com.google.android.material.appbar.MaterialToolbar
 

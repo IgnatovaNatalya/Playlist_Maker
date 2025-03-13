@@ -45,19 +45,17 @@ class SettingsActivity : AppCompatActivity() {
             viewModel.changeTheme(checked)
         }
 
-//        val btnShare = findViewById<TextView>(R.id.settings_share_button)
-//        btnShare.setOnClickListener {
-//            shareInteractor.shareApp()
-//        }
-//
-//        val btnSupport = findViewById<TextView>(R.id.settings_support_button)
-//        btnSupport.setOnClickListener {
-//            shareInteractor.sendEmail()
-//        }
-//
-//        val btnAgreement = findViewById<TextView>(R.id.settings_agreement_button)
-//        btnAgreement.setOnClickListener {
-//            shareInteractor.openTerms()
-//        }
+        binding.settingsShareButton.setOnClickListener{
+            viewModel.shareApp()
+        }
+
+        binding.settingsSupportButton.setOnClickListener{
+            viewModel.callSupport()
+        }
+
+        binding.settingsAgreementButton.setOnClickListener{
+            viewModel.openAgreement()
+        }
+
     }
 }

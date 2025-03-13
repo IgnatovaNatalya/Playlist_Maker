@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.ui
+package com.example.playlistmaker.search.ui.activity
 
 import android.util.TypedValue
 import androidx.recyclerview.widget.RecyclerView

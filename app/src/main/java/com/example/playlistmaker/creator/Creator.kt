@@ -5,13 +5,13 @@ import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.search.data.repositoryImpl.HistoryRepositoryImpl
 import com.example.playlistmaker.search.data.repositoryImpl.TrackRepositoryImpl
 import com.example.playlistmaker.player.domain.intractorImpl.PlaybackInteractorImpl
-import com.example.playlistmaker.search.domain.interactorImpl.HistoryInteractorImpl
+import com.example.playlistmaker.search.domain.impl.HistoryInteractorImpl
 import com.example.playlistmaker.settings.domain.impl.ThemeInteractorImpl
-import com.example.playlistmaker.search.domain.interactorImpl.SearchTracksInteractorImpl
+import com.example.playlistmaker.search.domain.impl.SearchTracksInteractorImpl
 import com.example.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 import com.example.playlistmaker.player.domain.intractor.PlaybackInteractor
-import com.example.playlistmaker.search.domain.intaractor.HistoryInteractor
-import com.example.playlistmaker.search.domain.intaractor.SearchTracksInteractor
+import com.example.playlistmaker.search.domain.HistoryInteractor
+import com.example.playlistmaker.search.domain.SearchTracksInteractor
 import com.example.playlistmaker.settings.domain.ThemeInteractor
 import com.example.playlistmaker.sharing.domain.SharingInteractor
 import com.example.playlistmaker.search.data.repository.HistoryRepository
@@ -29,7 +29,7 @@ object Creator {
         return TrackRepositoryImpl(RetrofitNetworkClient())
     }
 
-    fun provideTracksInteractor(): SearchTracksInteractor {
+    fun provideSearchTracksInteractor(): SearchTracksInteractor {
         return SearchTracksInteractorImpl(getTracksRepository())
     }
 

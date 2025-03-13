@@ -85,7 +85,7 @@
                 android:visibility="gone"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/search_recycler"
+                android:id="@+id/tracks_recycler"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -113,7 +113,7 @@
                     tools:ignore="RtlCompat" />
 
                 <Button
-                    android:id="@+id/search_reload_button"
+                    android:id="@+id/placeholder_reload_button"
                     style="@style/UsualButtonsStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

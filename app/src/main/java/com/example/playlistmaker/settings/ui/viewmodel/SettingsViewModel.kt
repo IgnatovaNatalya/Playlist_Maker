@@ -23,7 +23,7 @@ class SettingsViewModel(
         }
     }
 
-    private val sharingInteractor = Creator.provideSharingInteractor(getApplication())
+    private val shareInteractor = Creator.provideSharingInteractor(getApplication())
     private val themeInteractor = Creator.provideThemeInteractor(getApplication())
 
     private val _themeState = MutableLiveData<Boolean>()
@@ -38,5 +38,17 @@ class SettingsViewModel(
         _themeState.postValue(
             themeInteractor.getSavedTheme()
         )
+    }
+
+    fun shareApp() {
+        shareInteractor.shareApp()
+    }
+
+    fun callSupport() {
+        shareInteractor.sendEmail()
+    }
+
+    fun openAgreement() {
+        shareInteractor.openTerms()
     }
 }

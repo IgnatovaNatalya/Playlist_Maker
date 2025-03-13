@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.domain.intaractor
+package com.example.playlistmaker.search.domain
 
 import com.example.playlistmaker.search.domain.model.Track
 

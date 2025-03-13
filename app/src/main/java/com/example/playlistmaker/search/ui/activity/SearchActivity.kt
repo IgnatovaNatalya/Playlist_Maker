@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.ui
+package com.example.playlistmaker.search.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -13,23 +13,24 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.search.domain.intaractor.HistoryInteractor
-import com.example.playlistmaker.search.domain.intaractor.SearchTracksInteractor
-import com.example.playlistmaker.search.domain.model.Track
-import com.example.playlistmaker.search.domain.model.SearchResult
 import com.example.playlistmaker.player.ui.PlayerActivity
+import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.search.ui.viewmodel.SearchState
+import com.example.playlistmaker.search.ui.viewmodel.TracksViewModel
 
-
-const val EXTRA_TRACK = "EXTRA_TRACK_STR"
-const val CLICK_DEBOUNCE_DELAY = 1000L
-const val SEARCH_DEBOUNCE_DELAY = 2000L
 
 class SearchActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_TRACK = "EXTRA_TRACK_STR"
+        const val CLICK_DEBOUNCE_DELAY = 1000L
+        const val ENTERED_TEXT = "ENTERED_TEXT"
+        const val DEFAULT_TEXT = ""
+    }
     private lateinit var binding: ActivitySearchBinding
 
     private var searchAdapter = TrackAdapter { openPlayer(it) }
@@ -38,10 +39,9 @@ class SearchActivity : AppCompatActivity() {
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
 
-    private val searchRunnable = Runnable { searchTracks() }
+    private var enteredText: String = DEFAULT_TEXT
 
-    private lateinit var tracksInteractor: SearchTracksInteractor
-    private lateinit var historyInteractor: HistoryInteractor
+    private lateinit var viewModel: TracksViewModel
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,16 +57,18 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        historyInteractor = Creator.provideHistoryInteractor(this)
-        tracksInteractor = Creator.provideTracksInteractor()
-
-        historyInteractor.getSavedHistory()
-
         binding.searchToolbar.setNavigationOnClickListener { finish() }
+
+        viewModel = ViewModelProvider(
+            this,
+            TracksViewModel.getViewModelFactory()
+        )[TracksViewModel::class.java]
+
+        viewModel.getSavedHistory()
 
         binding.clearSearchButton.setOnClickListener {
             binding.searchInputText.setText(DEFAULT_TEXT)
-            binding.searchRecycler.visibility = View.GONE
+            binding.tracksRecycler.visibility = View.GONE
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
             setHistoryVisibility(true)
@@ -77,95 +79,96 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                enteredText = s.toString()
                 binding.clearSearchButton.visibility = clearButtonVisibility(s)
-                binding.searchRecycler.visibility = View.GONE
-                setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
                 setHistoryVisibility(binding.searchInputText.hasFocus() && s?.isEmpty() == true)
-                searchDebounce()
+                enteredText = s.toString()
+                viewModel.searchDebounce(enteredText)
             }
         })
 
         binding.searchInputText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && historyInteractor.getTracks().isNotEmpty()) {
+            if (hasFocus && viewModel.historyIsNotEmpty()) {//historyInteractor.getTracks().isNotEmpty()) {
                 setHistoryVisibility(hasFocus)
             }
         }
 
-        binding.searchRecycler.layoutManager = LinearLayoutManager(this)
+        binding.tracksRecycler.layoutManager = LinearLayoutManager(this)
+        binding.tracksRecycler.adapter = searchAdapter
 
-        binding.searchRecycler.adapter = searchAdapter
+        viewModel.searchState.observe(this) { render(it) }
+        viewModel.searchTracks.observe(this) { searchAdapter.tracks = it }
+        viewModel.historyTracks.observe(this) { historyAdapter.tracks = it }
 
-        binding.searchReloadButton.setOnClickListener {
+        binding.placeholderReloadButton.setOnClickListener {
             setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
-            searchDebounce()
+            viewModel.searchDebounce(enteredText)
         }
 
         binding.clearHistoryButton.setOnClickListener {
-            historyInteractor.clearHistory()
+            viewModel.clearHistory()
             historyAdapter.notifyDataSetChanged()
             setHistoryVisibility(false)
-            binding.searchRecycler.visibility = View.GONE
+            binding.tracksRecycler.visibility = View.GONE
         }
     }
 
-    private fun searchTracks() {
-        if (enteredText != "") {
-
-            binding.placeholderMessage.visibility = View.GONE
-            binding.searchReloadButton.visibility = View.GONE
-            binding.progressBar.visibility = View.VISIBLE
-
-            tracksInteractor.searchTracks(
-                enteredText,
-                object : SearchTracksInteractor.TracksConsumer {
-                    @SuppressLint("NotifyDataSetChanged")
-                    override fun consume(searchResult: SearchResult) {
-                        runOnUiThread {
-                            binding.progressBar.visibility = View.GONE
-                            when (searchResult.resultCode) {
-                                200 -> {
-                                    if (searchResult.results.isNotEmpty()) {
-                                        searchAdapter.tracks = searchResult.results
-                                        binding.searchRecycler.visibility = View.VISIBLE
-                                        searchAdapter.notifyDataSetChanged()
-                                    } else {
-                                        setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
-                                    }
-                                }
-
-                                else -> {
-                                    setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
-                                }
-                            }
-                        }
-                    }
-                })
+    private fun render(state: SearchState) {
+        when (state) {
+            is SearchState.Content -> showContent()
+            is SearchState.Empty -> showEmpty()
+            is SearchState.Error -> showError()
+            is SearchState.Loading -> showLoading()
         }
     }
 
-    fun setHistoryVisibility(searchFieldEmpty: Boolean) {
-        if (searchFieldEmpty) {
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showContent() {
+        binding.tracksRecycler.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        searchAdapter.notifyDataSetChanged()
+        setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+    }
+
+    private fun showEmpty() {
+        binding.tracksRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+        setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
+    }
+
+    private fun showError() {
+        binding.tracksRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+        setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
+    }
+
+    private fun showLoading() {
+        binding.tracksRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.VISIBLE
+        setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+    }
+
+    fun setHistoryVisibility(isVisible: Boolean) {
+        if (isVisible) {
             binding.historyHeader.visibility = View.VISIBLE
             binding.clearHistoryButton.visibility = View.VISIBLE
-            historyAdapter.tracks = historyInteractor.getTracks()
-            binding.searchRecycler.adapter = historyAdapter
-            binding.searchRecycler.visibility = View.VISIBLE
+            binding.tracksRecycler.adapter = historyAdapter
+            binding.tracksRecycler.visibility = View.VISIBLE
         } else {
             binding.historyHeader.visibility = View.GONE
             binding.clearHistoryButton.visibility = View.GONE
-            binding.searchRecycler.adapter = searchAdapter
+            binding.tracksRecycler.adapter = searchAdapter
+            binding.tracksRecycler.visibility = View.VISIBLE
         }
     }
 
     override fun onPause() {
-        historyInteractor.saveHistory()
+        viewModel.saveHistory()
         super.onPause()
     }
 
     private fun openPlayer(track: Track) {
         if (clickDebounce()) {
-            historyInteractor.addTrackToHistory(track)
+            viewModel.addTrackToHistory(track)
             val intent = Intent(this, PlayerActivity::class.java)
             intent.putExtra(EXTRA_TRACK, track)
             startActivity(intent)
@@ -177,19 +180,25 @@ class SearchActivity : AppCompatActivity() {
         when (message) {
             PlaceholderMessage.MESSAGE_CLEAR -> {
                 binding.placeholderMessage.visibility = View.GONE
-                binding.searchReloadButton.visibility = View.GONE
+                binding.placeholderReloadButton.visibility = View.GONE
             }
 
-            PlaceholderMessage.MESSAGE_NO_INTERNET,
+            PlaceholderMessage.MESSAGE_NO_INTERNET -> {
+                binding.placeholderMessage.visibility = View.VISIBLE
+                binding.placeholderReloadButton.visibility = View.VISIBLE
+                binding.placeholderMessage.text = this.getString(message.text)
+                binding.placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    message.image,
+                    0,
+                    0
+                )
+            }
+
             PlaceholderMessage.MESSAGE_NOT_FOUND -> {
                 binding.placeholderMessage.visibility = View.VISIBLE
-
-                if (message == PlaceholderMessage.MESSAGE_NO_INTERNET)
-                    binding.searchReloadButton.visibility = View.VISIBLE
-                else binding.searchReloadButton.visibility = View.GONE
-
-                binding.searchRecycler.visibility = View.GONE
-                binding.placeholderMessage.text = this.getString(message.resText)
+                binding.placeholderReloadButton.visibility = View.GONE
+                binding.placeholderMessage.text = this.getString(message.text)
                 binding.placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(0, message.image, 0, 0)
             }
         }
@@ -213,14 +222,14 @@ class SearchActivity : AppCompatActivity() {
 
         if (enteredText.isNotEmpty()) {
             binding.searchInputText.setText(enteredText)
-            searchTracks()
+            //viewModel.searchTracks(enteredText)
         }
     }
 
-    private fun searchDebounce() { //дебаунс в поисковой строке
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-    }
+//    private fun searchDebounce() { //дебаунс в поисковой строке
+//        handler.removeCallbacks(searchRunnable)
+//        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+//    }
 
     private fun clickDebounce(): Boolean { //дебаунс для нажатия на обложку
         val current = isClickAllowed
@@ -231,10 +240,4 @@ class SearchActivity : AppCompatActivity() {
         return current
     }
 
-    private var enteredText: String = DEFAULT_TEXT
-
-    companion object {
-        const val ENTERED_TEXT = "ENTERED_TEXT"
-        const val DEFAULT_TEXT = ""
-    }
 }
