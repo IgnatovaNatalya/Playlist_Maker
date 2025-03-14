@@ -1,7 +1,7 @@
-package com.example.playlistmaker.player.domain.intractorImpl
+package com.example.playlistmaker.player.domain.impl
 
 import android.media.MediaPlayer
-import com.example.playlistmaker.player.domain.intractor.PlaybackInteractor
+import com.example.playlistmaker.player.domain.PlaybackInteractor
 
 class PlaybackInteractorImpl: PlaybackInteractor {
 
@@ -51,7 +51,6 @@ class PlaybackInteractorImpl: PlaybackInteractor {
     override fun releasePlayer() {
         mediaPlayer.release()
     }
-
 
     companion object {
         const val STATE_DEFAULT = 0

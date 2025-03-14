@@ -14,7 +14,6 @@ class HistoryRepositoryImpl(context: Context) : HistoryRepository {
     private val gson = Gson()
     private var sharedPrefs = context.getSharedPreferences(PLAYLIST_MAKER_PREFS, Context.MODE_PRIVATE)
 
-
     override fun getSavedHistory():List<Track> {
         val str = sharedPrefs.getString(PLAYLIST_MAKER_HISTORY, null)
         if (str != null) return createTracksListFromJson(str)

@@ -1,4 +1,4 @@
-package com.example.playlistmaker.player.domain.intractor
+package com.example.playlistmaker.player.domain
 
 interface PlaybackInteractor {
     fun preparePlayer(trackUrl:String?, onPrepare: OnPreparedListener, onComplete: OnCompletionListener)

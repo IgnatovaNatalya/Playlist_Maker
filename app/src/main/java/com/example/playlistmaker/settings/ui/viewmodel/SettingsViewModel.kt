@@ -27,7 +27,7 @@ class SettingsViewModel(
     private val themeInteractor = Creator.provideThemeInteractor(getApplication())
 
     private val _themeState = MutableLiveData<Boolean>()
-    val themeState: LiveData<Boolean> get() = _themeState
+    val themeState: LiveData<Boolean> = _themeState
 
     fun changeTheme(theme: Boolean) {
         themeInteractor.switchTheme(theme)
