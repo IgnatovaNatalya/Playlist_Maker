@@ -68,7 +68,7 @@ class TracksViewModel(application: Application) : AndroidViewModel(application) 
 
     fun searchDebounce(changedText: String) { //дебаунс в поисковой строке
 
-        if (latestQueryText == changedText) return
+        //if (latestQueryText == changedText) return
 
         latestQueryText = changedText
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)

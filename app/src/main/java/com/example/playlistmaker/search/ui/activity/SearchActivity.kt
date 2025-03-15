@@ -27,7 +27,7 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_TRACK = "EXTRA_TRACK_STR"
-        const val CLICK_DEBOUNCE_DELAY = 1000L
+        const val CLICK_DEBOUNCE_DELAY = 2000L
         const val ENTERED_TEXT = "ENTERED_TEXT"
         const val DEFAULT_TEXT = ""
     }
@@ -72,6 +72,7 @@ class SearchActivity : AppCompatActivity() {
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
             setHistoryVisibility(true)
+            setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
         }
 
         binding.searchInputText.addTextChangedListener(object : TextWatcher {
@@ -81,6 +82,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 binding.clearSearchButton.visibility = clearButtonVisibility(s)
                 setHistoryVisibility(binding.searchInputText.hasFocus() && s?.isEmpty() == true)
+                setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
                 enteredText = s.toString()
                 viewModel.searchDebounce(enteredText)
             }

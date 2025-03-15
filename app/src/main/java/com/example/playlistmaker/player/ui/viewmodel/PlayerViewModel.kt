@@ -14,10 +14,7 @@ import com.example.playlistmaker.creator.Creator
 
 import com.example.playlistmaker.search.domain.model.Track
 
-class PlaybackViewModel(application: Application) :
-    AndroidViewModel(application) { // todo нужен ли контекст?
-
-    //class PlaybackViewModel: ViewModel() {
+class PlaybackViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val START_TIME = 1
@@ -99,5 +96,10 @@ class PlaybackViewModel(application: Application) :
         val sec = time % 60
         val strTime = "%02d".format(min) + ":" + "%02d".format(sec)
         _playerTime.postValue(strTime)
+    }
+
+    override fun onCleared() {
+        mainThreadHandler.removeCallbacksAndMessages(null)
+        releasePlayer()
     }
 }
