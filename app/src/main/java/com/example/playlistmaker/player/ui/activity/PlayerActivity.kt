@@ -34,15 +34,11 @@ class PlayerActivity : AppCompatActivity() {
             insets
         }
 
-        viewModel = ViewModelProvider(
-            this,
-            PlaybackViewModel.getViewModelFactory()
-        )[PlaybackViewModel::class.java]
+        viewModel = ViewModelProvider(this)[PlaybackViewModel::class.java]
 
         binding.playerToolbar.setNavigationOnClickListener { finish() }
 
         viewModel.playerState.observe(this) { state -> renderState(state) }
-        viewModel.playerTime.observe(this) { strTime -> renderTime(strTime) }
 
         val intent = intent
 
@@ -64,16 +60,19 @@ class PlayerActivity : AppCompatActivity() {
                 binding.buttonPlayPause.isEnabled = false
             }
 
-            PlayerState.Prepared -> binding.buttonPlayPause.isEnabled = true
-            PlayerState.Playing -> showPlaying()
-            PlayerState.Paused -> showPaused()
-            PlayerState.Completed -> showPaused()
+            PlayerState.Prepared -> {
+                binding.buttonPlayPause.isEnabled = true
+
+            }
+            is PlayerState.Playing -> showPlaying(state.playerTime)
+            is PlayerState.Paused -> showPaused()
+            PlayerState.Completed -> {
+                showPaused()
+                binding.playbackTimer.text = formatTime(0)
+            }
         }
     }
 
-    private fun renderTime(strTime: String) {
-        binding.playbackTimer.text = strTime
-    }
 
     private fun drawTrack(track: Track) {
 
@@ -102,8 +101,9 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerCountry.text = track.country
     }
 
-    private fun showPlaying() {
+    private fun showPlaying(time: Int) {
         binding.buttonPlayPause.setImageResource(R.drawable.button_pause)
+        binding.playbackTimer.text = formatTime(time)
     }
 
     private fun showPaused() {
@@ -118,5 +118,11 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.releasePlayer()
+    }
+
+    private fun formatTime(time:Int) :String{
+        val min = time / 60
+        val sec = time % 60
+        return "%02d".format(min) + ":" + "%02d".format(sec)
     }
 }

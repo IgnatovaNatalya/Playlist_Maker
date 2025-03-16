@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
+import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.player.ui.activity.PlayerActivity
 import com.example.playlistmaker.search.domain.model.Track
@@ -33,8 +34,7 @@ class SearchActivity : AppCompatActivity() {
     }
     private lateinit var binding: ActivitySearchBinding
 
-    private var searchAdapter = TrackAdapter { openPlayer(it) }
-    private var historyAdapter = TrackAdapter { openPlayer(it) }
+    private var tracksAdapter = TrackAdapter { openPlayer(it) }
 
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
@@ -43,7 +43,6 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var viewModel: TracksViewModel
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -61,19 +60,21 @@ class SearchActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(
             this,
-            TracksViewModel.getViewModelFactory()
+            TracksViewModel.getViewModelFactory(
+                Creator.provideSearchTracksInteractor(),
+                Creator.provideHistoryInteractor(this)
+            )
         )[TracksViewModel::class.java]
 
         viewModel.getSavedHistory()
 
         binding.clearSearchButton.setOnClickListener {
             binding.searchInputText.setText(DEFAULT_TEXT)
-            binding.tracksRecycler.visibility = View.GONE
             val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
-            setHistoryVisibility(true)
-            setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+            viewModel.showHistory()
         }
+
 
         binding.searchInputText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -81,85 +82,90 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 binding.clearSearchButton.visibility = clearButtonVisibility(s)
-                setHistoryVisibility(binding.searchInputText.hasFocus() && s?.isEmpty() == true)
                 setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
                 enteredText = s.toString()
-                viewModel.searchDebounce(enteredText)
+                viewModel.onSearchTextChanged(enteredText)
             }
         })
 
         binding.searchInputText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && viewModel.historyIsNotEmpty()) {//historyInteractor.getTracks().isNotEmpty()) {
-                setHistoryVisibility(hasFocus)
-            }
+            viewModel.showHistory()
         }
 
         binding.tracksRecycler.layoutManager = LinearLayoutManager(this)
-        binding.tracksRecycler.adapter = searchAdapter
+        binding.tracksRecycler.adapter = tracksAdapter
 
         viewModel.searchState.observe(this) { render(it) }
-        viewModel.searchTracks.observe(this) { searchAdapter.tracks = it }
-        viewModel.historyTracks.observe(this) { historyAdapter.tracks = it }
 
-        binding.placeholderReloadButton.setOnClickListener {
-            setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
-            viewModel.searchDebounce(enteredText)
-        }
-
-        binding.clearHistoryButton.setOnClickListener {
-            viewModel.clearHistory()
-            historyAdapter.notifyDataSetChanged()
-            setHistoryVisibility(false)
-            binding.tracksRecycler.visibility = View.GONE
-        }
+        binding.placeholderReloadButton.setOnClickListener { viewModel.searchDebounce(enteredText) }
+        binding.clearHistoryButton.setOnClickListener { viewModel.onClickHistoryClearButton() }
     }
 
     private fun render(state: SearchState) {
         when (state) {
-            is SearchState.Content -> showContent()
             is SearchState.Empty -> showEmpty()
             is SearchState.Error -> showError()
             is SearchState.Loading -> showLoading()
+            is SearchState.HistoryContent -> showHistoryContent(state)
+            is SearchState.SearchContent -> showSearchContent(state)
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun showContent() {
+    private fun showHistoryContent(state: SearchState.HistoryContent) {
+        tracksAdapter.tracks = state.historyTracks
+        tracksAdapter.notifyDataSetChanged()
+
         binding.tracksRecycler.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
-        searchAdapter.notifyDataSetChanged()
+
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+        setHistoryVisibility(true)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showSearchContent(state: SearchState.SearchContent) {
+        tracksAdapter.tracks = state.searchTracks
+        tracksAdapter.notifyDataSetChanged()
+
+        binding.tracksRecycler.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+
+        setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+        setHistoryVisibility(false)
     }
 
     private fun showEmpty() {
         binding.tracksRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
+
         setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
+        setHistoryVisibility(false)
     }
 
     private fun showError() {
         binding.tracksRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
+
         setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
+        setHistoryVisibility(false)
     }
 
     private fun showLoading() {
         binding.tracksRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
+
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+        setHistoryVisibility(false)
     }
 
     fun setHistoryVisibility(isVisible: Boolean) {
         if (isVisible) {
             binding.historyHeader.visibility = View.VISIBLE
             binding.clearHistoryButton.visibility = View.VISIBLE
-            binding.tracksRecycler.adapter = historyAdapter
-            binding.tracksRecycler.visibility = View.VISIBLE
         } else {
             binding.historyHeader.visibility = View.GONE
             binding.clearHistoryButton.visibility = View.GONE
-            binding.tracksRecycler.adapter = searchAdapter
-            binding.tracksRecycler.visibility = View.VISIBLE
         }
     }
 
@@ -177,7 +183,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun setPlaceHolder(message: PlaceholderMessage) {
         when (message) {
             PlaceholderMessage.MESSAGE_CLEAR -> {
@@ -212,27 +217,6 @@ class SearchActivity : AppCompatActivity() {
         else View.VISIBLE
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(ENTERED_TEXT, enteredText)
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
-
-        if (enteredText.isNotEmpty()) {
-            binding.searchInputText.setText(enteredText)
-            //viewModel.searchTracks(enteredText)
-        }
-    }
-
-//    private fun searchDebounce() { //дебаунс в поисковой строке
-//        handler.removeCallbacks(searchRunnable)
-//        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-//    }
-
     private fun clickDebounce(): Boolean { //дебаунс для нажатия на обложку
         val current = isClickAllowed
         if (isClickAllowed) {
@@ -242,4 +226,17 @@ class SearchActivity : AppCompatActivity() {
         return current
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(ENTERED_TEXT, enteredText)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
+
+        if (enteredText.isNotEmpty()) {
+            binding.searchInputText.setText(enteredText)
+        }
+    }
 }

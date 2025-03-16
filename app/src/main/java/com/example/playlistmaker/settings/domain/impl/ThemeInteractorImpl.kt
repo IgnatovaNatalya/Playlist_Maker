@@ -1,6 +1,5 @@
 package com.example.playlistmaker.settings.domain.impl
 
-import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.settings.domain.ThemeRepository
 import com.example.playlistmaker.settings.domain.ThemeInteractor
 
@@ -19,13 +18,7 @@ class ThemeInteractorImpl (private val repository: ThemeRepository): ThemeIntera
     }
 
     override fun switchTheme(theme: Boolean) {
-        AppCompatDelegate.setDefaultNightMode(
-            if (theme) {
-                AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                AppCompatDelegate.MODE_NIGHT_NO
-            }
-        )
+        repository.switchTheme(theme)
         saveTheme(theme)
     }
 }

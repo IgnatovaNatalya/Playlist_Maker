@@ -1,61 +1,35 @@
 package com.example.playlistmaker.player.domain.impl
 
-import android.media.MediaPlayer
+import com.example.playlistmaker.player.data.repository.PlaybackRepository
 import com.example.playlistmaker.player.domain.PlaybackInteractor
 
-class PlaybackInteractorImpl: PlaybackInteractor {
+class PlaybackInteractorImpl(private val repository: PlaybackRepository): PlaybackInteractor {
 
-    private var playerState = STATE_DEFAULT
-    private var mediaPlayer = MediaPlayer()
-
-    override fun preparePlayer(trackUrl: String?,
-                               onPrepare: PlaybackInteractor.OnPreparedListener,
-                               onComplete: PlaybackInteractor.OnCompletionListener ) {
-        mediaPlayer.setDataSource(trackUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            onPrepare.onPrepare()
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            onComplete.onComplete()
-            playerState = STATE_PREPARED
-        }
-    }
-
-    override fun pausePlayer() {
-        playerState = STATE_PAUSED
-        mediaPlayer.pause()
-    }
-
-    override fun isPlaying() : Boolean {
-        return (playerState == STATE_PLAYING)
+    override fun preparePlayer(
+        trackUrl: String?,
+        onPrepare: () -> Unit,
+        onComplete: () -> Unit
+    ) {
+        repository.preparePlayer (trackUrl,onPrepare, onComplete)
     }
 
     override fun startPlayer() {
-        playerState = STATE_PLAYING
-        mediaPlayer.start()
+        repository.startPlayer()
+    }
+
+    override fun pausePlayer() {
+        repository.pausePlayer()
+    }
+
+    override fun isPlaying(): Boolean {
+        return repository.isPlaying()
     }
 
     override fun playbackControl() {
-        when (playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
-            }
-        }
+        repository.playbackControl()
     }
 
     override fun releasePlayer() {
-        mediaPlayer.release()
-    }
-
-    companion object {
-        const val STATE_DEFAULT = 0
-        const val STATE_PREPARED = 1
-        const val STATE_PLAYING = 2
-        const val STATE_PAUSED = 3
+        repository.releasePlayer()
     }
 }

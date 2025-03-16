@@ -1,44 +1,38 @@
 package com.example.playlistmaker.search.ui.viewmodel
 
-import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.HistoryInteractor
 import com.example.playlistmaker.search.domain.SearchTracksInteractor
 import com.example.playlistmaker.search.domain.model.SearchResult
 import com.example.playlistmaker.search.domain.model.Track
 
-class TracksViewModel(application: Application) : AndroidViewModel(application) {
+class TracksViewModel(
+    private val searchInteractor: SearchTracksInteractor,
+    private val historyInteractor: HistoryInteractor
+) : ViewModel() {
 
     companion object {
-        private const val SEARCH_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private val SEARCH_REQUEST_TOKEN = Any()
 
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
+        fun getViewModelFactory(
+            searchInteractor: SearchTracksInteractor,
+            historyInteractor: HistoryInteractor
+        ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                TracksViewModel(this[APPLICATION_KEY] as Application)
+                TracksViewModel(searchInteractor, historyInteractor)
             }
         }
     }
 
-    private val tracksInteractor: SearchTracksInteractor = Creator.provideSearchTracksInteractor()
-    private val historyInteractor: HistoryInteractor =
-        Creator.provideHistoryInteractor(getApplication())
-
-    private val _historyTracks = MutableLiveData<List<Track>>()
-    val historyTracks: LiveData<List<Track>> = _historyTracks
-
-    private val _searchTracks = MutableLiveData<List<Track>>()
-    val searchTracks: LiveData<List<Track>> = _searchTracks
 
     private val _searchState = MutableLiveData<SearchState>()
     val searchState: LiveData<SearchState> = _searchState
@@ -52,23 +46,12 @@ class TracksViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun getSavedHistory() {
-        _historyTracks.postValue(
-            historyInteractor.getSavedHistory()
-        )
-    }
-
-    fun historyIsNotEmpty(): Boolean {
-        return _historyTracks.value?.isNotEmpty() ?: false
-    }
-
-    fun clearHistory() {
-        historyInteractor.clearHistory()
-        _historyTracks.postValue(listOf())
+        historyInteractor.getSavedHistory()
     }
 
     fun searchDebounce(changedText: String) { //дебаунс в поисковой строке
 
-        //if (latestQueryText == changedText) return
+        if (latestQueryText == changedText) return
 
         latestQueryText = changedText
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
@@ -80,17 +63,16 @@ class TracksViewModel(application: Application) : AndroidViewModel(application) 
     fun searchTracks(queryText: String) {
         if (queryText.isNotEmpty()) {
             renderState(SearchState.Loading)
-            tracksInteractor.searchTracks(
+            searchInteractor.searchTracks(
                 queryText,
                 object : SearchTracksInteractor.TracksConsumer {
                     override fun consume(searchResult: SearchResult) {
                         when (searchResult.resultCode) {
                             200 -> {
-                                if (searchResult.results.isNotEmpty()) {
-                                    _searchTracks.postValue(searchResult.results)
-                                    renderState(SearchState.Content)
-                                } else
+                                if (searchResult.results.isEmpty())
                                     renderState(SearchState.Empty)
+                                else
+                                    renderState(SearchState.SearchContent(searchTracks = searchResult.results))
                             }
                             else -> { renderState(SearchState.Error)}
                         }
@@ -109,8 +91,26 @@ class TracksViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun addTrackToHistory(track: Track) {
-        historyInteractor.addTrackToHistory(track)
+        if (_searchState.value is SearchState.SearchContent)
+            historyInteractor.addTrackToHistory(track)
     }
 
+    fun onSearchTextChanged(queryText: String) {
+        if (queryText.isEmpty())
+            _searchState.postValue(SearchState.HistoryContent(historyTracks = historyInteractor.getTracks()))
+        else
+            searchDebounce(queryText)
+    }
 
+    fun onClickHistoryClearButton() {
+        historyInteractor.clearHistory()
+        _searchState.postValue(SearchState.SearchContent(searchTracks = listOf()))
+    }
+
+    fun showHistory() {
+        if (historyInteractor.getTracks().isNotEmpty())
+            _searchState.postValue(SearchState.HistoryContent(historyTracks = historyInteractor.getTracks()))
+        else
+            _searchState.postValue(SearchState.SearchContent(searchTracks = listOf()))
+    }
 }

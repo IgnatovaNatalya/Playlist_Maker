@@ -1,18 +1,15 @@
 package com.example.playlistmaker.settings.data.impl
 
-import android.content.Context
+import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.settings.domain.ThemeRepository
 
-const val DARK_THEME = "dark_theme"
-const val PLAYLIST_MAKER_PREFS = "playlist_maker_prefs"//todo дублируется
+class ThemeRepositoryImpl (private val sharedPrefs: SharedPreferences) : ThemeRepository {
 
-class ThemeRepositoryImpl (context: Context) : ThemeRepository {
+    companion object {
+        const val DARK_THEME = "dark_theme"
+    }
 
-    private var sharedPrefs = context.getSharedPreferences(PLAYLIST_MAKER_PREFS, Context.MODE_PRIVATE)
-
-//    override fun containsTheme(): Boolean {
-//        return sharedPrefs.contains(DARK_THEME)
-//    }
 
     override fun isSaved(): Boolean {
         return sharedPrefs.contains(DARK_THEME)
@@ -29,7 +26,12 @@ class ThemeRepositoryImpl (context: Context) : ThemeRepository {
     }
 
     override fun switchTheme(theme: Boolean) {
-        TODO("Not yet implemented")
+        AppCompatDelegate.setDefaultNightMode(
+            if (theme) {
+                AppCompatDelegate.MODE_NIGHT_YES
+            } else {
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+        )
     }
-
 }

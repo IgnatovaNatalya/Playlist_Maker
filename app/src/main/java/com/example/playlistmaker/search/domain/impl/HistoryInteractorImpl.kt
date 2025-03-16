@@ -12,6 +12,7 @@ class HistoryInteractorImpl (private val repository: HistoryRepository) :
     private var historyTrackList = mutableListOf<Track>()
 
     override fun getSavedHistory() : List<Track> {
+        historyTrackList.clear()
         historyTrackList.addAll(repository.getSavedHistory())
         return historyTrackList
     }
