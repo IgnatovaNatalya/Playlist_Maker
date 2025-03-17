@@ -3,9 +3,8 @@ package com.example.playlistmaker.player.data.repositoryImpl
 import android.media.MediaPlayer
 import com.example.playlistmaker.player.data.repository.PlaybackRepository
 
-class PlaybackRepositoryImpl: PlaybackRepository {
+class PlaybackRepositoryImpl(private var mediaPlayer:MediaPlayer): PlaybackRepository {
     private var playerState = STATE_DEFAULT
-    private var mediaPlayer = MediaPlayer()
 
     override fun preparePlayer(trackUrl: String?,
                                onPrepare: () -> Unit,

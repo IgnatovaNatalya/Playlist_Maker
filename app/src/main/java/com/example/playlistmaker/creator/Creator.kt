@@ -2,6 +2,7 @@ package com.example.playlistmaker.creator
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.MediaPlayer
 import com.example.playlistmaker.player.data.repository.PlaybackRepository
 import com.example.playlistmaker.player.data.repositoryImpl.PlaybackRepositoryImpl
 import com.example.playlistmaker.player.domain.PlaybackInteractor
@@ -23,6 +24,8 @@ import com.example.playlistmaker.sharing.data.ExternalNavigatorImpl
 import com.example.playlistmaker.sharing.domain.ExternalNavigator
 import com.example.playlistmaker.sharing.domain.SharingInteractor
 import com.example.playlistmaker.sharing.domain.impl.SharingInteractorImpl
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 object Creator {
@@ -38,8 +41,17 @@ object Creator {
     }
 
     //search
+    private fun getRetrofit():Retrofit {
+        val baseUrl = "https://itunes.apple.com"
+
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
     private fun getTracksRepository(): TracksRepository {
-        return TrackRepositoryImpl(RetrofitNetworkClient())
+        return TrackRepositoryImpl(RetrofitNetworkClient(getRetrofit()))
     }
 
     fun provideSearchTracksInteractor(): SearchTracksInteractor {
@@ -56,8 +68,12 @@ object Creator {
     }
 
     //play
+    private fun getMediaPlayer(): MediaPlayer {
+        return MediaPlayer()
+    }
+
     private fun getPlaybackRepository(): PlaybackRepository {
-        return PlaybackRepositoryImpl()
+        return PlaybackRepositoryImpl(getMediaPlayer())
     }
 
     fun providePlaybackInteractor(): PlaybackInteractor {

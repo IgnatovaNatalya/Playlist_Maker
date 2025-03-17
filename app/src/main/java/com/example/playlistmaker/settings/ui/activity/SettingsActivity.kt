@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
+import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.settings.ui.viewmodel.SettingsViewModel
 
@@ -30,7 +31,10 @@ class SettingsActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(
             this,
-            SettingsViewModel.getViewModelFactory()
+            SettingsViewModel.getViewModelFactory(
+                Creator.provideSharingInteractor(this),
+                Creator.provideThemeInteractor(this)
+            )
         )[SettingsViewModel::class.java]
 
         binding.settingsToolbar.setNavigationOnClickListener { finish() }
