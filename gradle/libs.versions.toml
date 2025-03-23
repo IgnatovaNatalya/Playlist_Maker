@@ -12,6 +12,7 @@ constraintlayout = "2.2.1"
 glide = "4.16.0"
 gson = "2.10.1"
 retrofit = "2.11.0"
+koin = "3.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,6 +28,7 @@ glide_compiler = { module = "com.github.bumptech.glide:compiler", version.ref = 
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit_converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+koin = {module = "io.insert-koin:koin-android", version.ref ="koin"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
