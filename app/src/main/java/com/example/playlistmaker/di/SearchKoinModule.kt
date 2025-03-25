@@ -21,15 +21,15 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 val SearchKoinModule = module {
-    single<HistoryInteractor> { HistoryInteractorImpl(get()) }
-    single<HistoryRepository> { HistoryRepositoryImpl(get()) }
+    factory<HistoryInteractor> { HistoryInteractorImpl(get()) }
+    factory<HistoryRepository> { HistoryRepositoryImpl(get(), get()) }
 
-    single { androidContext().getSharedPreferences("playlist_maker_prefs", Context.MODE_PRIVATE) }
-    single<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
-    single<TracksRepository> { TrackRepositoryImpl(get()) }
-    single<NetworkClient> { RetrofitNetworkClient(get()) }
+    factory { androidContext().getSharedPreferences("playlist_maker_prefs", Context.MODE_PRIVATE) }
+    factory<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
+    factory<TracksRepository> { TrackRepositoryImpl(get()) }
+    factory<NetworkClient> { RetrofitNetworkClient(get()) }
 
-    single<ItunesApiService> {
+    factory<ItunesApiService> {
         Retrofit.Builder()
             .baseUrl("https://itunes.apple.com")
             .addConverterFactory(GsonConverterFactory.create())

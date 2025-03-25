@@ -14,9 +14,9 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val SettingsKoinModule = module {
-    single<ThemeInteractor> { ThemeInteractorImpl(get()) }
-    single<SharingInteractor> { SharingInteractorImpl(get()) }
-    single<ThemeRepository> { ThemeRepositoryImpl(get()) }
-    single<ExternalNavigator> { ExternalNavigatorImpl(androidContext()) }
+    factory<ThemeInteractor> { ThemeInteractorImpl(get()) }
+    factory<SharingInteractor> { SharingInteractorImpl(get()) }
+    factory<ThemeRepository> { ThemeRepositoryImpl(get()) }
+    factory<ExternalNavigator> { ExternalNavigatorImpl(androidContext()) }
     viewModel { SettingsViewModel(get(), get()) }
 }
