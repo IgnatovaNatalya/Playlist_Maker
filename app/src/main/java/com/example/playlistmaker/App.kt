@@ -2,17 +2,25 @@ package com.example.playlistmaker
 
 import android.app.Application
 import android.content.res.Configuration
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.di.PlayerKoinModule
+import com.example.playlistmaker.di.SearchKoinModule
+import com.example.playlistmaker.di.SettingsKoinModule
 import com.example.playlistmaker.settings.domain.ThemeInteractor
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.startKoin
 
 class App : Application() {
 
-    private lateinit var themeInteractor: ThemeInteractor
+    private val themeInteractor: ThemeInteractor by inject()
 
     override fun onCreate() {
         super.onCreate()
 
-        themeInteractor = Creator.provideThemeInteractor(this)
+        startKoin {
+            androidContext(this@App)
+            modules(SearchKoinModule, SettingsKoinModule, PlayerKoinModule)
+        }
 
         if (themeInteractor.isSaved()) {
             themeInteractor.switchTheme(themeInteractor.getSavedTheme())

@@ -57,4 +57,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
+
+    implementation(libs.koin)
+
 }

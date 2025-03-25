@@ -13,15 +13,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.player.ui.activity.PlayerActivity
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.ui.viewmodel.SearchState
 import com.example.playlistmaker.search.ui.viewmodel.TracksViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
 
 class SearchActivity : AppCompatActivity() {
@@ -41,7 +41,7 @@ class SearchActivity : AppCompatActivity() {
 
     private var enteredText: String = DEFAULT_TEXT
 
-    private lateinit var viewModel: TracksViewModel
+    private val viewModel: TracksViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,17 +56,11 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        binding.searchToolbar.setNavigationOnClickListener { finish() }
-
-        viewModel = ViewModelProvider(
-            this,
-            TracksViewModel.getViewModelFactory(
-                Creator.provideSearchTracksInteractor(),
-                Creator.provideHistoryInteractor(this)
-            )
-        )[TracksViewModel::class.java]
-
         viewModel.getSavedHistory()
+
+        viewModel.searchState.observe(this) { render(it) }
+
+        binding.searchToolbar.setNavigationOnClickListener { finish() }
 
         binding.clearSearchButton.setOnClickListener {
             binding.searchInputText.setText(DEFAULT_TEXT)
@@ -74,7 +68,6 @@ class SearchActivity : AppCompatActivity() {
             manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
             viewModel.showHistory()
         }
-
 
         binding.searchInputText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -94,8 +87,6 @@ class SearchActivity : AppCompatActivity() {
 
         binding.tracksRecycler.layoutManager = LinearLayoutManager(this)
         binding.tracksRecycler.adapter = tracksAdapter
-
-        viewModel.searchState.observe(this) { render(it) }
 
         binding.placeholderReloadButton.setOnClickListener { viewModel.searchDebounce(enteredText) }
         binding.clearHistoryButton.setOnClickListener { viewModel.onClickHistoryClearButton() }

@@ -5,17 +5,16 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.player.domain.PlaybackInteractor
 
 import com.example.playlistmaker.search.domain.model.Track
 
-class PlaybackViewModel: ViewModel() {
+class PlaybackViewModel(private val playbackInteractor: PlaybackInteractor) : ViewModel() {
 
     companion object {
         private const val START_TIME = 1
     }
 
-    private var playbackInteractor = Creator.providePlaybackInteractor()
 
     private val _playerState = MutableLiveData<PlayerState>()
     val playerState: LiveData<PlayerState> = _playerState
@@ -68,7 +67,7 @@ class PlaybackViewModel: ViewModel() {
         mainThreadHandler.postDelayed(
             object : Runnable {
                 override fun run() {
-                    _playerState.postValue(PlayerState.Playing(playerTime=time))
+                    _playerState.postValue(PlayerState.Playing(playerTime = time))
                     time++
                     mainThreadHandler.postDelayed(this, 1000L)
                 }
