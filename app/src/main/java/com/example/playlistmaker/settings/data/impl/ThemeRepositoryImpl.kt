@@ -3,13 +3,13 @@ package com.example.playlistmaker.settings.data.impl
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.settings.domain.ThemeRepository
+import androidx.core.content.edit
 
 class ThemeRepositoryImpl (private val sharedPrefs: SharedPreferences) : ThemeRepository {
 
     companion object {
         const val DARK_THEME = "dark_theme"
     }
-
 
     override fun isSaved(): Boolean {
         return sharedPrefs.contains(DARK_THEME)
@@ -20,9 +20,9 @@ class ThemeRepositoryImpl (private val sharedPrefs: SharedPreferences) : ThemeRe
     }
 
     override fun saveTheme(theme: Boolean) {
-        sharedPrefs.edit()
-            .putBoolean(DARK_THEME, theme)
-            .apply()
+        sharedPrefs.edit() {
+            putBoolean(DARK_THEME, theme)
+        }
     }
 
     override fun switchTheme(theme: Boolean) {

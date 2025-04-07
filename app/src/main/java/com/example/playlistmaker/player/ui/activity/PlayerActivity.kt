@@ -6,7 +6,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
@@ -15,11 +14,13 @@ import com.example.playlistmaker.player.ui.viewmodel.PlaybackViewModel
 import com.example.playlistmaker.player.ui.viewmodel.PlayerState
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.ui.activity.SearchActivity.Companion.EXTRA_TRACK
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
-    private lateinit var viewModel: PlaybackViewModel
+    private val viewModel: PlaybackViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +34,6 @@ class PlayerActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        viewModel = ViewModelProvider(this)[PlaybackViewModel::class.java]
 
         binding.playerToolbar.setNavigationOnClickListener { finish() }
 
@@ -72,7 +71,6 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun drawTrack(track: Track) {
 
@@ -112,11 +110,6 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.pausePlayer()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
         viewModel.releasePlayer()
     }
 
