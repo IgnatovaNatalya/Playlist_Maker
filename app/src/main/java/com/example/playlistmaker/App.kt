@@ -2,6 +2,7 @@ package com.example.playlistmaker
 
 import android.app.Application
 import android.content.res.Configuration
+import com.example.playlistmaker.di.MediaKoinModule
 import com.example.playlistmaker.di.PlayerKoinModule
 import com.example.playlistmaker.di.SearchKoinModule
 import com.example.playlistmaker.di.SettingsKoinModule
@@ -19,7 +20,7 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(SearchKoinModule, SettingsKoinModule, PlayerKoinModule)
+            modules(SearchKoinModule, SettingsKoinModule, PlayerKoinModule, MediaKoinModule)
         }
 
         if (themeInteractor.isSaved()) {

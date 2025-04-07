@@ -34,4 +34,11 @@
     <string name="playback_control_time">00:00</string>
 
 
+    <string name="favorite_tracks">Избранные треки</string>
+    <string name="playlosts">Плейлисты</string>
+    <string name="no_playlists">Вы не создали\nни одного плейлиста</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="no_tracks">Ваша медиатека пуста</string>
+
+
 </resources>
