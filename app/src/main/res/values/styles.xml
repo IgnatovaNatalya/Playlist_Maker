@@ -19,7 +19,7 @@
         <item name="iconTint">?attr/colorOnPrimary</item>
     </style>
 
-    <style name="UsualButtonsStyle" >
+    <style name="UsualButtonsStyle">
         <item name="cornerRadius">54dp</item>
         <item name="android:backgroundTint">?attr/android:textColor</item>
         <item name="android:textColor">?attr/android:colorBackground</item>
@@ -38,7 +38,7 @@
         <item name="android:layout_gravity">center_vertical</item>
     </style>
 
-    <style name="SettingsSwitch"  parent = "Widget.AppCompat.CompoundButton.Switch">
+    <style name="SettingsSwitch" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="thumbTint">@color/selector_switch_thumb</item>
         <item name="trackTint">?attr/colorSecondaryContainer</item>
     </style>
@@ -91,10 +91,20 @@
         <item name="android:textSize">13sp</item>
         <item name="fontFamily">@font/ys_text_regular</item>
     </style>
-    
-    <style name="PlayerTextGrey" parent = "PlayerTextInfo">
-        <item name="android:textColor">@color/light_grey</item>
 
+    <style name="PlayerTextGrey" parent="PlayerTextInfo">
+        <item name="android:textColor">@color/light_grey</item>
+    </style>
+
+    <style name="TabStyle">
+        <item name="tabTextColor">?attr/android:textColor</item>
+        <item name="tabBackground">?attr/android:colorBackground</item>
+        <item name="tabIndicatorColor">?attr/android:textColor</item>
+        <item name="tabIndicatorFullWidth">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="tabIndicatorHeight">2dp</item>
+        <item name="fontFamily">@font/ys_text_medium</item>
     </style>
 
 </resources>
