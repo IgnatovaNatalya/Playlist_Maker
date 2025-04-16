@@ -1,21 +1,19 @@
-package com.example.playlistmaker.search.ui.activity
+package com.example.playlistmaker.search.ui.fragment
 
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.core.BindingFragment
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.player.ui.activity.PlayerActivity
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.ui.viewmodel.SearchState
@@ -23,16 +21,7 @@ import com.example.playlistmaker.search.ui.viewmodel.TracksViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
-
-class SearchActivity : AppCompatActivity() {
-
-    companion object {
-        const val EXTRA_TRACK = "EXTRA_TRACK_STR"
-        const val CLICK_DEBOUNCE_DELAY = 2000L
-        const val ENTERED_TEXT = "ENTERED_TEXT"
-        const val DEFAULT_TEXT = ""
-    }
-    private lateinit var binding: ActivitySearchBinding
+class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
     private var tracksAdapter = TrackAdapter { openPlayer(it) }
 
@@ -43,28 +32,21 @@ class SearchActivity : AppCompatActivity() {
 
     private val viewModel: TracksViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+    override fun createBinding(inflater: LayoutInflater, container: ViewGroup?):
+            FragmentSearchBinding {
+        return FragmentSearchBinding.inflate(inflater, container, false)
+    }
 
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         viewModel.getSavedHistory()
 
-        viewModel.searchState.observe(this) { render(it) }
-
-        binding.searchToolbar.setNavigationOnClickListener { finish() }
+        viewModel.searchState.observe(viewLifecycleOwner) { render(it) }
 
         binding.clearSearchButton.setOnClickListener {
             binding.searchInputText.setText(DEFAULT_TEXT)
-            val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            val manager = activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
             viewModel.showHistory()
         }
@@ -85,11 +67,12 @@ class SearchActivity : AppCompatActivity() {
             viewModel.showHistory()
         }
 
-        binding.tracksRecycler.layoutManager = LinearLayoutManager(this)
+        binding.tracksRecycler.layoutManager = LinearLayoutManager(activity)
         binding.tracksRecycler.adapter = tracksAdapter
 
         binding.placeholderReloadButton.setOnClickListener { viewModel.searchDebounce(enteredText) }
         binding.clearHistoryButton.setOnClickListener { viewModel.onClickHistoryClearButton() }
+
     }
 
     private fun render(state: SearchState) {
@@ -168,8 +151,7 @@ class SearchActivity : AppCompatActivity() {
     private fun openPlayer(track: Track) {
         if (clickDebounce()) {
             viewModel.addTrackToHistory(track)
-            val intent = Intent(this, PlayerActivity::class.java)
-            intent.putExtra(EXTRA_TRACK, track)
+            val intent = PlayerActivity.newInstance(requireContext(), track)
             startActivity(intent)
         }
     }
@@ -197,7 +179,12 @@ class SearchActivity : AppCompatActivity() {
                 binding.placeholderMessage.visibility = View.VISIBLE
                 binding.placeholderReloadButton.visibility = View.GONE
                 binding.placeholderMessage.text = this.getString(message.text)
-                binding.placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(0, message.image, 0, 0)
+                binding.placeholderMessage.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    message.image,
+                    0,
+                    0
+                )
             }
         }
     }
@@ -212,7 +199,10 @@ class SearchActivity : AppCompatActivity() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            handler.postDelayed(
+                { isClickAllowed = true },
+                CLICK_DEBOUNCE_DELAY
+            )
         }
         return current
     }
@@ -222,12 +212,23 @@ class SearchActivity : AppCompatActivity() {
         outState.putString(ENTERED_TEXT, enteredText)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        enteredText = savedInstanceState.getString(ENTERED_TEXT, DEFAULT_TEXT)
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
+        if (savedInstanceState != null)
+            enteredText = savedInstanceState.getString(
+                ENTERED_TEXT,
+                DEFAULT_TEXT
+            )
 
         if (enteredText.isNotEmpty()) {
             binding.searchInputText.setText(enteredText)
         }
+    }
+
+    companion object {
+        const val CLICK_DEBOUNCE_DELAY = 2000L
+        const val ENTERED_TEXT = "ENTERED_TEXT"
+        const val DEFAULT_TEXT = ""
     }
 }

@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".media.ui.fragment.MediaFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/media_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/arrow_back"
         app:title="@string/media"
         app:titleTextAppearance="@style/ToolbarTitleStyle"
         app:contentInsetStart="0dp"

@@ -1,5 +1,7 @@
 package com.example.playlistmaker.player.ui.activity
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.activity.enableEdgeToEdge
@@ -13,7 +15,6 @@ import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.player.ui.viewmodel.PlaybackViewModel
 import com.example.playlistmaker.player.ui.viewmodel.PlayerState
 import com.example.playlistmaker.search.domain.model.Track
-import com.example.playlistmaker.search.ui.activity.SearchActivity.Companion.EXTRA_TRACK
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
@@ -118,4 +119,16 @@ class PlayerActivity : AppCompatActivity() {
         val sec = time % 60
         return "%02d".format(min) + ":" + "%02d".format(sec)
     }
+
+    companion object {
+
+        const val EXTRA_TRACK = "EXTRA_TRACK"
+
+        fun newInstance(context: Context, track: Track): Intent {
+            return Intent(context, PlayerActivity::class.java).apply {
+                putExtra(EXTRA_TRACK, track)
+            }
+        }
+    }
+
 }
