@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimary">@color/YP_Blue</item>
         <item name="colorOnPrimary">@color/YP_Black</item>
         <item name="colorPrimaryContainer">@color/white</item>
 
@@ -14,7 +14,7 @@
         <item name="background">@color/YP_Black</item>
         <item name="android:colorBackground">@color/YP_Black</item>
 
-        <item name="colorOnBackground">@color/extra_light_grey</item>
+        <item name="colorOnBackground">@color/YP_light_grey</item>
         <item name="android:textColor">@color/white</item>
         <item name="colorSecondaryVariant">@color/white</item>
 
@@ -24,6 +24,7 @@
         <item name="colorOnSurfaceVariant">@color/white</item>
 
         <item name="cursorColor">@color/YP_Blue</item>
+
 
     </style>
 

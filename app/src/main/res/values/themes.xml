@@ -4,16 +4,17 @@
     <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
 
-        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimary">@color/YP_Blue</item>
         <item name="colorOnPrimary">@color/YP_Black</item>
         <item name="colorPrimaryContainer">@color/white</item>
 
         <item name="colorAccent">@color/YP_Blue</item>
 
-        <item name="colorSecondaryContainer">@color/extra_light_grey</item>
+        <item name="colorSecondaryContainer">@color/YP_light_grey</item>
 
         <item name="android:colorBackground">@color/white</item>
         <item name="android:textColor">@color/YP_Black</item>
+
         <item name="colorSecondaryVariant">@color/light_grey</item>
         <item name="colorOnSurfaceVariant">@color/black</item>
 
@@ -21,9 +22,8 @@
 
         <item name="android:textColorHint">@color/light_grey</item>
         <item name="android:editTextColor">@color/YP_Black</item>
-        <item name="android:editTextBackground">@color/extra_light_grey</item>
+        <item name="android:editTextBackground">@color/YP_light_grey</item>
         <item name="cursorColor">@color/YP_Blue</item>
-
 
 
     </style>

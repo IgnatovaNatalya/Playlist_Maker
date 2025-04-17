@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".search.ui.fragment.SearchFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/search_toolbar"
@@ -13,7 +14,6 @@
         android:layout_height="wrap_content"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
-        app:navigationIcon="@drawable/arrow_back"
         app:title="@string/search"
         app:titleMarginStart="8dp"
         app:titleTextAppearance="@style/ToolbarTitleStyle" />
