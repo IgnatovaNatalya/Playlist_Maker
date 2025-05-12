@@ -63,7 +63,6 @@ class TracksViewModel(
     }
 
 
-
     fun getSavedHistory() {
         historyInteractor.getSavedHistory()
     }
