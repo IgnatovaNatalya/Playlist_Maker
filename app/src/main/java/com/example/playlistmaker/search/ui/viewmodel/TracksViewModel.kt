@@ -4,12 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.core.debounce
 import com.example.playlistmaker.search.domain.HistoryInteractor
 import com.example.playlistmaker.search.domain.SearchTracksInteractor
-import com.example.playlistmaker.search.domain.model.SearchResult
 import com.example.playlistmaker.search.domain.model.Track
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TracksViewModel(
@@ -25,43 +23,40 @@ class TracksViewModel(
     val searchState: LiveData<SearchState> = _searchState
 
     private var latestQueryText: String? = null
-    private var searchJob: Job? = null
+
+    private val trackSearchDebounce = debounce<String>(
+        SEARCH_DEBOUNCE_DELAY,
+        viewModelScope,
+        true
+    ) { request -> searchTracks(request) }
 
     fun searchDebounce(changedText: String) { //дебаунс в поисковой строке
-
         if (latestQueryText == changedText) return
-
         latestQueryText = changedText
-
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            delay(SEARCH_DEBOUNCE_DELAY)
-            searchTracks(changedText)
-        }
+        trackSearchDebounce(changedText)
     }
 
    fun searchTracks(queryText: String) {
         if (queryText.isNotEmpty()) {
             renderState(SearchState.Loading)
-            searchInteractor.searchTracks(
-                queryText,
-                object : SearchTracksInteractor.TracksConsumer {
-                    override fun consume(searchResult: SearchResult) {
-                        when (searchResult.resultCode) {
-                            200 -> {
-                                if (searchResult.results.isEmpty())
-                                    renderState(SearchState.Empty)
-                                else
-                                    renderState(SearchState.SearchContent(searchTracks = searchResult.results))
+            viewModelScope.launch {
+                searchInteractor.searchTracks(queryText).collect { result ->
+                    when (result.resultCode) {
+                        200 -> {
+                            if (result.results.isEmpty())
+                                renderState(SearchState.Empty)
+                            else
+                                renderState(SearchState.SearchContent(searchTracks = result.results))
                             }
-                            else -> { renderState(SearchState.Error)}
+
+                        else -> {
+                            renderState(SearchState.Error)
                         }
                     }
                 }
-            )
+            }
         }
     }
-
 
     fun getSavedHistory() {
         historyInteractor.getSavedHistory()

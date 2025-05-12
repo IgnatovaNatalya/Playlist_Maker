@@ -4,13 +4,16 @@ import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.dto.TracksSearchRequest
 import com.example.playlistmaker.search.data.dto.TracksSearchResponse
 import com.example.playlistmaker.search.data.repository.TracksRepository
-import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.domain.model.SearchResult
+import com.example.playlistmaker.search.domain.model.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class TrackRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
-    override fun searchTracks(expression: String): SearchResult {
+
+    override fun searchTracks(expression: String): Flow<SearchResult> = flow {
         val response = networkClient.doRequest(TracksSearchRequest(expression))
 
         when (response.resultCode) {
@@ -29,10 +32,10 @@ class TrackRepositoryImpl(private val networkClient: NetworkClient) : TracksRepo
                         it.previewUrl
                     )
                 }
-                return SearchResult(resultCode = 200, results = listTrack)
+                emit(SearchResult(resultCode = 200, results = listTrack))
             }
             else -> {
-                return SearchResult(resultCode = response.resultCode, results = listOf())
+                emit(SearchResult(resultCode = response.resultCode, results = listOf()))
             }
         }
     }
