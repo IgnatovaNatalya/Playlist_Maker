@@ -1,15 +1,16 @@
 package com.example.playlistmaker.search.ui.viewmodel
 
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.search.domain.HistoryInteractor
 import com.example.playlistmaker.search.domain.SearchTracksInteractor
 import com.example.playlistmaker.search.domain.model.SearchResult
 import com.example.playlistmaker.search.domain.model.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TracksViewModel(
     private val searchInteractor: SearchTracksInteractor,
@@ -18,36 +19,28 @@ class TracksViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private val SEARCH_REQUEST_TOKEN = Any()
     }
 
     private val _searchState = MutableLiveData<SearchState>()
     val searchState: LiveData<SearchState> = _searchState
 
-    private val handler = Handler(Looper.getMainLooper())
-
     private var latestQueryText: String? = null
-
-    override fun onCleared() {
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
-    }
-
-    fun getSavedHistory() {
-        historyInteractor.getSavedHistory()
-    }
+    private var searchJob: Job? = null
 
     fun searchDebounce(changedText: String) { //дебаунс в поисковой строке
 
         if (latestQueryText == changedText) return
 
         latestQueryText = changedText
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
-        val searchRunnable = Runnable { searchTracks(changedText) }
-        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
-        handler.postAtTime(searchRunnable, SEARCH_REQUEST_TOKEN, postTime)
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
+            searchTracks(changedText)
+        }
     }
 
-    fun searchTracks(queryText: String) {
+   fun searchTracks(queryText: String) {
         if (queryText.isNotEmpty()) {
             renderState(SearchState.Loading)
             searchInteractor.searchTracks(
@@ -67,6 +60,12 @@ class TracksViewModel(
                 }
             )
         }
+    }
+
+
+
+    fun getSavedHistory() {
+        historyInteractor.getSavedHistory()
     }
 
     private fun renderState(state: SearchState) {
