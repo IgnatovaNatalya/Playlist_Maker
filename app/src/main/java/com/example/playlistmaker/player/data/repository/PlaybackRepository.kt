@@ -6,6 +6,5 @@ interface PlaybackRepository {
     fun pausePlayer()
     fun isPlaying(): Boolean
     fun getCurrentPosition(): Int
-    //fun playbackControl()
     fun releasePlayer()
 }

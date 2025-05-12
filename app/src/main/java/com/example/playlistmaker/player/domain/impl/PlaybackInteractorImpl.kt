@@ -29,12 +29,6 @@ class PlaybackInteractorImpl(private val repository: PlaybackRepository): Playba
         return  repository.getCurrentPosition()
     }
 
-//    override fun playbackControl() {
-//        repository.playbackControl()
-//    }
-
-
-
     override fun releasePlayer() {
         repository.releasePlayer()
     }

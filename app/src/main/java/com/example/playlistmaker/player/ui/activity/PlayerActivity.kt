@@ -101,5 +101,4 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
     }
-
 }
