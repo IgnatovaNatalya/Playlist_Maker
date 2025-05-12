@@ -50,27 +50,13 @@ class PlayerActivity : AppCompatActivity() {
             viewModel.preparePlayer(track)
         }
 
-        binding.buttonPlayPause.setOnClickListener { viewModel.playbackControl() }
+        binding.buttonPlayPause.setOnClickListener { viewModel.onPlayButtonClicked() }
     }
 
     private fun renderState(state: PlayerState) {
-        when (state) {
-            PlayerState.NotPrepared -> {
-                showPaused()
-                binding.buttonPlayPause.isEnabled = false
-            }
-
-            PlayerState.Prepared -> {
-                binding.buttonPlayPause.isEnabled = true
-
-            }
-            is PlayerState.Playing -> showPlaying(state.playerTime)
-            is PlayerState.Paused -> showPaused()
-            PlayerState.Completed -> {
-                showPaused()
-                binding.playbackTimer.text = formatTime(0)
-            }
-        }
+        binding.buttonPlayPause.isEnabled = state.isPlayButtonEnabled
+        binding.buttonPlayPause.setImageResource(state.buttonResource)
+        binding.playbackTimer.text = state.progress
     }
 
     private fun drawTrack(track: Track) {
@@ -100,24 +86,9 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerCountry.text = track.country
     }
 
-    private fun showPlaying(time: Int) {
-        binding.buttonPlayPause.setImageResource(R.drawable.button_pause)
-        binding.playbackTimer.text = formatTime(time)
-    }
-
-    private fun showPaused() {
-        binding.buttonPlayPause.setImageResource(R.drawable.button_play)
-    }
-
     override fun onPause() {
         super.onPause()
-        viewModel.releasePlayer()
-    }
-
-    private fun formatTime(time:Int) :String{
-        val min = time / 60
-        val sec = time % 60
-        return "%02d".format(min) + ":" + "%02d".format(sec)
+        viewModel.onPause()
     }
 
     companion object {
