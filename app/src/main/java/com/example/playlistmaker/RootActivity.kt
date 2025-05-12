@@ -49,4 +49,9 @@ class RootActivity : AppCompatActivity() {
     fun animateBottomNavigationView() {
         binding.bottomNavigationView.visibility = View.GONE
     }
+
+    override fun onResume() {
+        super.onResume()
+        binding.bottomNavigationView.visibility = View.VISIBLE
+    }
 }
