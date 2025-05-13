@@ -7,7 +7,6 @@ sealed class PlayerState(
     val buttonResource: Int,
     val progress: String
 ) {
-
     class Default : PlayerState(false, R.drawable.button_play, "00:00")
     class Prepared : PlayerState(true, R.drawable.button_play, "00:00")
     class Playing(progress: String) : PlayerState(true, R.drawable.button_pause, progress)

@@ -61,10 +61,12 @@ class PlaybackViewModel(private val playbackInteractor: PlaybackInteractor) : Vi
     }
 
     private fun startTimer() {
+        timerJob?.cancel()
+
         timerJob = viewModelScope.launch {
             while (playbackInteractor.isPlaying()) {
-                delay(300L)
                 _playerState.postValue(PlayerState.Playing(getCurrentPlayerPosition()))
+                delay(TIMER_UPDATE_INTERVAL)
             }
         }
     }
@@ -81,5 +83,9 @@ class PlaybackViewModel(private val playbackInteractor: PlaybackInteractor) : Vi
     override fun onCleared() {
         super.onCleared()
         releasePlayer()
+    }
+
+    companion object{
+        const val TIMER_UPDATE_INTERVAL = 300L
     }
 }

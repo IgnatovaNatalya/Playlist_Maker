@@ -6,8 +6,6 @@ import android.net.NetworkCapabilities
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.TracksSearchRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class RetrofitNetworkClient(
     private val context: Context,
@@ -18,13 +16,11 @@ class RetrofitNetworkClient(
         if (!isConnected()) return Response().apply { resultCode = -1 }
 
         return if (dto is TracksSearchRequest) {
-            withContext(Dispatchers.IO) {
-                try {
-                    val response = apiService.search(dto.expression)
-                    response.apply { resultCode = 200 }
-                } catch (e: Throwable) {
-                    Response().apply { resultCode = 500 }
-                }
+            try {
+                val response = apiService.search(dto.expression)
+                response.apply { resultCode = 200 }
+            } catch (e: Throwable) {
+                Response().apply { resultCode = 500 }
             }
         } else {
             Response().apply { resultCode = 400 }
