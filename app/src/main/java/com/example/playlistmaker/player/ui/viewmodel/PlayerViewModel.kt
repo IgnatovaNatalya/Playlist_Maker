@@ -1,82 +1,91 @@
 package com.example.playlistmaker.player.ui.viewmodel
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.player.domain.PlaybackInteractor
-
 import com.example.playlistmaker.search.domain.model.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlaybackViewModel(private val playbackInteractor: PlaybackInteractor) : ViewModel() {
 
-    companion object {
-        private const val START_TIME = 1
-    }
-
-
-    private val _playerState = MutableLiveData<PlayerState>()
+    private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default())
     val playerState: LiveData<PlayerState> = _playerState
 
-    private val mainThreadHandler = Handler(Looper.getMainLooper())
+    private var timerJob: Job? = null
 
-    private var time = START_TIME
+    private fun startPlayer() {
+        playbackInteractor.startPlayer()
+        _playerState.postValue(PlayerState.Playing(getCurrentPlayerPosition()))
+        startTimer()
+    }
 
-    fun pausePlayer() {
+    private fun pausePlayer() {
         playbackInteractor.pausePlayer()
+        timerJob?.cancel()
+        _playerState.postValue(PlayerState.Paused(getCurrentPlayerPosition()))
     }
 
     fun releasePlayer() {
         playbackInteractor.releasePlayer()
+        _playerState.value = PlayerState.Default()
     }
 
     fun preparePlayer(track: Track) {
-        _playerState.postValue(PlayerState.NotPrepared)
         playbackInteractor.preparePlayer(
             track.previewUrl,
-            {
-                resetTimer()
-                _playerState.postValue(PlayerState.Prepared)
-
-            },
-            {
-                resetTimer()
-                _playerState.postValue(PlayerState.Completed)
-            }
+            { _playerState.postValue(PlayerState.Prepared()) },
+            { _playerState.postValue(PlayerState.Prepared()) }
         )
     }
 
-    fun playbackControl() {
-        playbackInteractor.playbackControl()
+    fun onPlayButtonClicked() {
 
-        if (playbackInteractor.isPlaying()) {
-            countTime()
-        } else {
-            _playerState.postValue(PlayerState.Paused)
-            mainThreadHandler.removeCallbacksAndMessages(null)
+        when (_playerState.value) {
+
+            is PlayerState.Playing -> {
+                pausePlayer()
+            }
+
+            is PlayerState.Prepared, is PlayerState.Paused -> {
+                startPlayer()
+            }
+
+            else -> {}
         }
     }
 
-    private fun resetTimer() {
-        time = START_TIME
-        mainThreadHandler.removeCallbacksAndMessages(null)
+    private fun startTimer() {
+        timerJob?.cancel()
+
+        timerJob = viewModelScope.launch {
+            while (playbackInteractor.isPlaying()) {
+                _playerState.postValue(PlayerState.Playing(getCurrentPlayerPosition()))
+                delay(TIMER_UPDATE_INTERVAL)
+            }
+        }
     }
 
-    private fun countTime() {
-        mainThreadHandler.postDelayed(
-            object : Runnable {
-                override fun run() {
-                    _playerState.postValue(PlayerState.Playing(playerTime = time))
-                    time++
-                    mainThreadHandler.postDelayed(this, 1000L)
-                }
-            }, 1000L
-        )
+    private fun getCurrentPlayerPosition(): String {
+        return SimpleDateFormat("mm:ss", Locale.getDefault())
+            .format(playbackInteractor.getCurrentPosition()) ?: "00:00"
+    }
+
+    fun onPause() {
+        pausePlayer()
     }
 
     override fun onCleared() {
-        mainThreadHandler.removeCallbacksAndMessages(null)
+        super.onCleared()
         releasePlayer()
+    }
+
+    companion object{
+        const val TIMER_UPDATE_INTERVAL = 300L
     }
 }

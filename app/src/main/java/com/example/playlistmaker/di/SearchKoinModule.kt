@@ -27,7 +27,7 @@ val SearchKoinModule = module {
     factory { androidContext().getSharedPreferences("playlist_maker_prefs", Context.MODE_PRIVATE) }
     factory<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
     factory<TracksRepository> { TrackRepositoryImpl(get()) }
-    factory<NetworkClient> { RetrofitNetworkClient(get()) }
+    factory<NetworkClient> { RetrofitNetworkClient(get(), get()) }
 
     factory<ItunesApiService> {
         Retrofit.Builder()

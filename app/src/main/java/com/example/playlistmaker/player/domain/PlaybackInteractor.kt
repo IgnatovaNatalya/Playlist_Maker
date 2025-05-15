@@ -5,6 +5,6 @@ interface PlaybackInteractor {
     fun startPlayer()
     fun pausePlayer()
     fun isPlaying():Boolean
-    fun playbackControl()
+    fun getCurrentPosition():Int
     fun releasePlayer()
 }

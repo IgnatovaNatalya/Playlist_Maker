@@ -1,15 +1,14 @@
 package com.example.playlistmaker.search.ui.viewmodel
 
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.core.debounce
 import com.example.playlistmaker.search.domain.HistoryInteractor
 import com.example.playlistmaker.search.domain.SearchTracksInteractor
-import com.example.playlistmaker.search.domain.model.SearchResult
 import com.example.playlistmaker.search.domain.model.Track
+import kotlinx.coroutines.launch
 
 class TracksViewModel(
     private val searchInteractor: SearchTracksInteractor,
@@ -18,55 +17,49 @@ class TracksViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private val SEARCH_REQUEST_TOKEN = Any()
     }
 
     private val _searchState = MutableLiveData<SearchState>()
     val searchState: LiveData<SearchState> = _searchState
 
-    private val handler = Handler(Looper.getMainLooper())
-
     private var latestQueryText: String? = null
 
-    override fun onCleared() {
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+    private val trackSearchDebounce = debounce<String>(
+        SEARCH_DEBOUNCE_DELAY,
+        viewModelScope,
+        true
+    ) { request -> searchTracks(request) }
+
+    fun searchDebounce(changedText: String) { //дебаунс в поисковой строке
+        if (latestQueryText == changedText) return
+        latestQueryText = changedText
+        trackSearchDebounce(changedText)
+    }
+
+   fun searchTracks(queryText: String) {
+        if (queryText.isNotEmpty()) {
+            renderState(SearchState.Loading)
+            viewModelScope.launch {
+                searchInteractor.searchTracks(queryText).collect { result ->
+                    when (result.resultCode) {
+                        200 -> {
+                            if (result.results.isEmpty())
+                                renderState(SearchState.Empty)
+                            else
+                                renderState(SearchState.SearchContent(searchTracks = result.results))
+                            }
+
+                        else -> {
+                            renderState(SearchState.Error)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun getSavedHistory() {
         historyInteractor.getSavedHistory()
-    }
-
-    fun searchDebounce(changedText: String) { //дебаунс в поисковой строке
-
-        if (latestQueryText == changedText) return
-
-        latestQueryText = changedText
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
-        val searchRunnable = Runnable { searchTracks(changedText) }
-        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
-        handler.postAtTime(searchRunnable, SEARCH_REQUEST_TOKEN, postTime)
-    }
-
-    fun searchTracks(queryText: String) {
-        if (queryText.isNotEmpty()) {
-            renderState(SearchState.Loading)
-            searchInteractor.searchTracks(
-                queryText,
-                object : SearchTracksInteractor.TracksConsumer {
-                    override fun consume(searchResult: SearchResult) {
-                        when (searchResult.resultCode) {
-                            200 -> {
-                                if (searchResult.results.isEmpty())
-                                    renderState(SearchState.Empty)
-                                else
-                                    renderState(SearchState.SearchContent(searchTracks = searchResult.results))
-                            }
-                            else -> { renderState(SearchState.Error)}
-                        }
-                    }
-                }
-            )
-        }
     }
 
     private fun renderState(state: SearchState) {
