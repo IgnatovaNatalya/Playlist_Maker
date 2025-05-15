@@ -5,6 +5,7 @@ import com.example.playlistmaker.data.dto.TracksSearchResponse
 import com.example.playlistmaker.data.network.NetworkClient
 import com.example.playlistmaker.domain.model.SearchResult
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.search.SearchTracksRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.text.SimpleDateFormat

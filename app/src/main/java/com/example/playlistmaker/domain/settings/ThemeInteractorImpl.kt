@@ -1,6 +1,5 @@
 package com.example.playlistmaker.domain.settings
 
-import com.example.playlistmaker.data.settings.ThemeRepository
 
 class ThemeInteractorImpl (private val repository: ThemeRepository): ThemeInteractor {
 

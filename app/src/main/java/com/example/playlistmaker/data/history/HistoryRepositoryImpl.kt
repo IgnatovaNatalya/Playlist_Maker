@@ -2,6 +2,7 @@ package com.example.playlistmaker.data.history
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.example.playlistmaker.domain.history.HistoryRepository
 import com.example.playlistmaker.domain.model.Track
 import com.google.gson.Gson
 

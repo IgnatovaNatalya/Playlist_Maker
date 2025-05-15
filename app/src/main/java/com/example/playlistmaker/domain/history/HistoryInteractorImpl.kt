@@ -1,7 +1,6 @@
 package com.example.playlistmaker.domain.history
 
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.data.history.HistoryRepository
 
 const val HISTORY_LIMIT = 10
 

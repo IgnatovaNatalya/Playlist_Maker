@@ -8,16 +8,16 @@ import androidx.room.Query
 import com.example.playlistmaker.data.db.entity.TrackEntity
 
 @Dao
-interface TrackDao {
+interface FavoritesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTracks(tracks: List<TrackEntity>)
+    suspend fun addToFavorites(track: TrackEntity)
 
     @Delete(entity = TrackEntity::class)
-    fun removeTrack(trackEntity: TrackEntity)
+    suspend fun removeFromFavorites(trackEntity: TrackEntity)
 
     @Query("SELECT * FROM fav_track_table")
-    suspend fun getTracks(): List<TrackEntity>
+    suspend fun getFavoriteTracks(): List<TrackEntity>
 
     @Query("SELECT trackId FROM fav_track_table")
-    suspend fun getTrackIds(): List<String>
+    suspend fun getFavoriteTracksId(): List<String>
 }

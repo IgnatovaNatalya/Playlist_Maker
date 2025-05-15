@@ -1,4 +1,4 @@
-package com.example.playlistmaker.data.settings
+package com.example.playlistmaker.domain.settings
 
 interface ThemeRepository {
     fun isSaved():Boolean

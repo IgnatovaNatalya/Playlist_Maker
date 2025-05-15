@@ -4,8 +4,8 @@ import android.content.Context
 import com.example.playlistmaker.data.network.NetworkClient
 import com.example.playlistmaker.data.network.ItunesApiService
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
-import com.example.playlistmaker.data.history.HistoryRepository
-import com.example.playlistmaker.data.search.SearchTracksRepository
+import com.example.playlistmaker.domain.history.HistoryRepository
+import com.example.playlistmaker.domain.search.SearchTracksRepository
 import com.example.playlistmaker.data.history.HistoryRepositoryImpl
 import com.example.playlistmaker.data.search.SearchTrackRepositoryImpl
 import com.example.playlistmaker.domain.history.HistoryInteractor
