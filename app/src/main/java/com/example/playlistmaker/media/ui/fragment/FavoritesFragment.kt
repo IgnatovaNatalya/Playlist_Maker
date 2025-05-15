@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.playlistmaker.core.BindingFragment
+import com.example.playlistmaker.util.BindingFragment
 import com.example.playlistmaker.databinding.FragmentFavoritesBinding
 import com.example.playlistmaker.media.ui.viewmodel.FavoritesViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel

@@ -14,11 +14,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.RootActivity
-import com.example.playlistmaker.core.BindingFragment
-import com.example.playlistmaker.core.debounce
+import com.example.playlistmaker.util.BindingFragment
+import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.player.ui.activity.PlayerActivity
-import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.search.ui.viewmodel.SearchState
 import com.example.playlistmaker.search.ui.viewmodel.TracksViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel

@@ -14,7 +14,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.player.ui.viewmodel.PlaybackViewModel
 import com.example.playlistmaker.player.ui.viewmodel.PlayerState
-import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.domain.model.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
