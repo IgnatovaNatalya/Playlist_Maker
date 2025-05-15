@@ -3,7 +3,7 @@ package com.example.playlistmaker.data.settings
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
-import com.example.playlistmaker.settings.domain.ThemeRepository
+import com.example.playlistmaker.data.settings.ThemeRepository
 
 class ThemeRepositoryImpl (private val sharedPrefs: SharedPreferences) : ThemeRepository {
 

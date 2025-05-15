@@ -2,12 +2,12 @@ package com.example.playlistmaker.util
 
 import android.app.Application
 import android.content.res.Configuration
-import com.example.playlistmaker.di.MediaKoinModule
-import com.example.playlistmaker.di.PlayerKoinModule
-import com.example.playlistmaker.di.SearchKoinModule
-import com.example.playlistmaker.di.SettingsKoinModule
+import com.example.playlistmaker.di.mediaModule
+import com.example.playlistmaker.di.playerModule
+import com.example.playlistmaker.di.searchTracksModule
+import com.example.playlistmaker.di.settingsModule
 import com.example.playlistmaker.di.dataModule
-import com.example.playlistmaker.settings.domain.ThemeInteractor
+import com.example.playlistmaker.domain.settings.ThemeInteractor
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext
@@ -22,10 +22,10 @@ class App : Application() {
         GlobalContext.startKoin {
             androidContext(this@App)
             modules(
-                SearchKoinModule,
-                SettingsKoinModule,
-                PlayerKoinModule,
-                MediaKoinModule,
+                searchTracksModule,
+                settingsModule,
+                playerModule,
+                mediaModule,
                 dataModule
             )
         }
