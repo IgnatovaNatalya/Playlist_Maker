@@ -36,8 +36,10 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         binding.playerToolbar.setNavigationOnClickListener { finish() }
+        binding.buttonLike.setOnClickListener { viewModel.onLikeClicked() }
 
         viewModel.playerState.observe(this) { state -> renderState(state) }
+        viewModel.favoriteState.observe(this) { favoriteState -> renderFav(favoriteState) }
 
         val intent = intent
 
@@ -56,6 +58,13 @@ class PlayerActivity : AppCompatActivity() {
         binding.buttonPlayPause.isEnabled = state.isPlayButtonEnabled
         binding.buttonPlayPause.setImageResource(state.buttonResource)
         binding.playbackTimer.text = state.progress
+    }
+
+    private fun renderFav(favState: Boolean) {
+        with(binding.buttonLike) {
+            if (favState)  setImageResource(R.drawable.button_liked)
+            else setImageResource(R.drawable.button_like)
+        }
     }
 
     private fun drawTrack(track: Track) {

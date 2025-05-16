@@ -7,7 +7,16 @@ import com.example.playlistmaker.domain.model.Track
 class TrackDbConvertor {
 
     fun map(track: Track): TrackEntity {
-        return TrackEntity(track.id, track.resultType, movie.image, track.title, track.description)
+        return TrackEntity(
+            track.trackId,
+            track.trackName,
+            track.artistName,
+            track.artworkUrl100,
+            track.collectionName,
+            track.releaseDate,
+            track.primaryGenreName,
+            track.country,
+            track.previewUrl)
     }
 
     fun map(track: TrackDto): TrackEntity {

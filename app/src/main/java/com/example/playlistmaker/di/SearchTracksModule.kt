@@ -22,11 +22,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val searchTracksModule = module {
     factory<HistoryInteractor> { HistoryInteractorImpl(get()) }
-    factory<HistoryRepository> { HistoryRepositoryImpl(get(), get()) }
+    factory<HistoryRepository> { HistoryRepositoryImpl(get(), get(), get()) }
 
     factory { androidContext().getSharedPreferences("playlist_maker_prefs", Context.MODE_PRIVATE) }
     factory<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
-    factory<SearchTracksRepository> { SearchTrackRepositoryImpl(get()) }
+    factory<SearchTracksRepository> { SearchTrackRepositoryImpl(get(), get()) }
     factory<NetworkClient> { RetrofitNetworkClient(get(), get()) }
 
     factory<ItunesApiService> {

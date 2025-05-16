@@ -28,6 +28,11 @@ class FavoritesRepositoryImpl(
         emit(convertFromTrackEntity(tracks))
     }
 
+    override fun getFavoriteTrackIds(): Flow<List<Int>> = flow {
+        val trackIds =  appDatabase.favoritesDao().getFavoriteTrackIds()
+        emit(trackIds)
+    }
+
     private fun convertFromTrackEntity(tracks: List<TrackEntity>): List<Track> {
         return tracks.map { track -> trackDbConvertor.map(track) }
     }
