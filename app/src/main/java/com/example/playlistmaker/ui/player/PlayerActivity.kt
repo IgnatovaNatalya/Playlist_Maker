@@ -62,7 +62,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun renderFav(favState: Boolean) {
         with(binding.buttonLike) {
-            if (favState)  setImageResource(R.drawable.button_liked)
+            if (favState) setImageResource(R.drawable.button_liked)
             else setImageResource(R.drawable.button_like)
         }
     }

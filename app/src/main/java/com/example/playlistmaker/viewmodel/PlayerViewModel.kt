@@ -53,6 +53,7 @@ class PlaybackViewModel(
             { _playerState.postValue(PlayerState.Prepared()) },
             { _playerState.postValue(PlayerState.Prepared()) }
         )
+        _favoriteState.postValue(track.isFavorite)
     }
 
     fun onLikeClicked() {
