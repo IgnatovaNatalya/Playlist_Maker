@@ -60,10 +60,17 @@ class PlaybackViewModel(
         if (currentTrack != null) {
             val track = currentTrack!!
             viewModelScope.launch {
-                if (track.isFavorite) favoritesInteractor.removeFromFavorites(track)
-                else favoritesInteractor.addToFavorites(track)
+                if (track.isFavorite) {
+                    favoritesInteractor.removeFromFavorites(track)
+                    track.isFavorite = false
+                }
+                else {
+                    favoritesInteractor.addToFavorites(track)
+                    track.isFavorite = true
+                }
             }
-            _favoriteState.postValue(!track.isFavorite)
+            _favoriteState.postValue(track.isFavorite == false)
+            currentTrack = track
         }
     }
 

@@ -1,11 +1,11 @@
-package com.example.playlistmaker.ui.media
+package com.example.playlistmaker.ui.player
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.playlistmaker.util.BindingFragment
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
+import com.example.playlistmaker.util.BindingFragment
 import com.example.playlistmaker.viewmodel.PlaylistsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
