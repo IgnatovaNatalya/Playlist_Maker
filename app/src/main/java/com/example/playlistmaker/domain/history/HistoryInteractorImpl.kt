@@ -11,7 +11,7 @@ class HistoryInteractorImpl (private val repository: HistoryRepository) :
 
     override fun getSavedHistory() : List<Track> {
         historyTrackList.clear()
-        historyTrackList.addAll(repository.getSavedHistory())
+        historyTrackList.addAll(repository.getHistory())
         return historyTrackList
     }
 

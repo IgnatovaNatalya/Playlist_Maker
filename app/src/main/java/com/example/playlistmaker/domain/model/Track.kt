@@ -1,7 +1,10 @@
 package com.example.playlistmaker.domain.model
 
 import android.os.Parcelable
+import com.example.playlistmaker.data.db.entity.TrackEntity
+import com.example.playlistmaker.data.db.entity.HistoryEntity
 import kotlinx.parcelize.Parcelize
+import java.lang.System.currentTimeMillis
 
 @Parcelize
 data class Track(
@@ -18,3 +21,38 @@ data class Track(
     var isFavorite: Boolean = false
 ): Parcelable
 
+fun Track.toHistoryEntity(track: Track): HistoryEntity {
+    return with(track) {
+        HistoryEntity(
+            trackId,
+            trackName,
+            artistName,
+            duration,
+            artworkUrl100,
+            collectionName,
+            releaseDate,
+            primaryGenreName,
+            country,
+            previewUrl,
+            currentTimeMillis()
+        )
+    }
+}
+
+fun Track.toHTrackEntity(track: Track): TrackEntity {
+    return with(track) {
+        TrackEntity(
+            trackId,
+            trackName,
+            artistName,
+            duration,
+            artworkUrl100,
+            collectionName,
+            releaseDate,
+            primaryGenreName,
+            country,
+            previewUrl,
+            currentTimeMillis()
+        )
+    }
+}

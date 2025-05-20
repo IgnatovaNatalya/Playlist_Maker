@@ -18,7 +18,7 @@ class FavoritesRepositoryImpl(
         appDatabase.favoritesDao().addToFavorites(trackEntity)
     }
 
-    override suspend fun removeFromFavorites(track: Track) { // todo тут точно достаточно id
+    override suspend fun removeFromFavorites(track: Track) {
         val trackEntity = trackConvertor.map(track)
         appDatabase.favoritesDao().removeFromFavorites(trackEntity)
     }

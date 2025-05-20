@@ -18,5 +18,5 @@ val favoritesModule = module {
 
     single<FavoritesRepository> { FavoritesRepositoryImpl(get(), get()) }
     single<FavoritesInteractor> { FavoritesInteractorImpl(get()) }
-    factory {TrackConvertor()}
+    //factory {TrackConvertor()}
 }
