@@ -16,10 +16,10 @@ data class Track(
     val collectionName: String,
     val releaseDate: String,
     val primaryGenreName: String,
-    val country:String,
+    val country: String,
     val previewUrl: String,
     var isFavorite: Boolean = false
-): Parcelable
+) : Parcelable
 
 fun Track.toHistoryEntity(track: Track): HistoryEntity {
     return with(track) {
@@ -34,25 +34,24 @@ fun Track.toHistoryEntity(track: Track): HistoryEntity {
             primaryGenreName,
             country,
             previewUrl,
-            currentTimeMillis()
+            currentTimeMillis(),
+            isFavorite
         )
     }
 }
 
-fun Track.toHTrackEntity(track: Track): TrackEntity {
-    return with(track) {
-        TrackEntity(
-            trackId,
-            trackName,
-            artistName,
-            duration,
-            artworkUrl100,
-            collectionName,
-            releaseDate,
-            primaryGenreName,
-            country,
-            previewUrl,
-            currentTimeMillis()
-        )
-    }
+fun Track.toTrackEntity(): TrackEntity {
+    return TrackEntity(
+        trackId,
+        trackName,
+        artistName,
+        duration,
+        artworkUrl100,
+        collectionName,
+        releaseDate,
+        primaryGenreName,
+        country,
+        previewUrl,
+        currentTimeMillis()
+    )
 }

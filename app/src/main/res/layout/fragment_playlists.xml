@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginVertical="@dimen/text_padding"
     android:orientation="vertical"
-    tools:context=".ui.player.PlaylistsFragment">
+    tools:context=".ui.playlists.PlaylistsFragment">
 
         <Button
             android:id="@+id/placeholder_button"

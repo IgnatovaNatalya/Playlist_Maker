@@ -58,8 +58,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             onTrackClickDebounce(track)
         }
 
-        viewModel.getSavedHistory()
-
         viewModel.searchState.observe(viewLifecycleOwner) { render(it) }
 
         binding.clearSearchButton.setOnClickListener {
@@ -170,11 +168,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         }
     }
 
-    override fun onPause() {
-        viewModel.saveHistory()
-        super.onPause()
-    }
-
     private fun setPlaceHolder(message: PlaceholderMessage) {
         when (message) {
             PlaceholderMessage.MESSAGE_CLEAR -> {
@@ -232,6 +225,13 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             binding.searchInputText.setText(enteredText)
         }
     }
+
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshContent()
+    }
+
 
     companion object {
         const val CLICK_DEBOUNCE_DELAY = 300L

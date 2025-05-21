@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.example.playlistmaker.domain.model.Track
 
 @Entity(tableName = "history_track_table")
-data class HistoryEntity (
+data class HistoryEntity(
     @PrimaryKey
     val trackId: Int,
     val trackName: String,
@@ -15,18 +15,17 @@ data class HistoryEntity (
     val collectionName: String,
     val releaseDate: String,
     val primaryGenreName: String,
-    val country:String,
+    val country: String,
     val previewUrl: String,
-    var added:Long
+    val added: Long,
+    val isFavorite:Boolean
 )
 
-fun HistoryEntity.toDomainModel() = Track(
+fun HistoryEntity.toTrack() = Track(
     trackId, trackName, artistName, duration, artworkUrl100,
-    collectionName, releaseDate, primaryGenreName, country, previewUrl
+    collectionName, releaseDate, primaryGenreName, country, previewUrl, isFavorite
 )
 
-fun toListDomainModel(tracksList: List<HistoryEntity>) =
-    tracksList.map {
-        it.toDomainModel()
-    }
+fun toListTrack(tracksList: List<HistoryEntity>) =
+    tracksList.map { it.toTrack() }
 

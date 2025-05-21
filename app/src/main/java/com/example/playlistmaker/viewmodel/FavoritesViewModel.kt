@@ -21,9 +21,9 @@ class FavoritesViewModel(private val favoritesInteractor: FavoritesInteractor) :
         renderState(FavoritesState.Loading)
 
         viewModelScope.launch {
-            favoritesInteractor.getFavoriteTracks().collect { result ->
-                if (result.isEmpty()) renderState(FavoritesState.Empty)
-                else renderState(FavoritesState.Content(favoriteTracks = result))
+            favoritesInteractor.getFavoriteTracks().collect { favoriteTracks ->
+                if (favoriteTracks.isEmpty()) renderState(FavoritesState.Empty)
+                else renderState(FavoritesState.Content(favoriteTracks = favoriteTracks))
             }
         }
     }

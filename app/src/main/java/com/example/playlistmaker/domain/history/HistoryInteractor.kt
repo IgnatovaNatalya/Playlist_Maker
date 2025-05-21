@@ -1,12 +1,10 @@
 package com.example.playlistmaker.domain.history
 
 import com.example.playlistmaker.domain.model.Track
+import kotlinx.coroutines.flow.Flow
 
-interface HistoryInteractor
-{
-    fun getSavedHistory() : List<Track>
-    fun saveHistory()
-    fun clearHistory()
-    fun getTracks(): List<Track>
-    fun addTrackToHistory(track: Track)
+interface HistoryInteractor {
+    fun getHistory(): Flow<List<Track>>
+    suspend fun clearHistory()
+    suspend fun addTrackToHistory(track: Track)
 }

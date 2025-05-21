@@ -1,39 +1,32 @@
 package com.example.playlistmaker.data.favorites
 
-import com.example.playlistmaker.util.TrackConvertor
 import com.example.playlistmaker.data.db.AppDatabase
-import com.example.playlistmaker.data.db.entity.TrackEntity
+import com.example.playlistmaker.data.db.entity.toListTrack
 import com.example.playlistmaker.domain.favorites.FavoritesRepository
 import com.example.playlistmaker.domain.model.Track
+
+import com.example.playlistmaker.domain.model.toTrackEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class FavoritesRepositoryImpl(
-    private val appDatabase: AppDatabase,
-    private val trackConvertor: TrackConvertor
+    private val appDatabase: AppDatabase
 ) : FavoritesRepository {
 
     override suspend fun addToFavorites(track: Track) {
-        val trackEntity = trackConvertor.map(track)
-        appDatabase.favoritesDao().addToFavorites(trackEntity)
+        appDatabase.favoritesDao().addToFavorites(track.toTrackEntity())
     }
 
     override suspend fun removeFromFavorites(track: Track) {
-        val trackEntity = trackConvertor.map(track)
-        appDatabase.favoritesDao().removeFromFavorites(trackEntity)
+        appDatabase.favoritesDao().removeFromFavorites(track.toTrackEntity())
     }
 
     override fun getFavoriteTracks(): Flow<List<Track>> = flow {
-        val tracks = appDatabase.favoritesDao().getFavoriteTracks()
-        emit(convertFromTrackEntity(tracks))
+        emit(toListTrack(appDatabase.favoritesDao().getFavoriteTracks()))
     }
 
     override fun getFavoriteTrackIds(): Flow<List<Int>> = flow {
-        val trackIds =  appDatabase.favoritesDao().getFavoriteTrackIds()
-        emit(trackIds)
+        emit(appDatabase.favoritesDao().getFavoriteTrackIds())
     }
 
-    private fun convertFromTrackEntity(tracks: List<TrackEntity>): List<Track> {
-        return tracks.map { track -> trackConvertor.map(track) }
-    }
 }

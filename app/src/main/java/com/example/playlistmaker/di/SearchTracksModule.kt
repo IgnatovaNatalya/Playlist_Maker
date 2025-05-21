@@ -13,7 +13,6 @@ import com.example.playlistmaker.domain.search.SearchTracksInteractor
 import com.example.playlistmaker.domain.history.HistoryInteractorImpl
 import com.example.playlistmaker.domain.search.SearchTracksInteractorImpl
 import com.example.playlistmaker.viewmodel.SearchTracksViewModel
-import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -37,7 +36,5 @@ val searchTracksModule = module {
             .create(ItunesApiService::class.java)
     }
 
-    //factory { Gson() }
-
-    viewModel { SearchTracksViewModel(get(), get()) }
+    viewModel { SearchTracksViewModel(get(), get(), get()) }
 }

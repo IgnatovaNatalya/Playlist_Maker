@@ -2,6 +2,7 @@ package com.example.playlistmaker.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.playlistmaker.domain.model.Track
 
 @Entity(tableName = "fav_track_table")
 data class TrackEntity (
@@ -18,3 +19,13 @@ data class TrackEntity (
     val previewUrl: String,
     var added:Long
 )
+
+fun TrackEntity.toTrack() = Track(
+    trackId, trackName, artistName, duration, artworkUrl100,
+    collectionName, releaseDate, primaryGenreName, country, previewUrl, true
+)
+
+fun toListTrack(tracksList: List<TrackEntity>) =
+    tracksList.map {
+        it.toTrack()
+    }
