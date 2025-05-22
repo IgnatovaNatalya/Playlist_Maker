@@ -9,8 +9,9 @@
 
     <color name="medium_grey">#818C99</color>
     <color name="light_grey">#AEAFB4</color>
-    <color name ="YP_light_grey">#E6E8EB</color>
+    <color name="YP_light_grey">#E6E8EB</color>
 
+    <color name="YP_Red">#F56B6C</color>
 
     <color name="transparent_blue">#489FBBF3</color>
 

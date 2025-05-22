@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
@@ -11,10 +10,10 @@
         android:id="@+id/album_picture"
         android:layout_width="@dimen/picture_size"
         android:layout_height="@dimen/picture_size"
-        android:layout_weight="0"
         android:layout_marginEnd="@dimen/text_padding"
+        android:layout_weight="0"
         android:importantForAccessibility="no"
-        android:src="@drawable/album_placeholder"/>
+        android:src="@drawable/album_placeholder" />
 
     <LinearLayout
         android:layout_width="wrap_content"
