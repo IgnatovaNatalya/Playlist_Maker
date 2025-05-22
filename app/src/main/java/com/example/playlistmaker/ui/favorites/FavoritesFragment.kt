@@ -68,11 +68,13 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
     private fun showEmpty() {
         binding.tracksRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
+        binding.placeholderMessage.visibility = View.VISIBLE
     }
 
     private fun showLoading() {
         binding.tracksRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
+        binding.placeholderMessage.visibility = View.GONE
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -82,6 +84,7 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
 
         binding.tracksRecycler.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
+        binding.placeholderMessage.visibility = View.GONE
     }
 
     override fun onDestroyView() {
