@@ -85,7 +85,17 @@
                 android:visibility="gone"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/tracks_recycler"
+                android:id="@+id/search_recycler"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/horizontal_padding"
+                android:visibility="visible"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_track" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/history_recycler"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

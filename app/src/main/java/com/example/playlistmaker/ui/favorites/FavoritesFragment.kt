@@ -53,7 +53,7 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
 
         viewModel.favoritesState.observe(viewLifecycleOwner) { render(it) }
 
-        tracksRecycler = binding.tracksRecycler
+        tracksRecycler = binding.favTracksRecycler
         tracksRecycler.layoutManager = LinearLayoutManager(activity)
         tracksRecycler.adapter = tracksAdapter
     }
@@ -66,13 +66,13 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
         }
     }
     private fun showEmpty() {
-        binding.tracksRecycler.visibility = View.GONE
+        binding.favTracksRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
         binding.placeholderMessage.visibility = View.VISIBLE
     }
 
     private fun showLoading() {
-        binding.tracksRecycler.visibility = View.GONE
+        binding.favTracksRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
         binding.placeholderMessage.visibility = View.GONE
     }
@@ -82,7 +82,7 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
         tracksAdapter?.tracks = state.favoriteTracks
         tracksAdapter?.notifyDataSetChanged()
 
-        binding.tracksRecycler.visibility = View.VISIBLE
+        binding.favTracksRecycler.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
         binding.placeholderMessage.visibility = View.GONE
     }

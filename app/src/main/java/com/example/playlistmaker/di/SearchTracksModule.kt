@@ -21,7 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val searchTracksModule = module {
     factory<HistoryInteractor> { HistoryInteractorImpl(get()) }
-    factory<HistoryRepository> { HistoryRepositoryImpl(get())}
+    factory<HistoryRepository> { HistoryRepositoryImpl(get()) }
 
     factory { androidContext().getSharedPreferences("playlist_maker_prefs", Context.MODE_PRIVATE) }
     factory<SearchTracksInteractor> { SearchTracksInteractorImpl(get()) }
@@ -36,5 +36,5 @@ val searchTracksModule = module {
             .create(ItunesApiService::class.java)
     }
 
-    viewModel { SearchTracksViewModel(get(), get(), get()) }
+    viewModel { SearchTracksViewModel(get(), get()) }
 }

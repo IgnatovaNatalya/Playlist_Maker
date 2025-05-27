@@ -10,7 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.ui.RootActivity
@@ -19,19 +21,26 @@ import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.ui.player.PlayerActivity
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.util.HistoryState
 import com.example.playlistmaker.util.SearchState
 import com.example.playlistmaker.viewmodel.SearchTracksViewModel
+import com.example.playlistmaker.viewmodel.SearchViewModelState
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
 class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
     private var enteredText: String = DEFAULT_TEXT
-    private var tracksAdapter: TrackAdapter? = null
+    private var searchAdapter: TrackAdapter? = null
+    private var historyAdapter: TrackAdapter? = null
+
     private val viewModel: SearchTracksViewModel by viewModel()
 
-    private lateinit var onTrackClickDebounce: (Track) -> Unit
-    private lateinit var tracksRecycler: RecyclerView
+    private lateinit var onSearchTrackClickDebounce: (Track) -> Unit
+    private lateinit var onHistoryTrackClickDebounce: (Track) -> Unit
+    private lateinit var searchRecycler: RecyclerView
+    private lateinit var historyRecycler: RecyclerView
     private lateinit var textWatcher: TextWatcher
     private lateinit var queryInput: EditText
 
@@ -43,28 +52,38 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        onTrackClickDebounce = debounce<Track>(
+        onSearchTrackClickDebounce = debounce<Track>(
             CLICK_DEBOUNCE_DELAY,
             viewLifecycleOwner.lifecycleScope,
             false
         ) { track ->
             viewModel.addTrackToHistory(track)
+            (activity as RootActivity).animateBottomNavigationView()
             val intent = PlayerActivity.newInstance(requireContext(), track)
             startActivity(intent)
         }
 
-        tracksAdapter = TrackAdapter { track ->
+        onHistoryTrackClickDebounce = debounce<Track>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { track ->
             (activity as RootActivity).animateBottomNavigationView()
-            onTrackClickDebounce(track)
+            val intent = PlayerActivity.newInstance(requireContext(), track)
+            startActivity(intent)
         }
 
-        viewModel.searchState.observe(viewLifecycleOwner) { render(it) }
+        searchAdapter = TrackAdapter { track -> onSearchTrackClickDebounce(track) }
+        historyAdapter = TrackAdapter { track -> onHistoryTrackClickDebounce(track) }
+
+        observeViewModel()
+        //viewModel.searchState.observe(viewLifecycleOwner) { render(it) }
 
         binding.clearSearchButton.setOnClickListener {
             binding.searchInputText.setText(DEFAULT_TEXT)
             val manager = activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
-            viewModel.showHistory()
+            viewModel.getHistory()
         }
 
         textWatcher = object : TextWatcher {
@@ -82,76 +101,120 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         queryInput.addTextChangedListener(textWatcher)
 
         queryInput.setOnFocusChangeListener { _, hasFocus ->
-            viewModel.showHistory()
+            viewModel.getHistory()
         }
 
-        tracksRecycler = binding.tracksRecycler
-        tracksRecycler.layoutManager = LinearLayoutManager(activity)
-        tracksRecycler.adapter = tracksAdapter
+        searchRecycler = binding.searchRecycler
+        searchRecycler.layoutManager = LinearLayoutManager(activity)
+        searchRecycler.adapter = searchAdapter
+
+        historyRecycler = binding.historyRecycler
+        historyRecycler.layoutManager = LinearLayoutManager(activity)
+        historyRecycler.adapter = historyAdapter
 
         binding.placeholderReloadButton.setOnClickListener { viewModel.searchDebounce(enteredText) }
         binding.clearHistoryButton.setOnClickListener { viewModel.onClickHistoryClearButton() }
     }
 
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewModeState.collect { iuState ->
+                    when (iuState) {
+                        SearchViewModelState.Search -> {
+                            lifecycleScope.launch {
+                                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                                    viewModel.searchState.collect { searchState ->
+                                        //if (searchState is SearchState.SearchContent) {
+                                        renderSearch(searchState)
+                                        if (searchState is SearchState.SearchContent) {
+                                            searchAdapter?.tracks = searchState.searchTracks
+                                            searchAdapter?.notifyDataSetChanged()
+                                        }
+                                        // }
+                                    }
+                                }
+                            }
+                        }
+
+                        SearchViewModelState.History -> {
+                            lifecycleScope.launch {
+                                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                                    viewModel.historyState.collect { historyState ->
+                                        if (historyState is HistoryState.HistoryContent) {
+                                            renderHistory()
+                                            historyAdapter?.tracks = historyState.historyTracks
+                                            historyAdapter?.notifyDataSetChanged()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        tracksAdapter = null
-        tracksRecycler.adapter = null
+        searchAdapter = null
+        searchRecycler.adapter = null
+        historyAdapter = null
+        historyRecycler.adapter = null
         textWatcher.let { queryInput.removeTextChangedListener(it) }
     }
 
-    private fun render(state: SearchState) {
+
+    fun renderSearch(state: SearchState) {
+        setHistoryVisibility(false)
         when (state) {
-            is SearchState.Empty -> showEmpty()
-            is SearchState.Error -> showError()
-            is SearchState.Loading -> showLoading()
-            is SearchState.HistoryContent -> showHistoryContent(state)
-            is SearchState.SearchContent -> showSearchContent(state)
+            is SearchState.Empty -> showSearchEmpty()
+            is SearchState.Error -> showSearchError()
+            is SearchState.Loading -> showSearchLoading()
+            is SearchState.SearchContent -> showSearchResults()
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun showHistoryContent(state: SearchState.HistoryContent) {
-        tracksAdapter?.tracks = state.historyTracks
-        tracksAdapter?.notifyDataSetChanged()
-
-        binding.tracksRecycler.visibility = View.VISIBLE
-        binding.progressBar.visibility = View.GONE
-
-        setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+    private fun renderHistory() {
         setHistoryVisibility(true)
+        binding.searchRecycler.visibility = View.VISIBLE
+        binding.historyRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+        setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun showSearchContent(state: SearchState.SearchContent) {
-        tracksAdapter?.tracks = state.searchTracks
-        tracksAdapter?.notifyDataSetChanged()
+    private fun showSearchResults() {
+        binding.searchRecycler.visibility = View.GONE
+        binding.historyRecycler.visibility = View.VISIBLE
 
-        binding.tracksRecycler.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
 
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
         setHistoryVisibility(false)
     }
 
-    private fun showEmpty() {
-        binding.tracksRecycler.visibility = View.GONE
+    private fun showSearchEmpty() {
+        binding.searchRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
 
         setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
         setHistoryVisibility(false)
     }
 
-    private fun showError() {
-        binding.tracksRecycler.visibility = View.GONE
+    private fun showSearchError() {
+        binding.searchRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
 
         setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
         setHistoryVisibility(false)
     }
 
-    private fun showLoading() {
-        binding.tracksRecycler.visibility = View.GONE
+    private fun showSearchLoading() {
+        binding.searchRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
 
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
@@ -227,10 +290,10 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     }
 
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.refreshContent()
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        viewModel.refreshContent()
+//    }
 
 
     companion object {
