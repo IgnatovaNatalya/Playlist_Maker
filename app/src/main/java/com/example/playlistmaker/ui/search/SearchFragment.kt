@@ -21,10 +21,8 @@ import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.ui.player.PlayerActivity
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.util.HistoryState
 import com.example.playlistmaker.util.SearchState
 import com.example.playlistmaker.viewmodel.SearchTracksViewModel
-import com.example.playlistmaker.viewmodel.SearchViewModelState
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
@@ -77,13 +75,12 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         historyAdapter = TrackAdapter { track -> onHistoryTrackClickDebounce(track) }
 
         observeViewModel()
-        //viewModel.searchState.observe(viewLifecycleOwner) { render(it) }
 
         binding.clearSearchButton.setOnClickListener {
             binding.searchInputText.setText(DEFAULT_TEXT)
             val manager = activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
-            viewModel.getHistory()
+            viewModel.showHistory()
         }
 
         textWatcher = object : TextWatcher {
@@ -101,7 +98,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         queryInput.addTextChangedListener(textWatcher)
 
         queryInput.setOnFocusChangeListener { _, hasFocus ->
-            viewModel.getHistory()
+            viewModel.showHistory()
         }
 
         searchRecycler = binding.searchRecycler
@@ -116,47 +113,32 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         binding.clearHistoryButton.setOnClickListener { viewModel.onClickHistoryClearButton() }
     }
 
-
     @SuppressLint("NotifyDataSetChanged")
     private fun observeViewModel() {
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.viewModeState.collect { iuState ->
-                    when (iuState) {
-                        SearchViewModelState.Search -> {
-                            lifecycleScope.launch {
-                                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                                    viewModel.searchState.collect { searchState ->
-                                        //if (searchState is SearchState.SearchContent) {
-                                        renderSearch(searchState)
-                                        if (searchState is SearchState.SearchContent) {
-                                            searchAdapter?.tracks = searchState.searchTracks
-                                            searchAdapter?.notifyDataSetChanged()
-                                        }
-                                        // }
-                                    }
-                                }
-                            }
-                        }
+                viewModel.uiState.collect { searchState -> render(searchState) }
+            }
+        }
 
-                        SearchViewModelState.History -> {
-                            lifecycleScope.launch {
-                                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                                    viewModel.historyState.collect { historyState ->
-                                        if (historyState is HistoryState.HistoryContent) {
-                                            renderHistory()
-                                            historyAdapter?.tracks = historyState.historyTracks
-                                            historyAdapter?.notifyDataSetChanged()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.foundTracks.collect { tracks ->
+                    searchAdapter?.tracks = tracks
+                    searchAdapter?.notifyDataSetChanged()
                 }
             }
         }
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.historyTracks.collect { tracks ->
+                    historyAdapter?.tracks = tracks
+                    historyAdapter?.notifyDataSetChanged()
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -169,28 +151,28 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     }
 
 
-    fun renderSearch(state: SearchState) {
+    fun render(state: SearchState) {
         setHistoryVisibility(false)
         when (state) {
             is SearchState.Empty -> showSearchEmpty()
             is SearchState.Error -> showSearchError()
             is SearchState.Loading -> showSearchLoading()
             is SearchState.SearchContent -> showSearchResults()
+            is SearchState.HistoryContent -> showHistory()
         }
     }
 
-    private fun renderHistory() {
+    private fun showHistory() {
         setHistoryVisibility(true)
-        binding.searchRecycler.visibility = View.VISIBLE
-        binding.historyRecycler.visibility = View.GONE
+        binding.searchRecycler.visibility = View.GONE
+        binding.historyRecycler.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
     }
 
     private fun showSearchResults() {
-        binding.searchRecycler.visibility = View.GONE
-        binding.historyRecycler.visibility = View.VISIBLE
-
+        binding.searchRecycler.visibility = View.VISIBLE
+        binding.historyRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
 
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
@@ -225,9 +207,13 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         if (isVisible) {
             binding.historyHeader.visibility = View.VISIBLE
             binding.clearHistoryButton.visibility = View.VISIBLE
+            binding.historyRecycler.visibility = View.VISIBLE
+            binding.searchRecycler.visibility = View.GONE
         } else {
             binding.historyHeader.visibility = View.GONE
             binding.clearHistoryButton.visibility = View.GONE
+            binding.historyRecycler.visibility = View.GONE
+            binding.searchRecycler.visibility = View.VISIBLE
         }
     }
 
@@ -283,18 +269,15 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
                 ENTERED_TEXT,
                 DEFAULT_TEXT
             )
-
         if (enteredText.isNotEmpty()) {
             binding.searchInputText.setText(enteredText)
         }
     }
 
-
-//    override fun onResume() {
-//        super.onResume()
-//        viewModel.refreshContent()
-//    }
-
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshContent()
+    }
 
     companion object {
         const val CLICK_DEBOUNCE_DELAY = 300L

@@ -6,33 +6,32 @@ import com.example.playlistmaker.domain.favorites.FavoritesInteractor
 import com.example.playlistmaker.domain.search.SearchTracksInteractor
 import com.example.playlistmaker.domain.history.HistoryInteractor
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.util.HistoryState
 import com.example.playlistmaker.util.SearchState
 import com.example.playlistmaker.util.debounce
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SearchTracksViewModel(
     private val searchInteractor: SearchTracksInteractor,
     private val historyInteractor: HistoryInteractor,
-    //private val favoritesInteractor: FavoritesInteractor
+    private val favoritesInteractor: FavoritesInteractor
 ) : ViewModel() {
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 
-    private val _searchState = MutableStateFlow<SearchState>(SearchState.Empty)
-    val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
+    // Постоянное хранение данных
+    private val _foundTracks = MutableStateFlow<List<Track>>(listOf())
+    val foundTracks = _foundTracks.asStateFlow()
 
-    private val _historyState = MutableStateFlow<HistoryState>(HistoryState.Empty)
-    val historyState: StateFlow<HistoryState> = _historyState.asStateFlow()
+    private val _historyTracks = MutableStateFlow<List<Track>>(listOf())
+    val historyTracks = _historyTracks.asStateFlow()
 
-    private val _viewModelState =
-        MutableStateFlow<SearchViewModelState>(SearchViewModelState.Search)
-    val viewModeState: StateFlow<SearchViewModelState> = _viewModelState.asStateFlow()
+    // Текущее состояние UI
+    private val _uiState = MutableStateFlow<SearchState>(SearchState.SearchContent)
+    val uiState = _uiState.asStateFlow()
 
     private var latestQueryText: String? = null
 
@@ -54,20 +53,23 @@ class SearchTracksViewModel(
 
     fun searchTracks(queryText: String) {
         if (queryText.isNotEmpty()) {
-            _searchState.value = SearchState.Loading
+            _uiState.value = SearchState.Loading
 
             viewModelScope.launch {
                 searchInteractor.searchTracks(queryText).collect { result ->
                     when (result.resultCode) {
 
                         200 -> {
-                            if (result.results.isEmpty()) _searchState.value = SearchState.Empty
-                            else _searchState.value =
-                                SearchState.SearchContent(searchTracks = result.results)
+                            if (result.results.isEmpty()) _uiState.value = SearchState.Empty
+                            else {
+                                _uiState.value = SearchState.SearchContent
+                                _foundTracks.value =
+                                    result.results.sortedByDescending { it.isFavorite }
+                            }
                         }
 
                         else -> {
-                            _searchState.value = SearchState.Error
+                            _uiState.value = SearchState.Error
                         }
                     }
                 }
@@ -76,46 +78,43 @@ class SearchTracksViewModel(
     }
 
     fun addTrackToHistory(track: Track) {
-        if (_searchState.value is SearchState.SearchContent)
+        if (_uiState.value is SearchState.SearchContent)
             viewModelScope.launch { historyInteractor.addTrackToHistory(track) }
     }
 
     fun onSearchTextChanged(queryText: String) {
         if (queryText.isEmpty())
-            _viewModelState.value = SearchViewModelState.History
+            _uiState.value = SearchState.HistoryContent
         else {
-            _viewModelState.value = SearchViewModelState.Search
             searchDebounce(queryText)
         }
     }
 
     fun onClickHistoryClearButton() {
         viewModelScope.launch { historyInteractor.clearHistory() }
-        _searchState.value = SearchState.Empty //SearchContent(searchTracks = listOf())
+        _uiState.value = SearchState.HistoryContent
     }
 
-    fun getHistory() {
+    private fun getHistory() {
         viewModelScope.launch {
             historyInteractor.getHistory().collect { historyTracks ->
-                if (historyTracks.isNotEmpty())
-                    _historyState.value = HistoryState.HistoryContent(historyTracks = historyTracks)
-                else
-                    _historyState.value = HistoryState.Empty
-                // _searchState.postValue(SearchState.SearchContent(searchTracks = listOf()))
+                _historyTracks.value = historyTracks
             }
         }
     }
 
-//    fun refreshContent() {
-//        if (_searchState.value is SearchState.SearchContent) {
-//            val foundTracks = (_searchState.value as SearchState.SearchContent).searchTracks
-//
-//            viewModelScope.launch {
-//                favoritesInteractor.getFavoriteTrackIds().collect { favoriteIds ->
-//                    for (t in foundTracks) if (t.trackId in favoriteIds) t.isFavorite = true
-//                    _searchState.postValue(SearchState.SearchContent(searchTracks = foundTracks))
-//                }
-//            }
-//        } else if (_searchState.value is SearchState.HistoryContent) getHistory()
-//    }
+    fun showHistory() {
+        _uiState.value = SearchState.HistoryContent
+    }
+
+    fun refreshContent() {
+        if (_uiState.value is SearchState.SearchContent) {
+            viewModelScope.launch {
+                favoritesInteractor.getFavoriteTrackIds().collect { favoriteIds ->
+                    for (t in foundTracks.value) if (t.trackId in favoriteIds) t.isFavorite = true
+                }
+            }
+        }
+    }
+
 }

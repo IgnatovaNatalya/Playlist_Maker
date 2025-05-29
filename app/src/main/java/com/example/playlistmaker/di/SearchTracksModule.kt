@@ -36,5 +36,5 @@ val searchTracksModule = module {
             .create(ItunesApiService::class.java)
     }
 
-    viewModel { SearchTracksViewModel(get(), get()) }
+    viewModel { SearchTracksViewModel(get(), get(), get()) }
 }
