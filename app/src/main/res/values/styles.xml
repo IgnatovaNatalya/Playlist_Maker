@@ -34,6 +34,7 @@
     <style name="SettingsTextStyle">
         <item name="fontFamily">@font/ys_text_regular</item>
         <item name="android:textSize">@dimen/text_med</item>
+        <item name="android:textColorHint">?attr/android:textColor</item>
     </style>
 
     <style name="ToolbarTitleStyle">
@@ -81,7 +82,7 @@
     </style>
 
     <style name="PlayerTextGrey" parent="PlayerTextInfo">
-        <item name="android:textColor">@color/light_grey</item>
+        <item name="android:textColor">@color/YP_text_gray</item>
     </style>
 
     <style name="TabStyle">

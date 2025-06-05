@@ -15,7 +15,7 @@
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
         app:title="@string/search"
-        app:titleMarginStart="8dp"
+        app:titleMarginStart="@dimen/horizontal_padding"
         app:titleTextAppearance="@style/ToolbarTitleStyle" />
 
     <FrameLayout

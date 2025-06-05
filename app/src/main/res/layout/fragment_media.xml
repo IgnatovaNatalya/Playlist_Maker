@@ -16,7 +16,7 @@
         app:titleTextAppearance="@style/ToolbarTitleStyle"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
-        app:titleMarginStart="8dp"/>
+        app:titleMarginStart="@dimen/horizontal_padding"/>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
