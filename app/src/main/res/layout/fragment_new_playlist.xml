@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.player.PlayerActivity">
+    tools:context=".ui.playlists.NewPlaylistFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/playlist_toolbar"
@@ -37,24 +37,26 @@
 
     <ImageView
         android:id="@+id/playlist_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="312dp"
+        android:layout_height="312dp"
+        android:scaleType="centerCrop"
         android:layout_marginTop="62dp"
         android:importantForAccessibility="no"
-        android:src="@drawable/playlist_image_picker"
-        app:layout_constraintDimensionRatio="h,1:1"
+        android:src="@drawable/image_picker"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <EditText
         android:id="@+id/playlist_title"
         style="@style/SettingsTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:background="@drawable/bg_stroke_rounded"
+        android:background="@drawable/bg_edittext_selector"
         android:gravity="center|left"
+        android:inputType="textCapSentences"
+        android:lines="1"
         android:hint="@string/title"
         android:paddingHorizontal="@dimen/horizontal_padding"
         android:paddingVertical="18dp"
@@ -62,14 +64,16 @@
         app:layout_constraintStart_toStartOf="@+id/leftBorder2"
         app:layout_constraintTop_toBottomOf="@+id/playlist_image" />
 
-    <TextView
+    <EditText
         android:id="@+id/playlist_description"
         style="@style/SettingsTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/bg_stroke_rounded"
+        android:background="@drawable/bg_edittext_selector"
         android:gravity="center|left"
+        android:inputType="textCapSentences"
+        android:lines="1"
         android:hint="@string/description"
         android:paddingHorizontal="@dimen/horizontal_padding"
         android:paddingVertical="18dp"
@@ -77,12 +81,16 @@
         app:layout_constraintStart_toStartOf="@+id/leftBorder2"
         app:layout_constraintTop_toBottomOf="@+id/playlist_title" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_create"
+        style="@style/ButtonsStyle"
+        android:layout_height="44dp"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:enabled="false"
         android:layout_marginBottom="32dp"
-        android:textAllCaps="false"
-        android:background="@drawable/bg_rounded_radius_m"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="@color/button_color_selector"
         android:text="@string/create"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/rightBorder2"

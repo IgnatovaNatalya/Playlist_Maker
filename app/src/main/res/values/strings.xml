@@ -39,9 +39,13 @@
     <string name="no_playlists">Вы не создали\nни одного плейлиста</string>
     <string name="new_playlist">Новый плейлист</string>
     <string name="no_tracks">Ваша медиатека пуста</string>
-    <string name="title">Название</string>
+    <string name="title">Название*</string>
     <string name="description">Описание</string>
     <string name="create">Создать</string>
 
+    <string name="finish_creating">Завершить создание плейлиста?</string>
+    <string name="info_erase_input">Все несохраненные данные будут потеряны</string>
+    <string name="finish">Завершить</string>
+    <string name="cancel">Отмена</string>
 
 </resources>

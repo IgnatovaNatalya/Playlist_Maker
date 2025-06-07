@@ -18,11 +18,7 @@
         android:id="@+id/mediaFragment"
         android:name="com.example.playlistmaker.ui.media.MediaFragment"
         android:label="fragment_media"
-        tools:layout="@layout/fragment_media" >
-        <action
-            android:id="@+id/action_mediaFragment_to_playerActivity"
-            app:destination="@id/playerActivity" />
-    </fragment>
+        tools:layout="@layout/fragment_media" />
 
     <fragment
         android:id="@+id/settingsFragment"
@@ -35,4 +31,27 @@
         android:name="com.example.playlistmaker.ui.player.PlayerActivity"
         android:label="activity_player"
         tools:layout="@layout/activity_player" />
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.playlistmaker.ui.favorites.FavoritesFragment"
+        android:label="fragment_favorites"
+        tools:layout="@layout/fragment_favorites" >
+        <action
+            android:id="@+id/action_favoritesFragment_to_playerActivity"
+            app:destination="@id/playerActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.example.playlistmaker.ui.playlists.PlaylistsFragment"
+        android:label="fragment_playlists"
+        tools:layout="@layout/fragment_playlists" >
+        <action
+            android:id="@+id/action_playlistsFragment_to_newPlaylistFragment"
+            app:destination="@id/newPlaylistFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newPlaylistFragment"
+        android:name="com.example.playlistmaker.ui.playlists.NewPlaylistFragment"
+        android:label="fragment_new_playlist"
+        tools:layout="@layout/fragment_new_playlist" />
 </navigation>

@@ -10,7 +10,7 @@
     tools:context=".ui.playlists.PlaylistsFragment">
 
         <Button
-            android:id="@+id/placeholder_button"
+            android:id="@+id/btn_create_playlist"
             style="@style/UsualButtonsStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

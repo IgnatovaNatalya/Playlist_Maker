@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.findNavController
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker.util.BindingFragment
-import com.example.playlistmaker.viewmodel.PlaylistsViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
 
@@ -16,11 +16,15 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         return FragmentPlaylistsBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel: PlaylistsViewModel by viewModel()
+    //private val viewModel: PlaylistsViewModel by viewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.btnCreatePlaylist.setOnClickListener {
+            val rootNavController = requireActivity().findNavController(R.id.fragment_container)
+            rootNavController.navigate(R.id.newPlaylistFragment)
+        }
     }
 
     companion object {
