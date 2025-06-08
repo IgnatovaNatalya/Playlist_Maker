@@ -7,6 +7,7 @@ import com.example.playlistmaker.di.playerModule
 import com.example.playlistmaker.di.searchTracksModule
 import com.example.playlistmaker.di.settingsModule
 import com.example.playlistmaker.di.favoritesModule
+import com.example.playlistmaker.di.playlistsModule
 import com.example.playlistmaker.domain.settings.ThemeInteractor
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -26,7 +27,8 @@ class App : Application() {
                 settingsModule,
                 playerModule,
                 mediaModule,
-                favoritesModule
+                favoritesModule,
+                playlistsModule
             )
         }
 

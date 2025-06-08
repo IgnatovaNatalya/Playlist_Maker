@@ -18,10 +18,6 @@ class SearchTracksViewModel(
     private val favoritesInteractor: FavoritesInteractor
 ) : ViewModel() {
 
-    companion object {
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-    }
-
     // Постоянное хранение данных
     private val _foundTracks = MutableStateFlow<List<Track>>(listOf())
     val foundTracks = _foundTracks.asStateFlow()
@@ -115,6 +111,10 @@ class SearchTracksViewModel(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 
 }

@@ -4,7 +4,6 @@ import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.db.entity.toListTrack
 import com.example.playlistmaker.domain.favorites.FavoritesRepository
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.domain.model.toTrackEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -14,16 +13,16 @@ class FavoritesRepositoryImpl(
 ) : FavoritesRepository {
 
     override suspend fun addToFavorites(track: Track) {
-        appDatabase.favoritesDao().addToFavorites(track.toTrackEntity())
+        appDatabase.favoritesDao().addToFavorites(track.toFavTrackEntity())
     }
 
     override suspend fun removeFromFavorites(track: Track) {
-        appDatabase.favoritesDao().removeFromFavorites(track.toTrackEntity())
+        appDatabase.favoritesDao().removeFromFavorites(track.toFavTrackEntity())
     }
 
     override fun getFavoriteTracks(): Flow<List<Track>> {
-        val tracks = appDatabase.favoritesDao().getFavoriteTracks()
-        return tracks.map { toListTrack(it) }
+        val favTracks = appDatabase.favoritesDao().getFavoriteTracks()
+        return favTracks.map { toListTrack(it) }
     }
 
     override fun getFavoriteTrackIds(): Flow<List<Int>> = flow {

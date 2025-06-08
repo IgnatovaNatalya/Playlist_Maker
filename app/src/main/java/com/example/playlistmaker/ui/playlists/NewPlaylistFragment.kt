@@ -22,8 +22,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.BitmapImageViewTarget
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentNewPlaylistBinding
+import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.util.BindingFragment
+import com.example.playlistmaker.viewmodel.NewPlaylistViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
 
@@ -32,15 +35,13 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
     private lateinit var playlistTitleInput: EditText
     private lateinit var textWatcher: TextWatcher
     private lateinit var confirmDialog: MaterialAlertDialogBuilder
-
-    //private val viewModel: PlaylistsViewModel by viewModel()
+    private val viewModel: NewPlaylistViewModel by viewModel()
     private var imageIsLoaded = false
 
     override fun createBinding(inflater: LayoutInflater, container: ViewGroup?)
             : FragmentNewPlaylistBinding {
         return FragmentNewPlaylistBinding.inflate(inflater, container, false)
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -112,6 +113,17 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
     }
 
     private fun finishAndSave() {
+        viewModel.createPlaylist(
+            Playlist(
+                0,
+                binding.playlistTitle.text.toString(),
+                binding.playlistDescription.text.toString(),
+                "",
+                0,
+                emptyList()
+            )
+        )
+
         Toast.makeText(
             requireContext(),
             "Плейлист ${binding.playlistTitle.text} создан",

@@ -1,8 +1,9 @@
 package com.example.playlistmaker.domain.model
 
 import android.os.Parcelable
-import com.example.playlistmaker.data.db.entity.TrackEntity
+import com.example.playlistmaker.data.db.entity.FavTrackEntity
 import com.example.playlistmaker.data.db.entity.HistoryEntity
+import com.example.playlistmaker.data.db.entity.TrackEntity
 import kotlinx.parcelize.Parcelize
 import java.lang.System.currentTimeMillis
 
@@ -19,11 +20,44 @@ data class Track(
     val country: String,
     val previewUrl: String,
     var isFavorite: Boolean = false
-) : Parcelable
+) : Parcelable {
 
-fun Track.toHistoryEntity(track: Track): HistoryEntity {
-    return with(track) {
-        HistoryEntity(
+    fun toTrackEntity(): TrackEntity {
+        return TrackEntity(
+            trackId,
+            trackName,
+            artistName,
+            duration,
+            artworkUrl100,
+            collectionName,
+            releaseDate,
+            primaryGenreName,
+            country,
+            previewUrl
+        )
+    }
+
+    fun toHistoryEntity(track: Track): HistoryEntity {
+        return with(track) {
+            HistoryEntity(
+                trackId,
+                trackName,
+                artistName,
+                duration,
+                artworkUrl100,
+                collectionName,
+                releaseDate,
+                primaryGenreName,
+                country,
+                previewUrl,
+                currentTimeMillis(),
+                isFavorite
+            )
+        }
+    }
+
+    fun toFavTrackEntity(): FavTrackEntity {
+        return FavTrackEntity(
             trackId,
             trackName,
             artistName,
@@ -34,24 +68,7 @@ fun Track.toHistoryEntity(track: Track): HistoryEntity {
             primaryGenreName,
             country,
             previewUrl,
-            currentTimeMillis(),
-            isFavorite
+            currentTimeMillis()
         )
     }
-}
-
-fun Track.toTrackEntity(): TrackEntity {
-    return TrackEntity(
-        trackId,
-        trackName,
-        artistName,
-        duration,
-        artworkUrl100,
-        collectionName,
-        releaseDate,
-        primaryGenreName,
-        country,
-        previewUrl,
-        currentTimeMillis()
-    )
 }
