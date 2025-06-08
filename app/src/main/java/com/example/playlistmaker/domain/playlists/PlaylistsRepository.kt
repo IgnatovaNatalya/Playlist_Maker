@@ -12,5 +12,5 @@ interface PlaylistsRepository {
     suspend fun addToPlaylist(playlistId:Int, track: Track)
     suspend fun removeFromPlaylist(playlistId:Int, track: Track) //todo или передвать только id? Еще нужно проверять когда трек не остался ни в одном плейлисте
 
-    fun getPlaylist(playlistId: Int):Flow<Playlist>
+    fun getPlaylists(): Flow<List<Playlist>>
 }

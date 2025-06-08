@@ -29,6 +29,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 
 class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
 
@@ -37,6 +38,7 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
     private lateinit var confirmDialog: MaterialAlertDialogBuilder
     private val viewModel: NewPlaylistViewModel by viewModel()
     private var imageIsLoaded = false
+    private var imagePath = ""
 
     override fun createBinding(inflater: LayoutInflater, container: ViewGroup?)
             : FragmentNewPlaylistBinding {
@@ -118,9 +120,8 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
                 0,
                 binding.playlistTitle.text.toString(),
                 binding.playlistDescription.text.toString(),
-                "",
-                0,
-                emptyList()
+                imagePath,
+                0
             )
         )
 
@@ -151,19 +152,32 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
     private fun saveImageToPrivateStorage(uri: Uri) {
 
         val filePath =
-            File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
+            File(
+                requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                DIRECTORY_COVERS
+            )
 
         if (!filePath.exists()) {
             filePath.mkdirs()
         }
 
-        val file = File(filePath, "first_cover.jpg")
+        //todo переделать нахрен все в репозиторий
+
+        val file = File(filePath, generateUniqueFileName())
+
         val inputStream = requireContext().contentResolver.openInputStream(uri)
         val outputStream = FileOutputStream(file)
 
         BitmapFactory
             .decodeStream(inputStream)
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
+
+        imagePath = file.path
+
+    }
+
+    private fun generateUniqueFileName(extension: String = "png"): String {
+        return "${UUID.randomUUID()}.$extension"
     }
 
     override fun onDestroyView() {
@@ -172,7 +186,6 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
     }
 
     companion object {
-        fun newInstance() = NewPlaylistFragment()
+        const val DIRECTORY_COVERS = "playlists_covers"
     }
-
 }

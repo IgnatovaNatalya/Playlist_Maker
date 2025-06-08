@@ -30,7 +30,6 @@
     </style>
 
 
-
     <style name="SettingsItemStyle">
         <item name="itemHorizontalPadding">@dimen/horizontal_padding</item>
         <item name="android:layout_marginVertical">@dimen/vertical_padding</item>
@@ -60,6 +59,12 @@
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
         <item name="fontFamily">@font/ys_text_regular</item>
         <item name="android:textSize">@dimen/text_med</item>
+    </style>
+
+    <style name="PlaylistStyle">
+        <item name="fontFamily">@font/ys_text_regular</item>
+        <item name="android:textSize">@dimen/text_little</item>
+        <item name="android:letterSpacing">-0.04</item>
     </style>
 
     <style name="BandNameStyle">

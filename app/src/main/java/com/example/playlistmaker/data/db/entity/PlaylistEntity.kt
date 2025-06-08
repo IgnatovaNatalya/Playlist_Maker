@@ -2,6 +2,7 @@ package com.example.playlistmaker.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.playlistmaker.domain.model.Playlist
 
 @Entity(tableName = "playlist_table")
 data class PlaylistEntity(
@@ -11,4 +12,14 @@ data class PlaylistEntity(
     val description:String,
     val path:String,
     val numberTracks:Int =0
-)
+) {
+    fun toPlaylist(): Playlist {
+        return Playlist(
+            id, title, description, path, numberTracks
+        )
+    }
+}
+
+
+fun toListPlaylist(playEntityLists: List<PlaylistEntity>) =
+    playEntityLists.map { it.toPlaylist() }

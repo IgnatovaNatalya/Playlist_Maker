@@ -16,6 +16,10 @@ interface PlaylistDao {
     @Delete
     suspend fun deletePlaylist(playlist:PlaylistEntity)
 
-    @Query("SELECT * FROM playlist_table WHERE id = :playlistId")
-    fun getPlaylist(playlistId:Int): Flow<PlaylistEntity>
+    //@Query("SELECT p.id, p.title,p.description,p.path,count(tp.trackId) as numberTracks FROM playlist_table p INNER JOIN tracks_playlists_table tp ON p.id = tp.playlistId ")
+    @Query("SELECT* FROM playlist_table")
+    fun getPlaylists(): Flow<List<PlaylistEntity>>
+
+//    @Query("SELECT * FROM playlist_table WHERE id = :playlistId")
+//    fun getPlaylist(playlistId:Int): Flow<PlaylistEntity>
 }
