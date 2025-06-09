@@ -9,12 +9,14 @@ import com.example.playlistmaker.util.PlaylistsState
 import kotlinx.coroutines.launch
 
 class PlaylistsViewModel(private val playlistsInteractor: PlaylistsInteractor) : ViewModel() {
+
     private val _playlistsState = MutableLiveData<PlaylistsState>()
     val playlistsState: LiveData<PlaylistsState> = _playlistsState
 
     init {
         getPlaylists()
     }
+
     fun getPlaylists() {
         renderState(PlaylistsState.Loading)
         viewModelScope.launch {

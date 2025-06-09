@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.playlists
+package com.example.playlistmaker.ui.newPlaylist
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -35,7 +35,7 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
 
     private lateinit var playlistTitleInput: EditText
     private lateinit var textWatcher: TextWatcher
-    private lateinit var confirmDialog: MaterialAlertDialogBuilder
+    //private lateinit var confirmDialog: MaterialAlertDialogBuilder
     private val viewModel: NewPlaylistViewModel by viewModel()
     private var imageIsLoaded = false
     private var imagePath = ""
@@ -105,7 +105,7 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
         }
 
         binding.playlistToolbar.setOnClickListener {
-            confirmDialog.show()
+            finishNotSave()
         }
 
         binding.btnCreate.setOnClickListener {
@@ -139,7 +139,7 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
 
         if (binding.playlistTitle.text.toString() != "" || binding.playlistDescription.text.toString() != "" || imageIsLoaded) {
 
-            confirmDialog = MaterialAlertDialogBuilder(requireContext())
+            val confirmDialog = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.finish_creating)
                 .setMessage(R.string.info_erase_input)
                 .setNeutralButton(R.string.cancel) { dialog, which -> }
