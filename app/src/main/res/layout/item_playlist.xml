@@ -13,10 +13,12 @@
         tools:ignore="ContentDescription" />
 
     <TextView
+        android:layout_marginTop="4dp"
         android:id="@+id/playlist_title"
         style="@style/PlaylistStyle"
         android:layout_width="160dp"
         android:layout_height="16dp"
+        android:ellipsize="end"
         tools:text = "BeSt SoNg EvEr!"/>
 
     <TextView

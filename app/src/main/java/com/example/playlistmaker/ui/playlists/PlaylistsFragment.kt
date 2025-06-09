@@ -2,6 +2,7 @@ package com.example.playlistmaker.ui.playlists
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker.ui.RootActivity
 import com.example.playlistmaker.util.BindingFragment
+import com.example.playlistmaker.util.GridSpacingItemDecoration
 import com.example.playlistmaker.util.PlaylistsState
 import com.example.playlistmaker.viewmodel.PlaylistsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -38,7 +40,14 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
 
         playlistsRecycler = binding.playlistsRecycler
         playlistsRecycler.layoutManager = GridLayoutManager(requireContext(), 2)
+
         playlistsRecycler.adapter = playlistsAdapter
+
+        val spacingPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 8F, requireContext().resources.displayMetrics
+        ).toInt()
+
+        playlistsRecycler.addItemDecoration(GridSpacingItemDecoration(2, spacingPx, false))
 
         binding.btnCreatePlaylist.setOnClickListener {
             val rootNavController = requireActivity().findNavController(R.id.fragment_container)
