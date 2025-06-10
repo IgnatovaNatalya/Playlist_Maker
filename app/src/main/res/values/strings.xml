@@ -24,8 +24,8 @@
     <string name="clear_history">Очистить историю</string>
     <string name="history_header">Вы искали</string>
     <string name="play_or_pause">Play or Pause</string>
-    <string name="add_to_playlist">Add to playlist</string>
-    <string name="add_to_favorities">Add to favorities</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="add_to_favorities">Добавить в избранное</string>
     <string name="duration">Длительность</string>
     <string name="album">Альбом</string>
     <string name="year">Год</string>

@@ -13,5 +13,5 @@ val playerModule = module {
     factory<PlaybackInteractor> { PlaybackInteractorImpl(get()) }
     factory<PlaybackRepository> { PlaybackRepositoryImpl(get()) }
     factory { MediaPlayer() }
-    viewModel { PlaybackViewModel(get(), get()) }
+    viewModel { PlaybackViewModel(get(), get() , get()) }
 }

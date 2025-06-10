@@ -5,8 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.favorites.FavoritesInteractor
+import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.player.PlaybackInteractor
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.playlists.PlaylistsInteractor
 import com.example.playlistmaker.util.PlayerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -16,7 +18,8 @@ import java.util.Locale
 
 class PlaybackViewModel(
     private val playbackInteractor: PlaybackInteractor,
-    private val favoritesInteractor: FavoritesInteractor
+    private val favoritesInteractor: FavoritesInteractor,
+    private var playlistsInteractor: PlaylistsInteractor
 ) : ViewModel() {
 
     private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default())
@@ -25,10 +28,25 @@ class PlaybackViewModel(
     private val _favoriteState = MutableLiveData<Boolean>()
     var favoriteState: LiveData<Boolean> = _favoriteState
 
+    private val _playlists = MutableLiveData<List<Playlist>>()
+    var playlists: LiveData<List<Playlist>> = _playlists
+
     private var timerJob: Job? = null
 
     private var currentTrack: Track? = null
 
+    init {
+        getPlaylists()
+    }
+
+    fun getPlaylists() {
+        viewModelScope.launch {
+            playlistsInteractor.getPlaylists().collect { playlists ->
+                _playlists.postValue(playlists)
+            }
+        }
+    }
+    
     private fun startPlayer() {
         playbackInteractor.startPlayer()
         _playerState.postValue(PlayerState.Playing(getCurrentPlayerPosition()))

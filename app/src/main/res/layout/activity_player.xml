@@ -257,16 +257,15 @@
         android:layout_height="match_parent"
         android:background="@color/YP_Background"
         android:fitsSystemWindows="true"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="505dp"
         android:background="@drawable/rounder_bottom"
-        android:fitsSystemWindows="true"
+        android:fitsSystemWindows="false"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
         android:visibility="visible"
         app:behavior_hideable="true"
         app:behavior_peekHeight="505dp"
@@ -279,29 +278,36 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/rounder" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/order"
-            android:layout_width="wrap_content"
+        <TextView
+            style="@style/PlaceHolderTextStyle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="60dp"
-            android:width="200dp"
-            android:text="Подтвердить заказ"
-            app:backgroundTint="@color/black"
-            tools:ignore="HardcodedText" />
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="@string/add_to_playlist" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/cancel"
+            android:id="@+id/btn_create_playlist"
+            style="@style/UsualButtonsStyle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="36dp"
             android:layout_gravity="center"
-            android:layout_marginTop="18dp"
-            android:width="200dp"
-            android:text="Отменить"
-            app:backgroundTint="#FFA1A1"
-            tools:ignore="HardcodedText" />
+            android:layout_marginTop="28dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/new_playlist" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/playlists_linear_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_marginHorizontal="13dp"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_playlist_linear" />
     </LinearLayout>
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,26 +1,26 @@
-package com.example.playlistmaker.ui.playlists
+package com.example.playlistmaker.ui.player
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.databinding.ItemPlaylistBinding
+import com.example.playlistmaker.databinding.ItemPlaylistLinearBinding
 import com.example.playlistmaker.domain.model.Playlist
 
-class PlaylistAdapter(private val clickListener: AdapterClickListener) :
-    RecyclerView.Adapter<PlaylistViewHolder>() {
+class PlaylistLinearAdapter(private val clickListener: AdapterClickListener) :
+    RecyclerView.Adapter<PlaylistLinearViewHolder>() {
 
     var playlists = listOf<Playlist>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistLinearViewHolder {
         val layoutInspector = LayoutInflater.from(parent.context)
-        return PlaylistViewHolder(ItemPlaylistBinding.inflate(layoutInspector, parent, false))
+        return PlaylistLinearViewHolder(ItemPlaylistLinearBinding.inflate(layoutInspector, parent, false))
     }
 
     override fun getItemCount(): Int {
         return playlists.size
     }
 
-    override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PlaylistLinearViewHolder, position: Int) {
         holder.bind(playlists[position])
         holder.itemView.setOnClickListener { clickListener.onPlaylistClick(playlists.get(position)) }
     }

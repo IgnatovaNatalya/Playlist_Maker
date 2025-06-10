@@ -1,5 +1,6 @@
 package com.example.playlistmaker.ui.player
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -13,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
@@ -27,7 +30,10 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
     private val viewModel: PlaybackViewModel by viewModel()
+    private var playlistsLinearAdapter: PlaylistLinearAdapter? = null
+    private lateinit var playlistsLinearRecycler: RecyclerView
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,12 +46,6 @@ class PlayerActivity : AppCompatActivity() {
 
         window.statusBarColor = Color.TRANSPARENT
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
-
-        // Для Android 11+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -84,8 +84,20 @@ class PlayerActivity : AppCompatActivity() {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
 
+        playlistsLinearAdapter = PlaylistLinearAdapter({ playlist -> {} })
+
+        viewModel.playlists.observe(this) {
+            playlistsLinearAdapter?.playlists = it
+            playlistsLinearAdapter?.notifyDataSetChanged()
+        }
+
+        playlistsLinearRecycler = binding.playlistsLinearRecycler
+        playlistsLinearRecycler.layoutManager = LinearLayoutManager(this)
+        playlistsLinearRecycler.adapter = playlistsLinearAdapter
+
         binding.buttonAddToPlaylist.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED}
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
 
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -105,6 +117,10 @@ class PlayerActivity : AppCompatActivity() {
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
+
+        binding.btnCreatePlaylist.setOnClickListener {
+           //создать плейлист
+        }
     }
 
     private fun renderState(state: PlayerState) {

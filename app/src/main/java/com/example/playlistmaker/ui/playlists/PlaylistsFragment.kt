@@ -20,7 +20,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
 
-    private var playlistsAdapter: PlaylistAdapter?=null
+    private var playlistsAdapter: PlaylistGridAdapter?=null
     private val viewModel: PlaylistsViewModel by viewModel()
     private lateinit var playlistsRecycler: RecyclerView
 
@@ -33,7 +33,7 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        playlistsAdapter = PlaylistAdapter {playlist -> {}
+        playlistsAdapter = PlaylistGridAdapter { playlist -> {}
             (activity as RootActivity).animateBottomNavigationView()
         }
         viewModel.playlistsState.observe(viewLifecycleOwner) { render(it)}
