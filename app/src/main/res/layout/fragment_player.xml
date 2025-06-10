@@ -262,9 +262,8 @@
     <LinearLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="505dp"
+        android:layout_height="515dp"
         android:background="@drawable/rounder_bottom"
-        android:fitsSystemWindows="false"
         android:orientation="vertical"
         android:visibility="visible"
         app:behavior_hideable="true"
