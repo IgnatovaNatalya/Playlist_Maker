@@ -1,83 +1,60 @@
 package com.example.playlistmaker.ui.player
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.util.BindingFragment
 import com.example.playlistmaker.util.PlayerState
 import com.example.playlistmaker.viewmodel.PlaybackViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
-class PlayerActivity : AppCompatActivity() {
+class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
 
-    private lateinit var binding: ActivityPlayerBinding
     private val viewModel: PlaybackViewModel by viewModel()
     private var playlistsLinearAdapter: PlaylistLinearAdapter? = null
     private lateinit var playlistsLinearRecycler: RecyclerView
 
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentPlayerBinding {
+        return FragmentPlayerBinding.inflate(inflater,container,false)
+    }
+
     @SuppressLint("NotifyDataSetChanged")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        /*чтобы затемнение было на весь экран включая системные области*/
-
-        window.decorView.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-
-        window.statusBarColor = Color.TRANSPARENT
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-            WindowCompat.setDecorFitsSystemWindows(window, false)
+        binding.playerToolbar.setNavigationOnClickListener {
+            val rootNavController = requireActivity().findNavController(R.id.fragment_container)
+            rootNavController.popBackStack()
         }
 
-        /*чтобы затемнение было на весь экран включая системные области*/
-
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, 0)
-            insets
-        }
-
-        binding.playerToolbar.setNavigationOnClickListener { finish() }
         binding.buttonLike.setOnClickListener { viewModel.onLikeClicked() }
 
-        viewModel.playerState.observe(this) { state -> renderState(state) }
-        viewModel.favoriteState.observe(this) { favoriteState -> renderFav(favoriteState) }
+        viewModel.playerState.observe(viewLifecycleOwner) { state -> renderState(state) }
+        viewModel.favoriteState.observe(viewLifecycleOwner) { favoriteState -> renderFav(favoriteState) }
 
-        val intent = intent
-
-        @Suppress("DEPRECATION")
-        val track = intent.getParcelableExtra<Track>(EXTRA_TRACK)
+        val track:Track? = requireArguments().getParcelable<Track>(EXTRA_TRACK)
 
         if (track != null) {
             drawTrack(track)
             viewModel.preparePlayer(track)
         }
-
         binding.buttonPlayPause.setOnClickListener { viewModel.onPlayButtonClicked() }
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
@@ -86,13 +63,13 @@ class PlayerActivity : AppCompatActivity() {
 
         playlistsLinearAdapter = PlaylistLinearAdapter({ playlist -> {} })
 
-        viewModel.playlists.observe(this) {
+        viewModel.playlists.observe(viewLifecycleOwner) {
             playlistsLinearAdapter?.playlists = it
             playlistsLinearAdapter?.notifyDataSetChanged()
         }
 
         playlistsLinearRecycler = binding.playlistsLinearRecycler
-        playlistsLinearRecycler.layoutManager = LinearLayoutManager(this)
+        playlistsLinearRecycler.layoutManager = LinearLayoutManager(requireContext())
         playlistsLinearRecycler.adapter = playlistsLinearAdapter
 
         binding.buttonAddToPlaylist.setOnClickListener {
@@ -119,9 +96,10 @@ class PlayerActivity : AppCompatActivity() {
         })
 
         binding.btnCreatePlaylist.setOnClickListener {
-           //создать плейлист
+            requireActivity().findNavController(R.id.fragment_container).navigate(R.id.newPlaylistFragment)
         }
     }
+
 
     private fun renderState(state: PlayerState) {
         binding.buttonPlayPause.isEnabled = state.isPlayButtonEnabled
@@ -172,10 +150,8 @@ class PlayerActivity : AppCompatActivity() {
 
         const val EXTRA_TRACK = "EXTRA_TRACK"
 
-        fun newInstance(context: Context, track: Track): Intent {
-            return Intent(context, PlayerActivity::class.java).apply {
-                putExtra(EXTRA_TRACK, track)
-            }
-        }
+        fun createArgs(track: Track): Bundle =
+            bundleOf(EXTRA_TRACK to track)
     }
+
 }

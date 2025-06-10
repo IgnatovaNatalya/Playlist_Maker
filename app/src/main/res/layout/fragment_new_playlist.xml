@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.newPlaylist.NewPlaylistFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -39,9 +38,9 @@
         android:id="@+id/playlist_image"
         android:layout_width="312dp"
         android:layout_height="312dp"
-        android:scaleType="centerCrop"
         android:layout_marginTop="62dp"
         android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
         android:src="@drawable/image_picker"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
@@ -55,9 +54,9 @@
         android:layout_marginTop="32dp"
         android:background="@drawable/bg_edittext_selector"
         android:gravity="center|left"
+        android:hint="@string/title"
         android:inputType="textCapSentences"
         android:lines="1"
-        android:hint="@string/title"
         android:paddingHorizontal="@dimen/horizontal_padding"
         android:paddingVertical="18dp"
         app:layout_constraintEnd_toEndOf="@id/rightBorder2"
@@ -72,9 +71,9 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_edittext_selector"
         android:gravity="center|left"
+        android:hint="@string/description"
         android:inputType="textCapSentences"
         android:lines="1"
-        android:hint="@string/description"
         android:paddingHorizontal="@dimen/horizontal_padding"
         android:paddingVertical="18dp"
         app:layout_constraintEnd_toEndOf="@id/rightBorder2"
@@ -84,14 +83,14 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_create"
         style="@style/ButtonsStyle"
-        android:layout_height="44dp"
         android:layout_width="0dp"
-        android:enabled="false"
+        android:layout_height="44dp"
         android:layout_marginBottom="32dp"
+        android:enabled="false"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        app:backgroundTint="@color/button_color_selector"
         android:text="@string/create"
+        app:backgroundTint="@color/button_color_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/rightBorder2"
         app:layout_constraintStart_toStartOf="@id/leftBorder2" />

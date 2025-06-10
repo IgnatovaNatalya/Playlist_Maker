@@ -20,7 +20,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
 
-    private var playlistsAdapter: PlaylistGridAdapter?=null
+    private var playlistsAdapter: PlaylistGridAdapter? = null
     private val viewModel: PlaylistsViewModel by viewModel()
     private lateinit var playlistsRecycler: RecyclerView
 
@@ -29,14 +29,14 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         return FragmentPlaylistsBinding.inflate(inflater, container, false)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        playlistsAdapter = PlaylistGridAdapter { playlist -> {}
+        playlistsAdapter = PlaylistGridAdapter { playlist ->
+            {}
             (activity as RootActivity).animateBottomNavigationView()
         }
-        viewModel.playlistsState.observe(viewLifecycleOwner) { render(it)}
+        viewModel.playlistsState.observe(viewLifecycleOwner) { render(it) }
 
         playlistsRecycler = binding.playlistsRecycler
         playlistsRecycler.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -50,8 +50,8 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         playlistsRecycler.addItemDecoration(GridSpacingItemDecoration(2, spacingPx, false))
 
         binding.btnCreatePlaylist.setOnClickListener {
-            val rootNavController = requireActivity().findNavController(R.id.fragment_container)
-            rootNavController.navigate(R.id.newPlaylistFragment)
+            requireActivity().findNavController(R.id.fragment_container)
+                .navigate(R.id.action_mediaFragment_to_newPlaylistFragment)
         }
     }
 
@@ -74,6 +74,7 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         binding.progressBar.visibility = View.VISIBLE
         binding.placeholderMessage.visibility = View.GONE
     }
+
     @SuppressLint("NotifyDataSetChanged")
     private fun showContent(state: PlaylistsState.Content) {
         playlistsAdapter?.playlists = state.playlists
@@ -83,7 +84,6 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         binding.progressBar.visibility = View.GONE
         binding.placeholderMessage.visibility = View.GONE
     }
-
 
     companion object {
         fun newInstance() = PlaylistsFragment()

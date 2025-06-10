@@ -24,7 +24,7 @@ class RootActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
             insets
         }
 
@@ -35,11 +35,9 @@ class RootActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val currentFragment = navController.currentDestination?.id
-            if (currentFragment == R.id.newPlaylistFragment) return@addOnDestinationChangedListener
             
             when (destination.id) {
-                R.id.playerActivity, R.id.newPlaylistFragment -> {
+                R.id.playerFragment, R.id.newPlaylistFragment -> {
                     binding.bottomNavigationView.visibility = View.GONE
                 }
 

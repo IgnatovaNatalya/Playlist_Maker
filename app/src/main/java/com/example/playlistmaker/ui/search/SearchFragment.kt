@@ -13,13 +13,15 @@ import android.widget.EditText
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.R
 import com.example.playlistmaker.ui.RootActivity
 import com.example.playlistmaker.util.BindingFragment
 import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.databinding.FragmentSearchBinding
-import com.example.playlistmaker.ui.player.PlayerActivity
+import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.util.SearchState
 import com.example.playlistmaker.viewmodel.SearchTracksViewModel
@@ -57,8 +59,10 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         ) { track ->
             viewModel.addTrackToHistory(track)
             (activity as RootActivity).animateBottomNavigationView()
-            val intent = PlayerActivity.newInstance(requireContext(), track)
-            startActivity(intent)
+            findNavController().navigate(
+                R.id.action_searchFragment_to_playerFragment,
+                PlayerFragment.createArgs(track)
+            )
         }
 
         onHistoryTrackClickDebounce = debounce<Track>(
@@ -67,8 +71,10 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             false
         ) { track ->
             (activity as RootActivity).animateBottomNavigationView()
-            val intent = PlayerActivity.newInstance(requireContext(), track)
-            startActivity(intent)
+            findNavController().navigate(
+                R.id.action_searchFragment_to_playerFragment,
+                PlayerFragment.createArgs(track)
+            )
         }
 
         searchAdapter = TrackAdapter { track -> onSearchTrackClickDebounce(track) }

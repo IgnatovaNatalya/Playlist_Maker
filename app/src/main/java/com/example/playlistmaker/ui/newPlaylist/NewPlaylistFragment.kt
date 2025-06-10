@@ -35,7 +35,6 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
 
     private lateinit var playlistTitleInput: EditText
     private lateinit var textWatcher: TextWatcher
-    //private lateinit var confirmDialog: MaterialAlertDialogBuilder
     private val viewModel: NewPlaylistViewModel by viewModel()
     private var imageIsLoaded = false
     private var imagePath = ""
