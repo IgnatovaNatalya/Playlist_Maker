@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.favorites.FavoritesInteractor
 import com.example.playlistmaker.domain.model.Playlist
-import com.example.playlistmaker.domain.player.PlaybackInteractor
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.player.PlaybackInteractor
 import com.example.playlistmaker.domain.playlists.PlaylistsInteractor
 import com.example.playlistmaker.util.PlayerState
 import kotlinx.coroutines.Job
@@ -30,6 +30,9 @@ class PlaybackViewModel(
 
     private val _playlists = MutableLiveData<List<Playlist>>()
     var playlists: LiveData<List<Playlist>> = _playlists
+
+    private val _toastState = MutableLiveData<String>()
+    var toastState: LiveData<String> = _toastState
 
     private var timerJob: Job? = null
 
@@ -106,6 +109,16 @@ class PlaybackViewModel(
         }
     }
 
+    fun addTrackTo(playList: Playlist) {
+        if (currentTrack != null) {
+            val track = currentTrack!!
+            viewModelScope.launch {
+                playlistsInteractor.addToPlaylist(playList.id, track)
+                _toastState.postValue("Добавлено в плейлист ${playList.title}")
+            }
+        }
+    }
+
     private fun startTimer() {
         timerJob?.cancel()
 
@@ -121,6 +134,7 @@ class PlaybackViewModel(
         return SimpleDateFormat("mm:ss", Locale.getDefault())
             .format(playbackInteractor.getCurrentPosition()) ?: "00:00"
     }
+
 
     fun onPause() {
         pausePlayer()

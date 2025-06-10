@@ -11,15 +11,14 @@ data class PlaylistEntity(
     val title: String,
     val description:String,
     val path:String,
-    val numberTracks:Int =0
+    val numTracks: Int
 ) {
     fun toPlaylist(): Playlist {
         return Playlist(
-            id, title, description, path, numberTracks
+            id, title, description, path, numTracks
         )
     }
 }
-
 
 fun toListPlaylist(playEntityLists: List<PlaylistEntity>) =
     playEntityLists.map { it.toPlaylist() }

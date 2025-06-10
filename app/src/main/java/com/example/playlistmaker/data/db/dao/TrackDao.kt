@@ -7,6 +7,6 @@ import com.example.playlistmaker.data.db.entity.TrackEntity
 
 @Dao
 interface TrackDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addTrack(trackEntity: TrackEntity)
 }

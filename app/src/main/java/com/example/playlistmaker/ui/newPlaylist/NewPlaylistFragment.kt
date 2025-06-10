@@ -39,6 +39,7 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
     private var imageIsLoaded = false
     private var imagePath = ""
 
+
     override fun createBinding(inflater: LayoutInflater, container: ViewGroup?)
             : FragmentNewPlaylistBinding {
         return FragmentNewPlaylistBinding.inflate(inflater, container, false)
@@ -172,7 +173,6 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
 
         imagePath = file.path
-
     }
 
     private fun generateUniqueFileName(extension: String = "png"): String {

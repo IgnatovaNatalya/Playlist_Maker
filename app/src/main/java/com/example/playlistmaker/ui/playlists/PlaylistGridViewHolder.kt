@@ -36,7 +36,7 @@ class PlaylistGridViewHolder(private val binding: ItemPlaylistGridBinding) :
 
         binding.playlistTitle.text = playlist.title
 
-        val str = "${playlist.numberTracks} треков"
+        val str = "${playlist.numTracks} треков"
         binding.numTracks.text = str
     }
 }

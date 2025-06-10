@@ -6,6 +6,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +21,6 @@ import com.example.playlistmaker.util.PlayerState
 import com.example.playlistmaker.viewmodel.PlaybackViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
 
 class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
 
@@ -48,6 +48,7 @@ class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
 
         viewModel.playerState.observe(viewLifecycleOwner) { state -> renderState(state) }
         viewModel.favoriteState.observe(viewLifecycleOwner) { favoriteState -> renderFav(favoriteState) }
+        viewModel.toastState.observe(viewLifecycleOwner) { toast -> showToast(toast) }
 
         val track:Track? = requireArguments().getParcelable<Track>(EXTRA_TRACK)
 
@@ -55,13 +56,16 @@ class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
             drawTrack(track)
             viewModel.preparePlayer(track)
         }
+
         binding.buttonPlayPause.setOnClickListener { viewModel.onPlayButtonClicked() }
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
 
-        playlistsLinearAdapter = PlaylistLinearAdapter({ playlist -> {} })
+        playlistsLinearAdapter = PlaylistLinearAdapter({ playlist ->
+            viewModel.addTrackTo(playlist)
+        })
 
         viewModel.playlists.observe(viewLifecycleOwner) {
             playlistsLinearAdapter?.playlists = it
@@ -98,8 +102,12 @@ class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
         binding.btnCreatePlaylist.setOnClickListener {
             requireActivity().findNavController(R.id.fragment_container).navigate(R.id.newPlaylistFragment)
         }
+
     }
 
+    private fun showToast(toast:String) {
+        Toast.makeText(requireContext(),toast, Toast.LENGTH_SHORT).show()
+    }
 
     private fun renderState(state: PlayerState) {
         binding.buttonPlayPause.isEnabled = state.isPlayButtonEnabled
@@ -144,6 +152,12 @@ class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
     override fun onPause() {
         super.onPause()
         viewModel.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        playlistsLinearAdapter = null
+        playlistsLinearRecycler.adapter = null
     }
 
     companion object {

@@ -7,11 +7,11 @@ data class Playlist(
     val title: String,
     val description: String,
     val path: String,
-    val numberTracks: Int
+    val numTracks:Int
 ) {
     fun toPlaylistEntity(): PlaylistEntity {
         return PlaylistEntity(
-            id, title, description, path, numberTracks
+            id, title, description, path, numTracks
         )
     }
 }

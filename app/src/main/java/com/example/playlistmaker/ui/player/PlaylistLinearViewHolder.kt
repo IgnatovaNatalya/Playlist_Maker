@@ -35,7 +35,7 @@ class PlaylistLinearViewHolder(private val binding: ItemPlaylistLinearBinding) :
 
         binding.playlistLinearTitle.text = playlist.title
 
-        val str = "${playlist.numberTracks} треков"
+        val str = "${playlist.numTracks} треков"
         binding.playlistLinearNumTracks.text = str
 
     }
