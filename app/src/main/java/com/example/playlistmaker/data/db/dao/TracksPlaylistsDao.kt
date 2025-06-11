@@ -12,7 +12,7 @@ import com.example.playlistmaker.data.db.entity.TracksPlaylistsEntity
 
 @Dao
 interface TracksPlaylistsDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun addToPlaylist(trackPlaylist: TracksPlaylistsEntity)
 
     @Delete

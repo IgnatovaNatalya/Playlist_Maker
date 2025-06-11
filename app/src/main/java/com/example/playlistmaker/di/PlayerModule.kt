@@ -1,6 +1,7 @@
 package com.example.playlistmaker.di
 
 import android.media.MediaPlayer
+import androidx.lifecycle.SavedStateHandle
 import com.example.playlistmaker.data.player.PlaybackRepository
 import com.example.playlistmaker.data.player.PlaybackRepositoryImpl
 import com.example.playlistmaker.domain.player.PlaybackInteractor
@@ -13,5 +14,7 @@ val playerModule = module {
     factory<PlaybackInteractor> { PlaybackInteractorImpl(get()) }
     factory<PlaybackRepository> { PlaybackRepositoryImpl(get()) }
     factory { MediaPlayer() }
-    viewModel { PlaybackViewModel(get(), get() , get()) }
+    viewModel { (handle: SavedStateHandle) ->
+        PlaybackViewModel(get(), get(), get(), savedStateHandle = handle)
+    }
 }

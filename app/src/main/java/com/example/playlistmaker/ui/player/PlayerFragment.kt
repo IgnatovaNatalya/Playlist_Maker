@@ -6,8 +6,10 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,29 +17,62 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
+import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.util.BindingFragment
 import com.example.playlistmaker.util.PlayerState
+import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.viewmodel.PlaybackViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
+class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
     private val viewModel: PlaybackViewModel by viewModel()
     private var playlistsLinearAdapter: PlaylistLinearAdapter? = null
     private lateinit var playlistsLinearRecycler: RecyclerView
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var onPlaylistClickDebounce: (Playlist) -> Unit
+    private lateinit var onPlaylistCreateDebounce: (Unit) -> Unit
+    private var toastShown = false
 
     override fun createBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentPlayerBinding {
-        return FragmentPlayerBinding.inflate(inflater,container,false)
+        return FragmentPlayerBinding.inflate(inflater, container, false)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        requireArguments().getParcelable<Track>(EXTRA_TRACK)?.let { track ->
+            viewModel.setTrack(track)
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        onPlaylistClickDebounce = debounce<Playlist>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { playlist ->
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            viewModel.addTrackTo(playlist)
+        }
+
+        onPlaylistCreateDebounce = debounce<Unit>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            requireActivity().findNavController(R.id.fragment_container)
+                .navigate(R.id.newPlaylistFragment)
+        }
 
         binding.playerToolbar.setNavigationOnClickListener {
             val rootNavController = requireActivity().findNavController(R.id.fragment_container)
@@ -47,25 +82,39 @@ class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
         binding.buttonLike.setOnClickListener { viewModel.onLikeClicked() }
 
         viewModel.playerState.observe(viewLifecycleOwner) { state -> renderState(state) }
-        viewModel.favoriteState.observe(viewLifecycleOwner) { favoriteState -> renderFav(favoriteState) }
-        viewModel.toastState.observe(viewLifecycleOwner) { toast -> showToast(toast) }
+        viewModel.favoriteState.observe(viewLifecycleOwner) { favoriteState ->
+            renderFav(
+                favoriteState
+            )
+        }
+        viewModel.toastState.observe(viewLifecycleOwner) { toastText ->
+            if (!toastText.isNullOrBlank()) {
+                if (!toastShown) {
+                    showToast(toastText)
+                    toastShown = true
+                } else {
+                    toastShown = false
+                }
+            }
+        }
 
-        val track:Track? = requireArguments().getParcelable<Track>(EXTRA_TRACK)
-
-        if (track != null) {
-            drawTrack(track)
-            viewModel.preparePlayer(track)
+        viewModel.track.observe(viewLifecycleOwner) { track ->
+            if (track != null) {
+                viewModel.preparePlayer()
+                drawTrack(track)
+            } else {
+                requireActivity().supportFragmentManager.popBackStack()
+            }
         }
 
         binding.buttonPlayPause.setOnClickListener { viewModel.onPlayButtonClicked() }
 
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
 
-        playlistsLinearAdapter = PlaylistLinearAdapter({ playlist ->
-            viewModel.addTrackTo(playlist)
-        })
+        playlistsLinearAdapter =
+            PlaylistLinearAdapter { playlist -> onPlaylistClickDebounce(playlist) }
 
         viewModel.playlists.observe(viewLifecycleOwner) {
             playlistsLinearAdapter?.playlists = it
@@ -75,10 +124,6 @@ class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
         playlistsLinearRecycler = binding.playlistsLinearRecycler
         playlistsLinearRecycler.layoutManager = LinearLayoutManager(requireContext())
         playlistsLinearRecycler.adapter = playlistsLinearAdapter
-
-        binding.buttonAddToPlaylist.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
 
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -99,14 +144,18 @@ class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
 
-        binding.btnCreatePlaylist.setOnClickListener {
-            requireActivity().findNavController(R.id.fragment_container).navigate(R.id.newPlaylistFragment)
+        binding.buttonAddToPlaylist.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
+        binding.btnCreatePlaylist.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            onPlaylistCreateDebounce(Unit)
+        }
     }
 
-    private fun showToast(toast:String) {
-        Toast.makeText(requireContext(),toast, Toast.LENGTH_SHORT).show()
+    private fun showToast(toast: String) {
+        Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT).show()
     }
 
     private fun renderState(state: PlayerState) {
@@ -160,9 +209,15 @@ class PlayerFragment: BindingFragment<FragmentPlayerBinding>() {
         playlistsLinearRecycler.adapter = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
     companion object {
 
         const val EXTRA_TRACK = "EXTRA_TRACK"
+        const val CLICK_DEBOUNCE_DELAY = 300L
 
         fun createArgs(track: Track): Bundle =
             bundleOf(EXTRA_TRACK to track)

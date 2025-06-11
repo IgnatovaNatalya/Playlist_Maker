@@ -1,11 +1,13 @@
 package com.example.playlistmaker.data.playlists
 
+import android.database.sqlite.SQLiteConstraintException
 import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.db.entity.TracksPlaylistsEntity
 import com.example.playlistmaker.data.db.entity.toListPlaylist
 import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.playlists.PlaylistsRepository
+import com.example.playlistmaker.util.AddToPlaylistResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -21,21 +23,32 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
     override suspend fun addToPlaylist(
         playlistId: Int,
         track: Track
-    ) {
+    ): AddToPlaylistResult {
         val trackEntity = track.toTrackEntity()
         val trackPlaylistEntity = TracksPlaylistsEntity(
-            trackId = track.trackId, playlistId = playlistId,
-            id = 0
+            trackId = track.trackId, playlistId = playlistId
         )
         appDatabase.trackDao().addTrack(trackEntity)
-        appDatabase.tracksPlaylistsDao().addToPlaylist(trackPlaylistEntity)
+
+        return try {
+            appDatabase.tracksPlaylistsDao().addToPlaylist(trackPlaylistEntity)
+            AddToPlaylistResult.Success
+        } catch (e: SQLiteConstraintException) {
+            if (e is SQLiteConstraintException && e.message?.contains("UNIQUE") == true) {
+                AddToPlaylistResult.AlreadyExists
+            } else {
+                AddToPlaylistResult.Error(e)
+            }
+        } catch (e: Exception) {
+            AddToPlaylistResult.Error(e)
+        }
     }
 
     override suspend fun removeFromPlaylist(
         playlistId: Int,
         track: Track
     ) {
-        val trackPlaylistEntity = TracksPlaylistsEntity(0, track.trackId, playlistId)
+        val trackPlaylistEntity = TracksPlaylistsEntity(track.trackId, playlistId)
         appDatabase.tracksPlaylistsDao().removeFromPlaylist(trackPlaylistEntity)
     }
 

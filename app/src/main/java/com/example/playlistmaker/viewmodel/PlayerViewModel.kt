@@ -2,6 +2,7 @@ package com.example.playlistmaker.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.favorites.FavoritesInteractor
@@ -9,6 +10,7 @@ import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.player.PlaybackInteractor
 import com.example.playlistmaker.domain.playlists.PlaylistsInteractor
+import com.example.playlistmaker.util.AddToPlaylistResult
 import com.example.playlistmaker.util.PlayerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -19,27 +21,33 @@ import java.util.Locale
 class PlaybackViewModel(
     private val playbackInteractor: PlaybackInteractor,
     private val favoritesInteractor: FavoritesInteractor,
-    private var playlistsInteractor: PlaylistsInteractor
+    private var playlistsInteractor: PlaylistsInteractor,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default())
     val playerState: LiveData<PlayerState> = _playerState
 
     private val _favoriteState = MutableLiveData<Boolean>()
-    var favoriteState: LiveData<Boolean> = _favoriteState
+    val favoriteState: LiveData<Boolean> = _favoriteState
 
     private val _playlists = MutableLiveData<List<Playlist>>()
-    var playlists: LiveData<List<Playlist>> = _playlists
+    val playlists: LiveData<List<Playlist>> = _playlists
 
     private val _toastState = MutableLiveData<String>()
-    var toastState: LiveData<String> = _toastState
+    val toastState: LiveData<String> = _toastState
+
+    private val _currentTrack = savedStateHandle.getLiveData<Track>(TRACK_KEY)
+    val track: LiveData<Track?> = _currentTrack
 
     private var timerJob: Job? = null
 
-    private var currentTrack: Track? = null
-
     init {
         getPlaylists()
+    }
+
+    fun setTrack(track: Track) {
+        _currentTrack.postValue(track)
     }
 
     fun getPlaylists() {
@@ -49,7 +57,7 @@ class PlaybackViewModel(
             }
         }
     }
-    
+
     private fun startPlayer() {
         playbackInteractor.startPlayer()
         _playerState.postValue(PlayerState.Playing(getCurrentPlayerPosition()))
@@ -67,31 +75,32 @@ class PlaybackViewModel(
         _playerState.value = PlayerState.Default()
     }
 
-    fun preparePlayer(track: Track) {
-        currentTrack = track
-        playbackInteractor.preparePlayer(
-            track.previewUrl,
-            { _playerState.postValue(PlayerState.Prepared()) },
-            { _playerState.postValue(PlayerState.Prepared()) }
-        )
-        _favoriteState.postValue(track.isFavorite)
+    fun preparePlayer() {
+        val currentTrack = _currentTrack.value
+        if (currentTrack != null) {
+            playbackInteractor.preparePlayer(
+                currentTrack.previewUrl,
+                { _playerState.postValue(PlayerState.Prepared()) },
+                { _playerState.postValue(PlayerState.Prepared()) }
+            )
+            _favoriteState.postValue(currentTrack.isFavorite)
+        }
     }
 
     fun onLikeClicked() {
+        val currentTrack = _currentTrack.value
         if (currentTrack != null) {
-            val track = currentTrack!!
             viewModelScope.launch {
-                if (track.isFavorite) {
-                    favoritesInteractor.removeFromFavorites(track)
-                    track.isFavorite = false
-                }
-                else {
-                    favoritesInteractor.addToFavorites(track)
-                    track.isFavorite = true
+                if (currentTrack.isFavorite) {
+                    favoritesInteractor.removeFromFavorites(currentTrack)
+                    currentTrack.isFavorite = false
+                } else {
+                    favoritesInteractor.addToFavorites(currentTrack)
+                    currentTrack.isFavorite = true
                 }
             }
-            _favoriteState.postValue(track.isFavorite == false)
-            currentTrack = track
+            _favoriteState.postValue(currentTrack.isFavorite == false)
+            _currentTrack.postValue(currentTrack)
         }
     }
 
@@ -102,19 +111,32 @@ class PlaybackViewModel(
             is PlayerState.Playing -> {
                 pausePlayer()
             }
+
             is PlayerState.Prepared, is PlayerState.Paused -> {
                 startPlayer()
             }
+
             else -> {}
         }
     }
 
     fun addTrackTo(playList: Playlist) {
+        val currentTrack = _currentTrack.value
         if (currentTrack != null) {
-            val track = currentTrack!!
             viewModelScope.launch {
-                playlistsInteractor.addToPlaylist(playList.id, track)
-                _toastState.postValue("Добавлено в плейлист ${playList.title}")
+                when (val result = playlistsInteractor.addToPlaylist(playList.id, currentTrack)) {
+                    is AddToPlaylistResult.Success -> {
+                        _toastState.postValue("Добавлено в плейлист ${playList.title}")
+                    }
+
+                    is AddToPlaylistResult.AlreadyExists -> {
+                        _toastState.postValue("Трек уже добавлен в плейлист ${playList.title}")
+                    }
+
+                    is AddToPlaylistResult.Error -> {
+                        _toastState.postValue("Ошибка: ${result.exception.message}")
+                    }
+                }
             }
         }
     }
@@ -147,5 +169,6 @@ class PlaybackViewModel(
 
     companion object {
         const val TIMER_UPDATE_INTERVAL = 300L
+        const val TRACK_KEY = "TRACK_KEY"
     }
 }

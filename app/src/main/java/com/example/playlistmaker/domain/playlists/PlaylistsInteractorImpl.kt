@@ -2,9 +2,12 @@ package com.example.playlistmaker.domain.playlists
 
 import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.util.AddToPlaylistResult
 import kotlinx.coroutines.flow.Flow
 
-class PlaylistsInteractorImpl(private val playlistsRepository: PlaylistsRepository): PlaylistsInteractor {
+class PlaylistsInteractorImpl(private val playlistsRepository: PlaylistsRepository) :
+    PlaylistsInteractor {
+
     override suspend fun createPlaylist(playlist: Playlist) {
         playlistsRepository.createPlaylist(playlist)
     }
@@ -16,8 +19,8 @@ class PlaylistsInteractorImpl(private val playlistsRepository: PlaylistsReposito
     override suspend fun addToPlaylist(
         playlistId: Int,
         track: Track
-    ) {
-        playlistsRepository.addToPlaylist(playlistId,track)
+    ): AddToPlaylistResult {
+        return playlistsRepository.addToPlaylist(playlistId, track)
     }
 
     override suspend fun removeFromPlaylist(
