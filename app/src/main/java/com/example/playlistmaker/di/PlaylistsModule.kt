@@ -4,6 +4,8 @@ import android.media.MediaPlayer
 import com.example.playlistmaker.data.player.PlaybackRepository
 import com.example.playlistmaker.data.player.PlaybackRepositoryImpl
 import com.example.playlistmaker.data.playlists.PlaylistsRepositoryImpl
+import com.example.playlistmaker.domain.internalStorage.InternalStorageInteractor
+import com.example.playlistmaker.domain.internalStorage.InternalStorageInteractorImpl
 import com.example.playlistmaker.domain.player.PlaybackInteractor
 import com.example.playlistmaker.domain.player.PlaybackInteractorImpl
 import com.example.playlistmaker.domain.playlists.PlaylistsInteractor
@@ -17,6 +19,7 @@ import org.koin.dsl.module
 val playlistsModule = module {
     factory<PlaylistsInteractor> { PlaylistsInteractorImpl(get()) }
     factory<PlaylistsRepository> { PlaylistsRepositoryImpl(get()) }
+    factory<InternalStorageInteractor> { InternalStorageInteractorImpl(get()) } //
 
-    viewModel { NewPlaylistViewModel( get()) }
+    viewModel { NewPlaylistViewModel(get(), get()) }
 }
