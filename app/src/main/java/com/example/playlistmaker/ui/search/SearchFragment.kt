@@ -186,27 +186,27 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     }
 
     private fun showSearchEmpty() {
-        binding.searchRecycler.visibility = View.GONE
-        binding.progressBar.visibility = View.GONE
-
         setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
         setHistoryVisibility(false)
+
+        binding.searchRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun showSearchError() {
-        binding.searchRecycler.visibility = View.GONE
-        binding.progressBar.visibility = View.GONE
-
         setPlaceHolder(PlaceholderMessage.MESSAGE_NO_INTERNET)
         setHistoryVisibility(false)
+
+        binding.searchRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun showSearchLoading() {
-        binding.searchRecycler.visibility = View.GONE
-        binding.progressBar.visibility = View.VISIBLE
-
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
         setHistoryVisibility(false)
+
+        binding.searchRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.VISIBLE
     }
 
     fun setHistoryVisibility(isVisible: Boolean) {

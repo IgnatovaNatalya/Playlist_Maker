@@ -1,10 +1,8 @@
 package com.example.playlistmaker.ui.newPlaylist
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
@@ -23,25 +21,18 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.BitmapImageViewTarget
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentNewPlaylistBinding
-import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.util.BindingFragment
 import com.example.playlistmaker.viewmodel.NewPlaylistViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.File
-import java.io.FileOutputStream
-import java.util.UUID
 
 class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
 
-//    private lateinit var playlistTitleInput: EditText
-//    private lateinit var textWatcher: TextWatcher
+    private lateinit var playlistTitleInput: EditText
+    private lateinit var textWatcher: TextWatcher
     private val viewModel: NewPlaylistViewModel by viewModel()
-//    private var imageIsLoaded = false
-//    private var imagePath = ""
-//
-private var imageUri: Uri? = null
+    private var imageUri: Uri? = null
 
     override fun createBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentNewPlaylistBinding.inflate(inflater, container, false)
@@ -53,46 +44,57 @@ private var imageUri: Uri? = null
             uri?.let { handleImageSelected(it) }
         }
 
-        setupTextWatchers()
-        setupClickListeners(pickMedia)
-        observeViewModel()
-    }
+        setupTextWatcher()
 
-    private fun setupTextWatchers() {
-        val textWatcher = object : TextWatcher {
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding.btnCreate.isEnabled = !s.isNullOrEmpty()
+        viewModel.playlistCreated.observe(viewLifecycleOwner) {
+            if (it == true) {
+                Toast.makeText(requireContext(), "Плейлист создан", Toast.LENGTH_LONG).show()
+                requireActivity().findNavController(R.id.fragment_container).popBackStack()
             }
-            // Остальные методы пустые
         }
-        binding.playlistTitle.addTextChangedListener(textWatcher)
-    }
 
-    private fun setupClickListeners(pickMedia: ActivityResultLauncher<PickVisualMediaRequest>) {
         binding.playlistImage.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
         binding.playlistToolbar.setOnClickListener { finishNotSave() }
         binding.btnCreate.setOnClickListener { createPlaylist() }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    finishNotSave()
+                }
+            })
     }
 
-    private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.playlistCreated.collect {
-                    Toast.makeText(requireContext(), "Плейлист создан", Toast.LENGTH_LONG).show()
-                    findNavController().popBackStack()
-                }
+    private fun createPlaylist() = viewLifecycleOwner.lifecycleScope.launch {
+        viewModel.createPlaylist(
+            binding.playlistTitle.text.toString(),
+            binding.playlistDescription.text.toString(),
+            imageUri?.toString() ?: "",
+        )
+    }
+
+    private fun setupTextWatcher() {
+        textWatcher = object : TextWatcher {
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.btnCreate.isEnabled = !s.isNullOrEmpty()
             }
         }
+        playlistTitleInput = binding.playlistTitle
+        playlistTitleInput.addTextChangedListener(textWatcher)
     }
 
-    private suspend fun handleImageSelected(uri: Uri) {
+    private fun handleImageSelected(uri: Uri) {
         val radiusPx = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, 8F, resources.displayMetrics
         )
         loadRoundedImage(uri, radiusPx)
-        viewModel.saveImage(uri, requireContext()).also { imageUri = uri }
+        viewModel.saveImage(uri).also { imageUri = uri }
     }
 
     private fun loadRoundedImage(uri: Uri, radiusPx: Float) {
@@ -112,168 +114,22 @@ private var imageUri: Uri? = null
             })
     }
 
-    private fun createPlaylist() = viewLifecycleOwner.lifecycleScope.launch {
-        viewModel.createPlaylist(
-            Playlist(
-                id = 0,
-                title = binding.playlistTitle.text.toString(),
-                description = binding.playlistDescription.text.toString(),
-                imagePath = imageUri?.toString() ?: "",
-                tracksCount = 0
-            )
-        )
+    private fun finishNotSave() {
+        val rootNavController = requireActivity().findNavController(R.id.fragment_container)
+
+        if (binding.playlistTitle.text.toString() != "" || binding.playlistDescription.text.toString() != "" || imageUri!=null) {
+            val confirmDialog = MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.finish_creating)
+                .setMessage(R.string.info_erase_input)
+                .setNeutralButton(R.string.cancel) { dialog, which -> }
+                .setPositiveButton(R.string.finish) { dialog, which -> rootNavController.popBackStack() }
+            confirmDialog.show()
+        } else
+            rootNavController.popBackStack()
     }
 
-    private fun finishNotSave() {
-        // Проверка на заполненность через ViewModel (при необходимости)
-        findNavController().popBackStack()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        textWatcher.let { playlistTitleInput.removeTextChangedListener(it) }
     }
-//
-//    override fun createBinding(inflater: LayoutInflater, container: ViewGroup?)
-//            : FragmentNewPlaylistBinding {
-//        return FragmentNewPlaylistBinding.inflate(inflater, container, false)
-//    }
-//
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//        val radiusPx = TypedValue.applyDimension(
-//            TypedValue.COMPLEX_UNIT_DIP, 8F, requireActivity().resources.displayMetrics
-//        )
-//
-//        val pickMedia =
-//            registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-//                if (uri != null) {
-//                    imageIsLoaded = true
-//                    Glide.with(this)
-//                        .asBitmap()
-//                        .load(uri)
-//                        .centerCrop()
-//                        .into(object : BitmapImageViewTarget(binding.playlistImage) {
-//                            override fun setResource(resource: Bitmap?) {
-//                                if (resource == null) return
-//                                val rounded =
-//                                    RoundedBitmapDrawableFactory.create(resources, resource)
-//                                        .apply { cornerRadius = radiusPx }
-//                                binding.playlistImage.setImageDrawable(rounded)
-//                            }
-//                        })
-//                    saveImageToPrivateStorage(uri)
-//                }
-//            }
-//
-//        textWatcher = object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-//            override fun afterTextChanged(s: Editable?) {}
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                if (s.isNullOrEmpty()) {
-//                    binding.playlistTitle.isActivated = false
-//                    binding.playlistDescription.isActivated = false
-//                    binding.btnCreate.isEnabled = false
-//                } else {
-//                    binding.playlistTitle.isActivated = true
-//                    binding.playlistDescription.isActivated = true
-//                    binding.btnCreate.isEnabled = true
-//                }
-//            }
-//        }
-//
-//        requireActivity().onBackPressedDispatcher.addCallback(
-//            this, object : OnBackPressedCallback(true) {
-//                override fun handleOnBackPressed() {
-//                    finishNotSave()
-//                }
-//            })
-//
-//        playlistTitleInput = binding.playlistTitle
-//        playlistTitleInput.addTextChangedListener(textWatcher)
-//
-//        binding.playlistImage.setOnClickListener {
-//            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-//        }
-//
-//        binding.playlistToolbar.setOnClickListener {
-//            finishNotSave()
-//        }
-//
-//        binding.btnCreate.setOnClickListener {
-//            if (binding.btnCreate.isEnabled)
-//                finishAndSave()
-//        }
-//    }
-//
-//    private fun finishAndSave() {
-//        viewModel.createPlaylist(
-//            Playlist(
-//                0,
-//                binding.playlistTitle.text.toString(),
-//                binding.playlistDescription.text.toString(),
-//                imagePath,
-//                0
-//            )
-//        )
-//
-//        Toast.makeText(
-//            requireContext(),
-//            "Плейлист ${binding.playlistTitle.text} создан",
-//            Toast.LENGTH_LONG
-//        ).show()
-//        val rootNavController = requireActivity().findNavController(R.id.fragment_container)
-//        rootNavController.popBackStack()
-//    }
-//
-//    private fun finishNotSave() {
-//        val rootNavController = requireActivity().findNavController(R.id.fragment_container)
-//
-//        if (binding.playlistTitle.text.toString() != "" || binding.playlistDescription.text.toString() != "" || imageIsLoaded) {
-//
-//            val confirmDialog = MaterialAlertDialogBuilder(requireContext())
-//                .setTitle(R.string.finish_creating)
-//                .setMessage(R.string.info_erase_input)
-//                .setNeutralButton(R.string.cancel) { dialog, which -> }
-//                .setPositiveButton(R.string.finish) { dialog, which -> rootNavController.popBackStack() }
-//            confirmDialog.show()
-//        } else
-//            rootNavController.popBackStack()
-//    }
-//
-//    private fun saveImageToPrivateStorage(uri: Uri) {
-//
-//        val filePath =
-//            File(
-//                requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-//                DIRECTORY_COVERS
-//            )
-//
-//        if (!filePath.exists()) {
-//            filePath.mkdirs()
-//        }
-//
-//        //todo переделать нахрен все в репозиторий
-//
-//        val file = File(filePath, generateUniqueFileName())
-//
-//        val inputStream = requireContext().contentResolver.openInputStream(uri)
-//        val outputStream = FileOutputStream(file)
-//
-//        BitmapFactory
-//            .decodeStream(inputStream)
-//            .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
-//
-//        imagePath = file.path
-//    }
-//
-//    private fun generateUniqueFileName(extension: String = "png"): String {
-//        return "${UUID.randomUUID()}.$extension"
-//    }
-//
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        textWatcher.let { playlistTitleInput.removeTextChangedListener(it) }
-//    }
-//
-//    companion object {
-//        const val DIRECTORY_COVERS = "playlists_covers"
-//    }
 }

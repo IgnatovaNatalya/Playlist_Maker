@@ -34,7 +34,6 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var onPlaylistClickDebounce: (Playlist) -> Unit
     private lateinit var onPlaylistCreateDebounce: (Unit) -> Unit
-    private var toastShown = false
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -87,15 +86,9 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
                 favoriteState
             )
         }
+
         viewModel.toastState.observe(viewLifecycleOwner) { toastText ->
-            if (!toastText.isNullOrBlank()) {
-                if (!toastShown) {
-                    showToast(toastText)
-                    toastShown = true
-                } else {
-                    toastShown = false
-                }
-            }
+            if (!toastText.isNullOrBlank()) showToast(toastText)
         }
 
         viewModel.track.observe(viewLifecycleOwner) { track ->
@@ -222,5 +215,4 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         fun createArgs(track: Track): Bundle =
             bundleOf(EXTRA_TRACK to track)
     }
-
 }

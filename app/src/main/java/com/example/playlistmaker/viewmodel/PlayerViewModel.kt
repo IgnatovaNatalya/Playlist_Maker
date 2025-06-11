@@ -100,7 +100,6 @@ class PlaybackViewModel(
                 }
             }
             _favoriteState.postValue(currentTrack.isFavorite == false)
-            _currentTrack.postValue(currentTrack)
         }
     }
 
@@ -157,9 +156,13 @@ class PlaybackViewModel(
             .format(playbackInteractor.getCurrentPosition()) ?: "00:00"
     }
 
+    private fun clearToast() {
+        _toastState.postValue("")
+    }
 
     fun onPause() {
         pausePlayer()
+        clearToast()
     }
 
     override fun onCleared() {
