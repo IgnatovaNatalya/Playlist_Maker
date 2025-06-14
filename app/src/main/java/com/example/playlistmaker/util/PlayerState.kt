@@ -6,19 +6,22 @@ sealed class PlayerState(
     val isPlayButtonEnabled: Boolean,
     val buttonResource: Int,
     val progress: String,
-    var isFavorite: Boolean = false,
 ) {
-    class Default( isFavorite: Boolean) :
-        PlayerState( false, R.drawable.button_play, "00:00", isFavorite)
+    class Default(): PlayerState(false, R.drawable.button_play, "00:00")
 
-    class Prepared( isFavorite: Boolean) :
-        PlayerState( true, R.drawable.button_play, "00:00", isFavorite)
+    class Prepared() : PlayerState(true, R.drawable.button_play, "00:00")
 
-    class Playing( progress: String, isFavorite: Boolean) :
-        PlayerState( true, R.drawable.button_pause, progress, isFavorite)
+    class Playing(progress: String) :
+        PlayerState(true, R.drawable.button_pause, progress)
 
-    class Paused(progress: String, isFavorite: Boolean) :
-        PlayerState( true, R.drawable.button_play, progress, isFavorite)
+    class Paused(progress: String) :
+        PlayerState( true, R.drawable.button_play, progress)
 }
 
+class PlayerUiState(
+    val isPlayButtonEnabled: Boolean,
+    val buttonResource: Int,
+    val progress: String,
+    val isFavorite:Boolean
+)
 

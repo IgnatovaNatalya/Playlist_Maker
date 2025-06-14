@@ -20,7 +20,7 @@ import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.util.BindingFragment
-import com.example.playlistmaker.util.PlayerState
+import com.example.playlistmaker.util.PlayerUiState
 import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.viewmodel.PlaybackViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -85,7 +85,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         playlistsLinearRecycler.layoutManager = LinearLayoutManager(requireContext())
         playlistsLinearRecycler.adapter = playlistsLinearAdapter
 
-        viewModel.playerState.observe(viewLifecycleOwner) { state ->
+        viewModel.playerUiState.observe(viewLifecycleOwner) { state ->
             renderState(state)
         }
 
@@ -137,7 +137,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT).show()
     }
 
-    private fun renderState(state: PlayerState) {
+    private fun renderState(state: PlayerUiState) {
         binding.buttonPlayPause.isEnabled = state.isPlayButtonEnabled
         binding.buttonPlayPause.setImageResource(state.buttonResource)
         binding.playbackTimer.text = state.progress

@@ -1,6 +1,7 @@
 package com.example.playlistmaker.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -17,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.example.playlistmaker.util.PlayerUiState
 
 class PlaybackViewModel(
     private val playbackInteractor: PlaybackInteractor,
@@ -38,6 +40,32 @@ class PlaybackViewModel(
     private val _playerState = MutableLiveData<PlayerState>()
     val playerState: LiveData<PlayerState> = _playerState
 
+    private val _isFavorite = MutableLiveData<Boolean>()
+    val isFavorite: LiveData<Boolean> = _isFavorite
+
+
+    val playerUiState = MediatorLiveData<PlayerUiState>().apply {
+        var state: PlayerState? = null
+        var isFav: Boolean? = null
+
+        fun update() {
+            state?.let {
+                postValue(
+                    PlayerUiState(
+                        it.isPlayButtonEnabled,
+                        it.buttonResource,
+                        it.progress,
+                        isFav == true
+                    )
+                )
+            }
+        }
+
+
+        addSource(playerState) { state = it; update() }
+        addSource(isFavorite) { isFav = it; update() }
+    }
+
     private var timerJob: Job? = null
 
     init {
@@ -46,7 +74,8 @@ class PlaybackViewModel(
 
     fun setTrack(track: Track) {
         _currentTrack.postValue(track)
-        _playerState.postValue(PlayerState.Default(track.isFavorite))
+        _playerState.postValue(PlayerState.Default())
+        _isFavorite.postValue(track.isFavorite)
     }
 
     fun getPlaylists() {
@@ -62,7 +91,7 @@ class PlaybackViewModel(
         if (track != null) {
             playbackInteractor.startPlayer()
             _playerState.postValue(
-                PlayerState.Playing(getCurrentPlayerPosition(), track.isFavorite)
+                PlayerState.Playing(getCurrentPlayerPosition())
             )
             startTimer()
         }
@@ -74,7 +103,7 @@ class PlaybackViewModel(
             playbackInteractor.pausePlayer()
             timerJob?.cancel()
             _playerState.postValue(
-                PlayerState.Paused(getCurrentPlayerPosition(), track.isFavorite)
+                PlayerState.Paused(getCurrentPlayerPosition())
             )
         }
     }
@@ -83,45 +112,31 @@ class PlaybackViewModel(
         val track = currentTrack.value
         if (track != null) {
             playbackInteractor.releasePlayer()
-            _playerState.postValue(PlayerState.Default(track.isFavorite))
+            _playerState.postValue(PlayerState.Default())
         }
     }
 
     fun preparePlayer(track: Track) {
         playbackInteractor.preparePlayer(
             track.previewUrl,
-            { _playerState.postValue(PlayerState.Prepared( track.isFavorite)) },//
-            { _playerState.postValue(PlayerState.Prepared( track.isFavorite)) }//
+            { _playerState.postValue(PlayerState.Prepared()) },
+            { _playerState.postValue(PlayerState.Prepared()) }
         )
     }
 
     fun onLikeClicked() {
-        currentTrack.value?.let {
-            val track = it.copy(isFavorite = !it.isFavorite)
-            val state = playerState.value
-            val newState = when (state) {
-                is PlayerState.Default ->
-                    PlayerState.Default( track.isFavorite)
-
-                is PlayerState.Paused ->
-                    PlayerState.Paused( state.progress, track.isFavorite)
-
-                is PlayerState.Playing ->
-                    PlayerState.Playing( state.progress, track.isFavorite)
-
-                is PlayerState.Prepared ->
-                    PlayerState.Prepared( track.isFavorite)
-            }
-            _playerState.postValue(newState)
-            _currentTrack.postValue(track)
-
+        val track = currentTrack.value
+        if (track != null) {
             viewModelScope.launch {
-                if (track.isFavorite != true)
+                if (track.isFavorite == true)
                     favoritesInteractor.removeFromFavorites(track)
                 else
                     favoritesInteractor.addToFavorites(track)
             }
+            _currentTrack.postValue(track.copy(isFavorite = !track.isFavorite))
+            _isFavorite.postValue(!track.isFavorite)
         }
+
     }
 
     fun onPlayButtonClicked() {
@@ -159,10 +174,7 @@ class PlaybackViewModel(
         timerJob = viewModelScope.launch {
             while (playbackInteractor.isPlaying()) {
                 _playerState.postValue(
-                    PlayerState.Playing(
-                        getCurrentPlayerPosition(),
-                        currentTrack.value?.isFavorite == true
-                    )
+                    PlayerState.Playing(getCurrentPlayerPosition())
                 )
                 delay(TIMER_UPDATE_INTERVAL)
             }
