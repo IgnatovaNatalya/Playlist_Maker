@@ -36,12 +36,13 @@
 
     <ImageView
         android:id="@+id/playlist_image"
-        android:layout_width="312dp"
-        android:layout_height="312dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginTop="62dp"
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         android:src="@drawable/image_picker"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
         app:layout_constraintTop_toTopOf="parent" />
@@ -55,10 +56,12 @@
         android:background="@drawable/bg_edittext_selector"
         android:gravity="center|left"
         android:hint="@string/title"
+        android:importantForAutofill="no"
         android:inputType="textCapSentences"
         android:lines="1"
         android:paddingHorizontal="@dimen/horizontal_padding"
         android:paddingVertical="18dp"
+        android:textColor="?attr/android:textColor"
         app:layout_constraintEnd_toEndOf="@id/rightBorder2"
         app:layout_constraintStart_toStartOf="@+id/leftBorder2"
         app:layout_constraintTop_toBottomOf="@+id/playlist_image" />
@@ -72,10 +75,12 @@
         android:background="@drawable/bg_edittext_selector"
         android:gravity="center|left"
         android:hint="@string/description"
+        android:importantForAutofill="no"
         android:inputType="textCapSentences"
         android:lines="1"
         android:paddingHorizontal="@dimen/horizontal_padding"
         android:paddingVertical="18dp"
+        android:textColor="?attr/android:textColor"
         app:layout_constraintEnd_toEndOf="@id/rightBorder2"
         app:layout_constraintStart_toStartOf="@+id/leftBorder2"
         app:layout_constraintTop_toBottomOf="@+id/playlist_title" />

@@ -7,6 +7,7 @@ sealed interface SearchState {
     data object SearchContent : SearchState
     data object HistoryContent : SearchState
     data object Error : SearchState
+    data object NotFound : SearchState
     data object Empty : SearchState
 }
 

@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
@@ -14,6 +15,7 @@ import com.example.playlistmaker.databinding.ActivityRootBinding
 class RootActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityRootBinding
+    lateinit var navController : NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,20 +32,23 @@ class RootActivity : AppCompatActivity() {
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            
-            when (destination.id) {
-                R.id.playerFragment, R.id.newPlaylistFragment -> {
-                    binding.bottomNavigationView.visibility = View.GONE
-                }
+            updateBottomNavVisibility()
+        }
+    }
 
-                else -> {
-                    binding.bottomNavigationView.visibility = View.VISIBLE
-                }
+    private fun updateBottomNavVisibility() {
+        val currentDestination = navController.currentDestination?.id
+        when (currentDestination) {
+            R.id.playerFragment, R.id.newPlaylistFragment -> {
+                binding.bottomNavigationView.visibility = View.GONE
+            }
+            else -> {
+                binding.bottomNavigationView.visibility = View.VISIBLE
             }
         }
     }
@@ -54,6 +59,6 @@ class RootActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        binding.bottomNavigationView.visibility = View.VISIBLE
+        updateBottomNavVisibility()
     }
 }

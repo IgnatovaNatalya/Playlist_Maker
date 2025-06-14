@@ -56,7 +56,7 @@ class SearchTracksViewModel(
                     when (result.resultCode) {
 
                         200 -> {
-                            if (result.results.isEmpty()) _uiState.value = SearchState.Empty
+                            if (result.results.isEmpty()) _uiState.value = SearchState.NotFound
                             else {
                                 _uiState.value = SearchState.SearchContent
                                 _foundTracks.value =
@@ -80,7 +80,7 @@ class SearchTracksViewModel(
 
     fun onSearchTextChanged(queryText: String) {
         if (queryText.isEmpty())
-            _uiState.value = SearchState.HistoryContent
+            showHistory()
         else {
             searchDebounce(queryText)
         }
@@ -88,7 +88,7 @@ class SearchTracksViewModel(
 
     fun onClickHistoryClearButton() {
         viewModelScope.launch { historyInteractor.clearHistory() }
-        _uiState.value = SearchState.HistoryContent
+        _uiState.value = SearchState.Empty///
     }
 
     private fun getHistory() {
@@ -100,18 +100,23 @@ class SearchTracksViewModel(
     }
 
     fun showHistory() {
-        _uiState.value = SearchState.HistoryContent
+        //_uiState.value = SearchState.HistoryContent
+        if (_historyTracks.value.isEmpty())
+            _uiState.value = SearchState.Empty
+        else
+            _uiState.value = SearchState.HistoryContent
     }
 
     fun refreshContent() {
         if (_uiState.value is SearchState.SearchContent) {
             viewModelScope.launch {
                 favoritesInteractor.getFavoriteTrackIds().collect { favoriteIds ->
-                    for (t in foundTracks.value) if (t.trackId in favoriteIds) t.isFavorite = true
+                    for (t in _foundTracks.value) if (t.trackId in favoriteIds) t.isFavorite = true
                 }
             }
         }
     }
+
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L

@@ -5,10 +5,20 @@ import com.example.playlistmaker.R
 sealed class PlayerState(
     val isPlayButtonEnabled: Boolean,
     val buttonResource: Int,
-    val progress: String
+    val progress: String,
+    var isFavorite: Boolean = false,
 ) {
-    class Default : PlayerState(false, R.drawable.button_play, "00:00")
-    class Prepared : PlayerState(true, R.drawable.button_play, "00:00")
-    class Playing(progress: String) : PlayerState(true, R.drawable.button_pause, progress)
-    class Paused(progress: String) : PlayerState(true, R.drawable.button_play, progress)
+    class Default( isFavorite: Boolean) :
+        PlayerState( false, R.drawable.button_play, "00:00", isFavorite)
+
+    class Prepared( isFavorite: Boolean) :
+        PlayerState( true, R.drawable.button_play, "00:00", isFavorite)
+
+    class Playing( progress: String, isFavorite: Boolean) :
+        PlayerState( true, R.drawable.button_pause, progress, isFavorite)
+
+    class Paused(progress: String, isFavorite: Boolean) :
+        PlayerState( true, R.drawable.button_play, progress, isFavorite)
 }
+
+

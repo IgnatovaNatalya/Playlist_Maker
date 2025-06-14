@@ -158,20 +158,21 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
 
     fun render(state: SearchState) {
-        setHistoryVisibility(false)
+        //setHistoryVisibility(false)
         when (state) {
-            is SearchState.Empty -> showSearchEmpty()
+            is SearchState.NotFound -> showNotFound()
             is SearchState.Error -> showSearchError()
             is SearchState.Loading -> showSearchLoading()
             is SearchState.SearchContent -> showSearchResults()
             is SearchState.HistoryContent -> showHistory()
+            SearchState.Empty -> showEmpty()
         }
     }
 
     private fun showHistory() {
         setHistoryVisibility(true)
-        binding.searchRecycler.visibility = View.GONE
-        binding.historyRecycler.visibility = View.VISIBLE
+//        binding.searchRecycler.visibility = View.GONE
+//        binding.historyRecycler.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
     }
@@ -185,8 +186,16 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         setHistoryVisibility(false)
     }
 
-    private fun showSearchEmpty() {
+    private fun showNotFound() {
         setPlaceHolder(PlaceholderMessage.MESSAGE_NOT_FOUND)
+        setHistoryVisibility(false)
+
+        binding.searchRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+    }
+
+    private fun showEmpty() {
+        setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
         setHistoryVisibility(false)
 
         binding.searchRecycler.visibility = View.GONE
@@ -283,6 +292,11 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshContent()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        textWatcher.let { queryInput.removeTextChangedListener(it) }
     }
 
     companion object {

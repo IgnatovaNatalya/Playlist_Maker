@@ -34,6 +34,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var onPlaylistClickDebounce: (Playlist) -> Unit
     private lateinit var onPlaylistCreateDebounce: (Unit) -> Unit
+    private lateinit var currentTrack: Track
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -47,6 +48,8 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
         requireArguments().getParcelable<Track>(EXTRA_TRACK)?.let { track ->
             viewModel.setTrack(track)
+            viewModel.preparePlayer(track)
+            currentTrack = track
         }
     }
 
@@ -73,64 +76,47 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
                 .navigate(R.id.newPlaylistFragment)
         }
 
-        binding.playerToolbar.setNavigationOnClickListener {
-            val rootNavController = requireActivity().findNavController(R.id.fragment_container)
-            rootNavController.popBackStack()
-        }
+        drawTrack(currentTrack)
 
-        binding.buttonLike.setOnClickListener { viewModel.onLikeClicked() }
+        playlistsLinearAdapter =
+            PlaylistLinearAdapter { playlist -> onPlaylistClickDebounce(playlist) }
 
-        viewModel.playerState.observe(viewLifecycleOwner) { state -> renderState(state) }
-        viewModel.favoriteState.observe(viewLifecycleOwner) { favoriteState ->
-            renderFav(
-                favoriteState
-            )
+        playlistsLinearRecycler = binding.playlistsLinearRecycler
+        playlistsLinearRecycler.layoutManager = LinearLayoutManager(requireContext())
+        playlistsLinearRecycler.adapter = playlistsLinearAdapter
+
+        viewModel.playerState.observe(viewLifecycleOwner) { state ->
+            renderState(state)
         }
 
         viewModel.toastState.observe(viewLifecycleOwner) { toastText ->
             if (!toastText.isNullOrBlank()) showToast(toastText)
         }
 
-        viewModel.track.observe(viewLifecycleOwner) { track ->
-            if (track != null) {
-                viewModel.preparePlayer()
-                drawTrack(track)
-            } else {
-                requireActivity().supportFragmentManager.popBackStack()
-            }
-        }
-
-        binding.buttonPlayPause.setOnClickListener { viewModel.onPlayButtonClicked() }
-
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
-            state = BottomSheetBehavior.STATE_HIDDEN
-        }
-
-        playlistsLinearAdapter =
-            PlaylistLinearAdapter { playlist -> onPlaylistClickDebounce(playlist) }
-
         viewModel.playlists.observe(viewLifecycleOwner) {
             playlistsLinearAdapter?.playlists = it
             playlistsLinearAdapter?.notifyDataSetChanged()
         }
 
-        playlistsLinearRecycler = binding.playlistsLinearRecycler
-        playlistsLinearRecycler.layoutManager = LinearLayoutManager(requireContext())
-        playlistsLinearRecycler.adapter = playlistsLinearAdapter
+        binding.playerToolbar.setNavigationOnClickListener {
+            val rootNavController = requireActivity().findNavController(R.id.fragment_container)
+            rootNavController.popBackStack()
+        }
+
+        binding.buttonPlayPause.setOnClickListener { viewModel.onPlayButtonClicked() }
+        binding.buttonLike.setOnClickListener { viewModel.onLikeClicked() }
+
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
 
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-
                 when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        binding.overlay.visibility = View.GONE
-                    }
-
-                    else -> {
-                        binding.overlay.visibility = View.VISIBLE
-                    }
+                    BottomSheetBehavior.STATE_HIDDEN -> binding.overlay.visibility = View.GONE
+                    else -> binding.overlay.visibility = View.VISIBLE
                 }
             }
 
@@ -155,14 +141,9 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         binding.buttonPlayPause.isEnabled = state.isPlayButtonEnabled
         binding.buttonPlayPause.setImageResource(state.buttonResource)
         binding.playbackTimer.text = state.progress
+        renderFav(state.isFavorite)
     }
 
-    private fun renderFav(favState: Boolean) {
-        with(binding.buttonLike) {
-            if (favState) setImageResource(R.drawable.button_liked)
-            else setImageResource(R.drawable.button_like)
-        }
-    }
 
     private fun drawTrack(track: Track) {
 
@@ -189,11 +170,20 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         ) else track.releaseDate
         binding.playerGenre.text = track.primaryGenreName
         binding.playerCountry.text = track.country
+
+        renderFav(track.isFavorite)
     }
 
     override fun onPause() {
         super.onPause()
         viewModel.onPause()
+    }
+
+    fun renderFav(isFav: Boolean) {
+        with(binding.buttonLike) {
+            if (isFav) setImageResource(R.drawable.button_liked)
+            else setImageResource(R.drawable.button_like)
+        }
     }
 
     override fun onDestroyView() {
@@ -208,11 +198,9 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     }
 
     companion object {
-
         const val EXTRA_TRACK = "EXTRA_TRACK"
         const val CLICK_DEBOUNCE_DELAY = 300L
 
-        fun createArgs(track: Track): Bundle =
-            bundleOf(EXTRA_TRACK to track)
+        fun createArgs(track: Track): Bundle = bundleOf(EXTRA_TRACK to track)
     }
 }
