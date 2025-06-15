@@ -18,7 +18,6 @@ class NewPlaylistViewModel(
     private val _playlistCreated = MutableLiveData<Boolean>()
     val playlistCreated: LiveData<Boolean> =_playlistCreated
 
-
     fun createPlaylist(title: String, description: String, path: String) {
         _playlistCreated.postValue(false)
         viewModelScope.launch {

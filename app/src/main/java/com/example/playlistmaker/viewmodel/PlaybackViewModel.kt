@@ -60,8 +60,6 @@ class PlaybackViewModel(
                 )
             }
         }
-
-
         addSource(playerState) { state = it; update() }
         addSource(isFavorite) { isFav = it; update() }
     }

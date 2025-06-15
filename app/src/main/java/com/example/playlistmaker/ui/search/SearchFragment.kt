@@ -17,17 +17,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.ui.RootActivity
-import com.example.playlistmaker.util.BindingFragment
-import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.databinding.FragmentSearchBinding
-import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.ui.RootActivity
+import com.example.playlistmaker.ui.player.PlayerFragment
+import com.example.playlistmaker.util.BindingFragment
 import com.example.playlistmaker.util.SearchState
+import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.viewmodel.SearchTracksViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.getValue
 
 class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
@@ -86,7 +85,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             binding.searchInputText.setText(DEFAULT_TEXT)
             val manager = activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             manager.hideSoftInputFromWindow(binding.clearSearchButton.windowToken, 0)
-            viewModel.showHistory()
+            viewModel.onClearSearchClicked()
         }
 
         textWatcher = object : TextWatcher {
@@ -94,7 +93,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             override fun afterTextChanged(s: Editable?) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding.clearSearchButton.visibility = clearButtonVisibility(s)
+                binding.clearSearchButton.visibility = clearSearchButtonVisibility(s)
                 setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
                 enteredText = s.toString()
                 viewModel.onSearchTextChanged(enteredText)
@@ -104,7 +103,8 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         queryInput.addTextChangedListener(textWatcher)
 
         queryInput.setOnFocusChangeListener { _, hasFocus ->
-            viewModel.showHistory()
+            if (hasFocus && queryInput.text.isEmpty())
+                viewModel.onClearSearchClicked()
         }
 
         searchRecycler = binding.searchRecycler
@@ -127,24 +127,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
                 viewModel.uiState.collect { searchState -> render(searchState) }
             }
         }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.foundTracks.collect { tracks ->
-                    searchAdapter?.tracks = tracks
-                    searchAdapter?.notifyDataSetChanged()
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.historyTracks.collect { tracks ->
-                    historyAdapter?.tracks = tracks
-                    historyAdapter?.notifyDataSetChanged()
-                }
-            }
-        }
     }
 
     override fun onDestroyView() {
@@ -158,32 +140,38 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
 
     fun render(state: SearchState) {
-        //setHistoryVisibility(false)
         when (state) {
             is SearchState.NotFound -> showNotFound()
             is SearchState.Error -> showSearchError()
             is SearchState.Loading -> showSearchLoading()
-            is SearchState.SearchContent -> showSearchResults()
-            is SearchState.HistoryContent -> showHistory()
+            is SearchState.SearchContent -> showSearchContent(state.foundTracks)
+            is SearchState.HistoryContent -> showHistoryContent(state.historyTracks)
             SearchState.Empty -> showEmpty()
         }
     }
 
-    private fun showHistory() {
-        setHistoryVisibility(true)
-//        binding.searchRecycler.visibility = View.GONE
-//        binding.historyRecycler.visibility = View.VISIBLE
-        binding.progressBar.visibility = View.GONE
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showHistoryContent(historyTracks: List<Track>) {
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
+        setHistoryVisibility(true)
+        historyAdapter?.tracks = historyTracks
+        historyAdapter?.notifyDataSetChanged()
+        binding.searchRecycler.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+
     }
 
-    private fun showSearchResults() {
-        binding.searchRecycler.visibility = View.VISIBLE
-        binding.historyRecycler.visibility = View.GONE
-        binding.progressBar.visibility = View.GONE
-
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showSearchContent(foundTracks: List<Track>) {
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
         setHistoryVisibility(false)
+
+        searchAdapter?.tracks = foundTracks
+        searchAdapter?.notifyDataSetChanged()
+
+        binding.searchRecycler.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+
     }
 
     private fun showNotFound() {
@@ -223,12 +211,10 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             binding.historyHeader.visibility = View.VISIBLE
             binding.clearHistoryButton.visibility = View.VISIBLE
             binding.historyRecycler.visibility = View.VISIBLE
-            binding.searchRecycler.visibility = View.GONE
         } else {
             binding.historyHeader.visibility = View.GONE
             binding.clearHistoryButton.visibility = View.GONE
             binding.historyRecycler.visibility = View.GONE
-            binding.searchRecycler.visibility = View.VISIBLE
         }
     }
 
@@ -265,7 +251,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         }
     }
 
-    private fun clearButtonVisibility(s: CharSequence?): Int {
+    private fun clearSearchButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty())
             View.GONE
         else View.VISIBLE

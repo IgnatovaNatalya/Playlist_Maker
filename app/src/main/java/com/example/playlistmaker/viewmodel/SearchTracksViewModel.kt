@@ -20,13 +20,10 @@ class SearchTracksViewModel(
 
     // Постоянное хранение данных
     private val _foundTracks = MutableStateFlow<List<Track>>(listOf())
-    val foundTracks = _foundTracks.asStateFlow()
-
     private val _historyTracks = MutableStateFlow<List<Track>>(listOf())
-    val historyTracks = _historyTracks.asStateFlow()
 
     // Текущее состояние UI
-    private val _uiState = MutableStateFlow<SearchState>(SearchState.SearchContent)
+    private val _uiState = MutableStateFlow<SearchState>(SearchState.Empty)
     val uiState = _uiState.asStateFlow()
 
     private var latestQueryText: String? = null
@@ -58,9 +55,7 @@ class SearchTracksViewModel(
                         200 -> {
                             if (result.results.isEmpty()) _uiState.value = SearchState.NotFound
                             else {
-                                _uiState.value = SearchState.SearchContent
-                                _foundTracks.value =
-                                    result.results.sortedByDescending { it.isFavorite }
+                                _uiState.value = SearchState.SearchContent(result.results.sortedByDescending { it.isFavorite })
                             }
                         }
 
@@ -80,7 +75,7 @@ class SearchTracksViewModel(
 
     fun onSearchTextChanged(queryText: String) {
         if (queryText.isEmpty())
-            showHistory()
+            onClearSearchClicked()
         else {
             searchDebounce(queryText)
         }
@@ -88,7 +83,7 @@ class SearchTracksViewModel(
 
     fun onClickHistoryClearButton() {
         viewModelScope.launch { historyInteractor.clearHistory() }
-        _uiState.value = SearchState.Empty///
+        _uiState.value = SearchState.Empty
     }
 
     private fun getHistory() {
@@ -99,12 +94,11 @@ class SearchTracksViewModel(
         }
     }
 
-    fun showHistory() {
-        //_uiState.value = SearchState.HistoryContent
+    fun onClearSearchClicked() {
         if (_historyTracks.value.isEmpty())
             _uiState.value = SearchState.Empty
         else
-            _uiState.value = SearchState.HistoryContent
+            _uiState.value = SearchState.HistoryContent(_historyTracks.value)
     }
 
     fun refreshContent() {
@@ -117,9 +111,7 @@ class SearchTracksViewModel(
         }
     }
 
-
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
-
 }

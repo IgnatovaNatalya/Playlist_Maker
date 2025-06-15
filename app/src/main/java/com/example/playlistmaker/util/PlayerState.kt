@@ -18,10 +18,4 @@ sealed class PlayerState(
         PlayerState( true, R.drawable.button_play, progress)
 }
 
-class PlayerUiState(
-    val isPlayButtonEnabled: Boolean,
-    val buttonResource: Int,
-    val progress: String,
-    val isFavorite:Boolean
-)
 
