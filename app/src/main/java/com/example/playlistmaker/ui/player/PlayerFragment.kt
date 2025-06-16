@@ -86,7 +86,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         playlistsLinearRecycler.adapter = playlistsLinearAdapter
 
         viewModel.playerUiState.observe(viewLifecycleOwner) { state ->
-            renderState(state)
+            if (state!=null) renderState(state)
         }
 
         viewModel.toastState.observe(viewLifecycleOwner) { toastText ->
@@ -138,9 +138,9 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     }
 
     private fun renderState(state: PlayerUiState) {
-        binding.buttonPlayPause.isEnabled = state.isPlayButtonEnabled
-        binding.buttonPlayPause.setImageResource(state.buttonResource)
-        binding.playbackTimer.text = state.progress
+        binding.buttonPlayPause.isEnabled = state.playerState.isPlayButtonEnabled
+        binding.buttonPlayPause.setImageResource(state.playerState.buttonResource)
+        binding.playbackTimer.text = state.playerState.progress
         renderFav(state.isFavorite)
     }
 

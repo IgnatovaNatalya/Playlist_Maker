@@ -19,7 +19,6 @@ class SearchTracksViewModel(
 ) : ViewModel() {
 
     // Постоянное хранение данных
-    private val _foundTracks = MutableStateFlow<List<Track>>(listOf())
     private val _historyTracks = MutableStateFlow<List<Track>>(listOf())
 
     // Текущее состояние UI
@@ -105,7 +104,7 @@ class SearchTracksViewModel(
         if (_uiState.value is SearchState.SearchContent) {
             viewModelScope.launch {
                 favoritesInteractor.getFavoriteTrackIds().collect { favoriteIds ->
-                    for (t in _foundTracks.value) if (t.trackId in favoriteIds) t.isFavorite = true
+                    for (t in (_uiState.value as SearchState.SearchContent).foundTracks) if (t.trackId in favoriteIds) t.isFavorite = true
                 }
             }
         }

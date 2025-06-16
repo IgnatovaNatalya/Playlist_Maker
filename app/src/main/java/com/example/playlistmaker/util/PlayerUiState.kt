@@ -1,8 +1,9 @@
 package com.example.playlistmaker.util
 
+import com.example.playlistmaker.domain.model.Track
+
 data class PlayerUiState(
-    val isPlayButtonEnabled: Boolean,
-    val buttonResource: Int,
-    val progress: String,
+    val track:Track,
+    val playerState: PlayerState,
     val isFavorite:Boolean
 )
