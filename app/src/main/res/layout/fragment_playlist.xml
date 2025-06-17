@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/YP_light_grey"
-    android:fitsSystemWindows="true"
     tools:context=".ui.playlist.PlaylistFragment">
 
 
@@ -36,6 +35,7 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/playlist_toolbar"
+            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:contentInsetStart="0dp"

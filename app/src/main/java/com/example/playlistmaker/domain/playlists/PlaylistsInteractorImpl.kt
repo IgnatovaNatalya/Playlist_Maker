@@ -38,4 +38,8 @@ class PlaylistsInteractorImpl(private val playlistsRepository: PlaylistsReposito
         return playlistsRepository.getPlaylist(playlistId)
     }
 
+    override fun getPlaylistTracks(playlistId: Int): Flow<List<Track>> {
+        return playlistsRepository.getPlaylistTracks(playlistId)
+    }
+
 }

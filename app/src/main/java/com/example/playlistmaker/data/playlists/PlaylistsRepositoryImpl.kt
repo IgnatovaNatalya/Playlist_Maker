@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteConstraintException
 import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.db.entity.TracksPlaylistsEntity
 import com.example.playlistmaker.data.db.entity.toListPlaylist
+import com.example.playlistmaker.data.db.entity.toListTrack
 import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.playlists.PlaylistsRepository
@@ -58,5 +59,9 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
 
     override fun getPlaylist(playlistId: Int): Flow<Playlist> {
         return appDatabase.playlistDao().getPlaylist(playlistId).map { it.toPlaylist() }
+    }
+
+    override fun getPlaylistTracks(playlistId: Int): Flow<List<Track>> {
+        return appDatabase.playlistDao().getPlaylistTracks(playlistId).map{ toListTrack(it) }
     }
 }

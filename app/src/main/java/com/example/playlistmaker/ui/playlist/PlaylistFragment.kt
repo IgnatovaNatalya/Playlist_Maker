@@ -1,18 +1,13 @@
 package com.example.playlistmaker.ui.playlist
 
-import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.target.BitmapImageViewTarget
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistBinding
 import com.example.playlistmaker.domain.model.Playlist
@@ -55,7 +50,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         }
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
-            state = BottomSheetBehavior.STATE_HIDDEN
+            state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
         bottomSheetBehavior.addBottomSheetCallback(object :
@@ -130,7 +125,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
     override fun onResume() {
         super.onResume()
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
     companion object {

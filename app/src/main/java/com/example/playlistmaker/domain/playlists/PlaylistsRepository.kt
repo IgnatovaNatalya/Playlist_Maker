@@ -15,4 +15,5 @@ interface PlaylistsRepository {
     fun getPlaylists(): Flow<List<Playlist>>
 
     fun getPlaylist(playlistId: Int): Flow<Playlist>
+    fun getPlaylistTracks(playlistId:Int): Flow<List<Track>>
 }

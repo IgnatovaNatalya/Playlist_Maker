@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.playlistmaker.data.db.entity.PlaylistEntity
+import com.example.playlistmaker.data.db.entity.TrackEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -14,14 +15,22 @@ interface PlaylistDao {
     suspend fun createPlaylist(playlist: PlaylistEntity)
 
     @Delete
-    suspend fun deletePlaylist(playlist:PlaylistEntity)
+    suspend fun deletePlaylist(playlist: PlaylistEntity)
 
-    @Query("SELECT p.id, p.title,p.description,p.path,count(tp.trackId) as numTracks FROM playlist_table p " +
-            "LEFT JOIN tracks_playlists_table tp ON p.id = tp.playlistId " +
-            "GROUP BY p.id ORDER BY p.id DESC")
+    @Query(
+        "SELECT p.id, p.title, p.description, p.path, count(tp.trackId) as numTracks FROM playlist_table p " +
+                "LEFT JOIN tracks_playlists_table tp ON p.id = tp.playlistId " +
+                "GROUP BY p.id ORDER BY p.id DESC"
+    )
     fun getPlaylists(): Flow<List<PlaylistEntity>>
 
-    @Query("SELECT * FROM playlist_table WHERE id = :playlistId")
-    fun getPlaylist(playlistId:Int): Flow<PlaylistEntity>
+    @Query(
+        "SELECT p.id, p.title, p.description, p.path, count(tp.trackId) as numTracks FROM playlist_table p " +
+                "LEFT JOIN tracks_playlists_table tp ON p.id = tp.playlistId WHERE p.id = :playlistId"
+    )
+    fun getPlaylist(playlistId: Int): Flow<PlaylistEntity>
 
+    @Query("SELECT t.* FROM  track_table t LEFT JOIN tracks_playlists_table tp " +
+            "ON t.trackId = tp.trackId WHERE tp.playlistId = :playlistId")
+    fun getPlaylistTracks(playlistId: Int): Flow<List<TrackEntity>>
 }
