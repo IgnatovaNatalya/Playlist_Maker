@@ -21,4 +21,7 @@ interface PlaylistDao {
             "GROUP BY p.id ORDER BY p.id DESC")
     fun getPlaylists(): Flow<List<PlaylistEntity>>
 
+    @Query("SELECT * FROM playlist_table WHERE id = :playlistId")
+    fun getPlaylist(playlistId:Int): Flow<PlaylistEntity>
+
 }

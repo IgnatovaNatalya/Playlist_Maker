@@ -55,4 +55,8 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
     override fun getPlaylists(): Flow<List<Playlist>> {
         return appDatabase.playlistDao().getPlaylists().map { toListPlaylist(it) }
     }
+
+    override fun getPlaylist(playlistId: Int): Flow<Playlist> {
+        return appDatabase.playlistDao().getPlaylist(playlistId).map { it.toPlaylist() }
+    }
 }

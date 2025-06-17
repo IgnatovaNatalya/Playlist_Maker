@@ -9,6 +9,7 @@ import com.example.playlistmaker.domain.playlists.PlaylistsInteractor
 import com.example.playlistmaker.domain.playlists.PlaylistsInteractorImpl
 import com.example.playlistmaker.domain.playlists.PlaylistsRepository
 import com.example.playlistmaker.viewmodel.NewPlaylistViewModel
+import com.example.playlistmaker.viewmodel.PlaylistViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -19,4 +20,6 @@ val playlistsModule = module {
     factory<InternalStorageRepository> { InternalStorageRepositoryImpl(get()) }
 
     viewModel { NewPlaylistViewModel(get(), get()) }
+
+    viewModel { PlaylistViewModel(get()) }
 }
