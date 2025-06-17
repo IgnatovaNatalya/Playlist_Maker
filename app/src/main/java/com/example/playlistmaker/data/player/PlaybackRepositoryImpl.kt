@@ -7,6 +7,7 @@ class PlaybackRepositoryImpl(private var mediaPlayer: MediaPlayer): PlaybackRepo
     override fun preparePlayer(trackUrl: String?,
                                onPrepare: () -> Unit,
                                onComplete: () -> Unit ) {
+        mediaPlayer.reset()
         mediaPlayer.setDataSource(trackUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {

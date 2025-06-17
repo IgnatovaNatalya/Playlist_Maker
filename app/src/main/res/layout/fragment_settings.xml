@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".ui.settings.SettingsFragment">
 
@@ -12,17 +12,17 @@
         android:id="@+id/settings_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settings"
-        app:titleTextAppearance="@style/ToolbarTitleStyle"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
-        app:titleMarginStart="8dp"/>
+        app:title="@string/settings"
+        app:titleMarginStart="@dimen/horizontal_padding"
+        app:titleTextAppearance="@style/ToolbarTitleStyle" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/theme_switcher"
+        style="@style/SettingsSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/SettingsSwitch"
         android:gravity="center_vertical"
         android:paddingHorizontal="@dimen/text_med"
         android:paddingVertical="20dp"

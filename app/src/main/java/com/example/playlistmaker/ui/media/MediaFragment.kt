@@ -28,7 +28,7 @@ class MediaFragment : BindingFragment<FragmentMediaBinding>() {
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             when (position) {
                 0 -> tab.text = getString(R.string.favorite_tracks)
-                1 -> tab.text = getString(R.string.playlosts)
+                1 -> tab.text = getString(R.string.playlists)
             }
         }
         tabMediator.attach()

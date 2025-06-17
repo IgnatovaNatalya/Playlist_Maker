@@ -24,8 +24,8 @@
     <string name="clear_history">Очистить историю</string>
     <string name="history_header">Вы искали</string>
     <string name="play_or_pause">Play or Pause</string>
-    <string name="add_to_playlist">Add to playlist</string>
-    <string name="add_to_favorities">Add to favorities</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="add_to_favorities">Добавить в избранное</string>
     <string name="duration">Длительность</string>
     <string name="album">Альбом</string>
     <string name="year">Год</string>
@@ -35,10 +35,17 @@
 
 
     <string name="favorite_tracks">Избранные треки</string>
-    <string name="playlosts">Плейлисты</string>
+    <string name="playlists">Плейлисты</string>
     <string name="no_playlists">Вы не создали\nни одного плейлиста</string>
     <string name="new_playlist">Новый плейлист</string>
     <string name="no_tracks">Ваша медиатека пуста</string>
+    <string name="title">Название*</string>
+    <string name="description">Описание</string>
+    <string name="create">Создать</string>
 
+    <string name="finish_creating">Завершить создание плейлиста?</string>
+    <string name="info_erase_input">Все несохраненные данные будут потеряны</string>
+    <string name="finish">Завершить</string>
+    <string name="cancel">Отмена</string>
 
 </resources>

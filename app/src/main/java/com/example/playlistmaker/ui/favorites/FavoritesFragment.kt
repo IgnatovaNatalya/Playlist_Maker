@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentFavoritesBinding
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.ui.RootActivity
-import com.example.playlistmaker.ui.player.PlayerActivity
+import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.ui.search.SearchFragment
 import com.example.playlistmaker.ui.search.TrackAdapter
 import com.example.playlistmaker.util.BindingFragment
@@ -42,8 +44,10 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
             viewLifecycleOwner.lifecycleScope,
             false
         ) { track ->
-            val intent = PlayerActivity.Companion.newInstance(requireContext(), track)
-            startActivity(intent)
+            requireActivity().findNavController(R.id.fragment_container).navigate(
+                R.id.playerFragment,
+                PlayerFragment.createArgs(track)
+            )
         }
 
         tracksAdapter = TrackAdapter { track ->
@@ -65,6 +69,7 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
             is FavoritesState.Content -> showContent(state)
         }
     }
+
     private fun showEmpty() {
         binding.favTracksRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
@@ -101,5 +106,4 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
     companion object {
         fun newInstance() = FavoritesFragment()
     }
-
 }

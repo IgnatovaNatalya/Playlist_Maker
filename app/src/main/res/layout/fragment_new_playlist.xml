@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.newPlaylist.NewPlaylistFragment">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/playlist_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/arrow_back"
+        app:title="@string/new_playlist"
+        app:titleMarginStart="@dimen/horizontal_padding"
+        app:titleTextAppearance="@style/ToolbarTitleStyle" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/leftBorder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/border_width" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/rightBorder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/border_width" />
+
+    <ImageView
+        android:id="@+id/playlist_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="62dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/image_picker"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="@id/rightBorder"
+        app:layout_constraintStart_toStartOf="@id/leftBorder"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/playlist_title"
+        style="@style/SettingsTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/bg_edittext_selector"
+        android:gravity="center|start"
+        android:hint="@string/title"
+        android:importantForAutofill="no"
+        android:inputType="textCapSentences"
+        android:lines="1"
+        android:paddingHorizontal="@dimen/horizontal_padding"
+        android:paddingVertical="18dp"
+        android:textColor="?attr/android:textColor"
+        app:layout_constraintEnd_toEndOf="@id/rightBorder2"
+        app:layout_constraintStart_toStartOf="@+id/leftBorder2"
+        app:layout_constraintTop_toBottomOf="@+id/playlist_image" />
+
+    <EditText
+        android:id="@+id/playlist_description"
+        style="@style/SettingsTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_edittext_selector"
+        android:gravity="center|start"
+        android:hint="@string/description"
+        android:importantForAutofill="no"
+        android:inputType="textCapSentences"
+        android:lines="1"
+        android:paddingHorizontal="@dimen/horizontal_padding"
+        android:paddingVertical="18dp"
+        android:textColor="?attr/android:textColor"
+        app:layout_constraintEnd_toEndOf="@id/rightBorder2"
+        app:layout_constraintStart_toStartOf="@+id/leftBorder2"
+        app:layout_constraintTop_toBottomOf="@+id/playlist_title" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_create"
+        style="@style/ButtonsStyle"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginBottom="32dp"
+        android:enabled="false"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/create"
+        app:backgroundTint="@color/button_color_selector"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/rightBorder2"
+        app:layout_constraintStart_toStartOf="@id/leftBorder2" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/leftBorder2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/horizontal_padding" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/rightBorder2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/horizontal_padding" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

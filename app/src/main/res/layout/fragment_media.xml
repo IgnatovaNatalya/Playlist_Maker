@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".ui.media.MediaFragment">
 
@@ -12,18 +12,18 @@
         android:id="@+id/media_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/media"
-        app:titleTextAppearance="@style/ToolbarTitleStyle"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
-        app:titleMarginStart="8dp"/>
+        app:title="@string/media"
+        app:titleMarginStart="@dimen/horizontal_padding"
+        app:titleTextAppearance="@style/ToolbarTitleStyle" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         style="@style/TabStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"/>
+        app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"

@@ -42,7 +42,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 style="@style/BandNameStyle"
-                android:textColor="?attr/colorSecondaryVariant"
                 android:maxLines="1"
                 android:ellipsize="end"
                 tools:text="Название группыНазНазвание группыНазНазвание группыНазвание группы"/>
@@ -61,7 +60,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 style="@style/BandNameStyle"
-                android:textColor="?attr/colorSecondaryVariant"
                 android:maxLines="1"
                 tools:text="5:11" />
         </LinearLayout>

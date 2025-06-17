@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".ui.search.SearchFragment">
 
@@ -15,7 +15,7 @@
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
         app:title="@string/search"
-        app:titleMarginStart="8dp"
+        app:titleMarginStart="@dimen/horizontal_padding"
         app:titleTextAppearance="@style/ToolbarTitleStyle" />
 
     <FrameLayout
@@ -77,29 +77,30 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <ProgressBar android:id="@+id/progress_bar"
+            <ProgressBar
+                android:id="@+id/progress_bar"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:layout_marginTop="140dp"
                 android:indeterminateTint="?attr/cursorColor"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/search_recycler"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/horizontal_padding"
+                android:orientation="vertical"
                 android:visibility="visible"
                 tools:itemCount="2"
                 tools:listitem="@layout/item_track" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/history_recycler"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/horizontal_padding"
+                android:orientation="vertical"
                 android:visibility="visible"
                 tools:itemCount="2"
                 tools:listitem="@layout/item_track" />

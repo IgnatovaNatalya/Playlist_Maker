@@ -1,11 +1,9 @@
 package com.example.playlistmaker.data.history
 
-
 import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.db.entity.toListTrack
 import com.example.playlistmaker.domain.history.HistoryRepository
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.domain.model.toHistoryEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
