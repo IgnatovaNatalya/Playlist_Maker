@@ -44,11 +44,18 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
             AddToPlaylistResult.Error(e)
         }
     }
+    override suspend fun removeTrackFromPlaylist(track: Track, playlistId:Int) {
+        removeFromPlaylist(track, playlistId)
+        if (!trackInPlaylists(track.trackId))
+            appDatabase.trackDao().deleteTrack(track.toTrackEntity())
+    }
 
-    override suspend fun removeFromPlaylist(
-        playlistId: Int,
-        track: Track
-    ) {
+    private suspend fun trackInPlaylists (trackId:Int):Boolean {
+        return appDatabase.tracksPlaylistsDao().trackInPlaylists(trackId)
+    }
+
+
+    private suspend fun removeFromPlaylist(track: Track, playlistId: Int,) {
         val trackPlaylistEntity = TracksPlaylistsEntity(track.trackId, playlistId)
         appDatabase.tracksPlaylistsDao().removeFromPlaylist(trackPlaylistEntity)
     }

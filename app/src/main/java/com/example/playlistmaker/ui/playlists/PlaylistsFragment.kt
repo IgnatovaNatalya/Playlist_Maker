@@ -49,7 +49,6 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
                 R.id.action_mediaFragment_to_playlistFragment,
                 PlaylistFragment.createArgs(playlist.id)
             )
-            //findNavController().navigate(R.id.action_playlistsFragment_to_playlistFragment,
         }
 
         playlistsAdapter = PlaylistGridAdapter { playlist -> onPlaylistClickDebounce(playlist) }

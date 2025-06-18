@@ -7,7 +7,6 @@
     android:background="@color/YP_light_grey"
     tools:context=".ui.playlist.PlaylistFragment">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_playlist_content"
         android:layout_width="match_parent"
@@ -59,7 +58,7 @@
             tools:text="Best songs 2021" />
 
         <TextView
-            android:id="@+id/playlist_descritrion"
+            android:id="@+id/playlist_description"
             style="@style/PlaylistTextStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -78,7 +77,7 @@
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
-            app:layout_constraintTop_toBottomOf="@+id/playlist_descritrion">
+            app:layout_constraintTop_toBottomOf="@+id/playlist_description">
 
             <TextView
                 android:id="@+id/playlist_duration"
@@ -113,6 +112,7 @@
             app:layout_constraintTop_toBottomOf="@+id/ll_duration_num_tracks">
 
             <ImageView
+                android:id="@+id/btn_share_playlist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/share_link"
@@ -120,6 +120,7 @@
                 app:tint="@color/YP_Black" />
 
             <ImageView
+                android:id="@+id/btn_menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/horizontal_padding"
@@ -138,23 +139,23 @@
         android:indeterminateTint="?attr/cursorColor"
         android:visibility="gone" />
 
-    <!--View
+    <View
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/YP_Background"
         android:fitsSystemWindows="true"
-        android:visibility="gone" /-->
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="515dp"
+        android:layout_height="365dp"
         android:background="@drawable/rounder_bottom"
         android:orientation="vertical"
         android:visibility="visible"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="266dp"
+        app:behavior_peekHeight="248dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View

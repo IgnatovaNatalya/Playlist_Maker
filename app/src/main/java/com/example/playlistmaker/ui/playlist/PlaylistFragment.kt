@@ -1,10 +1,12 @@
 package com.example.playlistmaker.ui.playlist
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -26,13 +28,15 @@ import com.example.playlistmaker.viewmodel.PlaylistViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
+    private val viewModel: PlaylistViewModel by viewModel {
+        parametersOf(requireArguments().getInt(EXTRA_PLAYLIST_ID))
+    }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
-    private val viewModel: PlaylistViewModel by viewModel()
-
     private lateinit var onTrackClickDebounce: (Track) -> Unit
     private var trackAdapter: TrackAdapter? = null
     private lateinit var trackRecycler: RecyclerView
@@ -47,11 +51,12 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requireArguments().getInt(EXTRA_PLAYLIST_ID).let { playlistId ->
-            viewModel.getPlaylist(playlistId)
-        }
+//        requireArguments().getInt(EXTRA_PLAYLIST_ID).let { playlistId ->
+//            viewModel.getPlaylist(playlistId)
+//        }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -68,17 +73,16 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
                 PlayerFragment.createArgs(track)
             )
         }
-        val onLongClick = { t:Track ->
+        val onLongClick = { t: Track ->
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.remove_track)
-                //.setMessage(R.string.info_erase_input)
                 .setNeutralButton(R.string.no) { dialog, which -> }
                 .setPositiveButton(R.string.yes) { dialog, which -> viewModel.removeTrack(t) }
                 .show()
             true
         }
 
-        trackAdapter = TrackAdapter (onTrackClickDebounce, onLongClick) //{ track -> onTrackClickDebounce(track) }
+        trackAdapter = TrackAdapter(onTrackClickDebounce, onLongClick)
 
         trackRecycler = binding.playlistTrackRecycler
         trackRecycler.layoutManager = LinearLayoutManager(activity)
@@ -89,10 +93,17 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         }
 
         viewModel.playlistTracks.observe(viewLifecycleOwner) { tracks ->
-            if (tracks.isNotEmpty()) {
+            if (tracks.isNotEmpty())
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
+            else
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
             trackAdapter?.tracks = tracks
+            trackAdapter?.notifyDataSetChanged()
+        }
+
+        viewModel.toastState.observe(viewLifecycleOwner) { toastText ->
+            if (!toastText.isNullOrBlank()) showToast(toastText)
         }
 
         binding.playlistToolbar.setNavigationOnClickListener {
@@ -100,20 +111,34 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             rootNavController.popBackStack()
         }
 
+        binding.btnSharePlaylist.setOnClickListener {
+            viewModel.sharePlaylist()
+        }
 
+        binding.btnMenu.setOnClickListener {
+            //еще один Боттом
+        }
 
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-//                when (newState) {
-//                    BottomSheetBehavior.STATE_HIDDEN -> binding.overlay.visibility = View.GONE
-//                    else -> binding.overlay.visibility = View.VISIBLE
-//                }
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN, BottomSheetBehavior.STATE_COLLAPSED ->
+                        binding.overlay.visibility = View.GONE
+
+                    else -> binding.overlay.visibility = View.VISIBLE
+                }
             }
+
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
     }
+
+    private fun showToast(toast: String) {
+        Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT).show()
+    }
+
 
     private fun renderState(state: PlaylistUiState) {
         when (state) {
@@ -124,19 +149,11 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     }
 
     fun showLoading() {
-//        binding.playlistCover.visibility = View.GONE
-//        binding.playlistTitle.visibility = View.GONE
-//        binding.llDurationNumTracks.visibility = View.GONE
-//        binding.llButtons.visibility = View.GONE
         binding.clPlaylistContent.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
     }
 
     fun showContent(playlist: Playlist) {
-//        binding.playlistCover.visibility = View.VISIBLE
-//        binding.playlistTitle.visibility = View.VISIBLE
-//        binding.llDurationNumTracks.visibility = View.VISIBLE
-//        binding.llButtons.visibility = View.VISIBLE
         binding.clPlaylistContent.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
 
@@ -145,29 +162,20 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
     private fun drawPlaylist(playlist: Playlist) {
 
-//        val radiusPx = TypedValue.applyDimension(
-//            TypedValue.COMPLEX_UNIT_DIP, 8F, binding.playlistCover.resources.displayMetrics
-//        )
-
-//        Glide.with(binding.playlistCover)
-//            .load(playlist.path)
-//            .centerInside()
-//            .transform(RoundedCorners(radiusPx))
-//            .placeholder(R.drawable.album_placeholder)
-//            .into(binding.playlistCover)
 
         Glide.with(binding.playlistCover)
-            //.asBitmap()
             .load(playlist.path)
             .centerCrop()
             .placeholder(R.drawable.album_placeholder)
             .into(binding.playlistCover)
 
-
-
         binding.playlistTitle.text = playlist.title
-        binding.playlistDescritrion.text = playlist.description
-        val str = binding.root.resources.getQuantityString(R.plurals.tracks, playlist.numTracks,playlist.numTracks)
+        binding.playlistDescription.text = playlist.description
+        val str = binding.root.resources.getQuantityString(
+            R.plurals.tracks,
+            playlist.numTracks,
+            playlist.numTracks
+        )
         binding.playlistNumTracks.text = str
         binding.playlistDuration.text = "Посчитать"
     }
@@ -175,6 +183,11 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     override fun onResume() {
         super.onResume()
         //bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onPause()
     }
 
     companion object {

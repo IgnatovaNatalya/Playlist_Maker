@@ -23,4 +23,7 @@ interface TracksPlaylistsDao {
 
     @Query("SELECT t.* FROM track_table t INNER JOIN tracks_playlists_table tp ON t.trackId = tp.trackId WHERE playlistId = :playlistId")
     fun getTracksInPlaylist(playlistId:Int): Flow<List<TrackEntity>>
+
+    @Query("SELECT EXISTS (SELECT 1 FROM tracks_playlists_table WHERE trackId = :trackId LIMIT 1)")
+    suspend fun trackInPlaylists(trackId:Int): Boolean
 }

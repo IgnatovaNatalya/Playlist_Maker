@@ -21,5 +21,11 @@ val playlistsModule = module {
 
     viewModel { NewPlaylistViewModel(get(), get()) }
 
-    viewModel { PlaylistViewModel(get()) }
+    viewModel { (playlistId: Int) ->
+        PlaylistViewModel(
+            playlistId = playlistId,
+            playlistsInteractor = get(),
+            shareInteractor = get()
+        )
+    }
 }
