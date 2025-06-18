@@ -138,13 +138,13 @@
         android:indeterminateTint="?attr/cursorColor"
         android:visibility="gone" />
 
-    <View
+    <!--View
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/YP_Background"
         android:fitsSystemWindows="true"
-        android:visibility="gone" />
+        android:visibility="gone" /-->
 
     <LinearLayout
         android:id="@+id/bottom_sheet"
@@ -153,7 +153,7 @@
         android:background="@drawable/rounder_bottom"
         android:orientation="vertical"
         android:visibility="visible"
-        app:behavior_hideable="true"
+        app:behavior_hideable="false"
         app:behavior_peekHeight="266dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 

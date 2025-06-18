@@ -50,5 +50,8 @@
 
     <string name="share_playlist">Поделиться плейлистом</string>
     <string name="menu">Меню</string>
+    <string name="remove_track">Хотите удалить трек?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 
 </resources>

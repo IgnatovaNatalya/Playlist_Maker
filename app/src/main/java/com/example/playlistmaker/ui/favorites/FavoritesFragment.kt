@@ -50,10 +50,13 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
             )
         }
 
-        tracksAdapter = TrackAdapter { track ->
-            (activity as RootActivity).animateBottomNavigationView()
-            onTrackClickDebounce(track)
-        }
+        tracksAdapter = TrackAdapter(
+            clickListener = { track ->
+                (activity as RootActivity).animateBottomNavigationView()
+                onTrackClickDebounce(track)
+            }
+        )
+
 
         viewModel.favoritesState.observe(viewLifecycleOwner) { render(it) }
 

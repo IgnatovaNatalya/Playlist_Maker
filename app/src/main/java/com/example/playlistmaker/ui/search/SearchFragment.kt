@@ -76,8 +76,8 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             )
         }
 
-        searchAdapter = TrackAdapter { track -> onSearchTrackClickDebounce(track) }
-        historyAdapter = TrackAdapter { track -> onHistoryTrackClickDebounce(track) }
+        searchAdapter = TrackAdapter({ track -> onSearchTrackClickDebounce(track) })
+        historyAdapter = TrackAdapter({ track -> onHistoryTrackClickDebounce(track) })
 
         observeViewModel()
 
