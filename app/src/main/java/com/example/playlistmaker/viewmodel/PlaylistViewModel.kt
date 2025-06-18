@@ -38,6 +38,15 @@ class PlaylistViewModel(
             }
     }
 
+    fun deletePlaylist() {
+        val state = _playlistUiState.value
+        if (state is PlaylistUiState.Content)
+            viewModelScope.launch {
+                playlistsInteractor.deletePlaylist(state.playlist)
+                _playlistUiState.value  = PlaylistUiState.Empty
+            }
+    }
+
     fun sharePlaylist() {
         val state = _playlistUiState.value
         val tracks = _playlistTracks.value

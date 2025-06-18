@@ -47,6 +47,8 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     private var trackAdapter: TrackAdapter? = null
     private lateinit var trackRecycler: RecyclerView
 
+    private var playlistTitle = ""
+
     override fun createBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -56,12 +58,12 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         setBottomSheets()
 
@@ -92,6 +94,10 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
         viewModel.playlistUiState.observe(viewLifecycleOwner) { state ->
             if (state != null) renderState(state)
+            else {
+                val rootNavController = requireActivity().findNavController(R.id.fragment_container)
+                rootNavController.popBackStack()
+            }
         }
 
         viewModel.playlistTracks.observe(viewLifecycleOwner) { tracks ->
@@ -125,6 +131,20 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             viewModel.sharePlaylist()
         }
 
+        binding.btnMenuDelete.setOnClickListener {
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.confirm_delete_playlist, playlistTitle))
+                .setNeutralButton(R.string.no) { dialog, which -> }
+                .setPositiveButton(R.string.yes) { dialog, _ -> viewModel.deletePlaylist() }
+                    //rootNavController.popBackStack()
+//                    {
+//                        rootNavController.popBackStack()
+//                        viewModel.deletePlaylist()
+//                    }
+
+                .show()
+        }
 
     }
 
@@ -166,6 +186,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         })
 
     }
+
     private fun showToast(toast: String) {
         Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT).show()
     }
@@ -174,6 +195,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         when (state) {
             is PlaylistUiState.Loading -> showLoading()
             is PlaylistUiState.Content -> showContent(state.playlist)
+            PlaylistUiState.Empty -> findNavController().popBackStack()
         }
     }
 
@@ -185,6 +207,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     fun showContent(playlist: Playlist) {
         binding.clPlaylistContent.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
+        playlistTitle = playlist.title
         drawPlaylist(playlist)
         drawPlaylistBottom(playlist)
     }

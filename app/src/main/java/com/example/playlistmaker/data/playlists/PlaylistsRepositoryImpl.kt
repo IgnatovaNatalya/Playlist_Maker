@@ -25,9 +25,7 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
         appDatabase.playlistDao().createPlaylist(playlistEntity)
     }
 
-    override suspend fun deletePlaylist(playlist: Playlist) {
-        appDatabase.playlistDao().deletePlaylist(playlist.toPlaylistEntity())
-    }
+
 
     override suspend fun addToPlaylist(
         playlistId: Int,
@@ -52,6 +50,15 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
             AddToPlaylistResult.Error(e)
         }
     }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        getPlaylistTracks(playlist.id).collect { trackList ->
+            for(track in trackList)
+                removeTrackFromPlaylist(track, playlist.id)
+            appDatabase.playlistDao().deletePlaylist(playlist.id)
+        }
+    }
+
     override suspend fun removeTrackFromPlaylist(track: Track, playlistId:Int) {
         removeFromPlaylist(track, playlistId)
         if (!trackInPlaylists(track.trackId))
@@ -61,7 +68,6 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
     private suspend fun trackInPlaylists (trackId:Int):Boolean {
         return appDatabase.tracksPlaylistsDao().trackInPlaylists(trackId)
     }
-
 
     private suspend fun removeFromPlaylist(track: Track, playlistId: Int,) {
         val trackPlaylistEntity = TracksPlaylistsEntity(track.trackId, playlistId)
