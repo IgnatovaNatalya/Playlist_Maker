@@ -30,7 +30,7 @@ interface HistoryDao {
     @Query("DELETE FROM history_track_table")
     suspend fun clearHistory()
 
-    @Query("SELECT h.trackId, h.trackName, h.artistName, h.duration, h.artworkUrl100, h.collectionName, " +
+    @Query("SELECT h.trackId, h.trackName, h.artistName, h.trackTimeMillis, h.artworkUrl100, h.collectionName, " +
             "h.releaseDate, h.primaryGenreName, h.country, h.previewUrl, h.added, f.added is not null AS isFavorite " +
             "FROM history_track_table h LEFT JOIN fav_track_table f ON h.trackId = f.trackId " +
             "ORDER BY h.added DESC")

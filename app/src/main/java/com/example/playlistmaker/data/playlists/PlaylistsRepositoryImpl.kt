@@ -2,9 +2,10 @@ package com.example.playlistmaker.data.playlists
 
 import android.database.sqlite.SQLiteConstraintException
 import com.example.playlistmaker.data.db.AppDatabase
+import com.example.playlistmaker.data.db.entity.PlaylistEntity
 import com.example.playlistmaker.data.db.entity.TracksPlaylistsEntity
-import com.example.playlistmaker.data.db.entity.toListPlaylist
 import com.example.playlistmaker.data.db.entity.toListTrack
+import com.example.playlistmaker.data.dto.toListPlaylist
 import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.playlists.PlaylistsRepository
@@ -13,8 +14,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsRepository {
-    override suspend fun createPlaylist(playlist: Playlist) {
-        appDatabase.playlistDao().createPlaylist(playlist.toPlaylistEntity())
+
+    override suspend fun createPlaylist(title: String, description: String, path: String) {
+        val playlistEntity = PlaylistEntity(
+            id = 0,
+            title = title,
+            description = description,
+            path = path
+        )
+        appDatabase.playlistDao().createPlaylist(playlistEntity)
     }
 
     override suspend fun deletePlaylist(playlist: Playlist) {

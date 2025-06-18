@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.internalStorage.InternalStorageInteractor
-import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.playlists.PlaylistsInteractor
 import kotlinx.coroutines.launch
 
@@ -21,14 +20,7 @@ class NewPlaylistViewModel(
     fun createPlaylist(title: String, description: String, path: String) {
         _playlistCreated.postValue(false)
         viewModelScope.launch {
-            val playlist = Playlist(
-                id = 0,
-                title = title,
-                description = description,
-                path = path,
-                numTracks = 0
-            )
-            playlistsInteractor.createPlaylist(playlist)
+            playlistsInteractor.createPlaylist(title, description, path)
             _playlistCreated.postValue(true)
         }
     }

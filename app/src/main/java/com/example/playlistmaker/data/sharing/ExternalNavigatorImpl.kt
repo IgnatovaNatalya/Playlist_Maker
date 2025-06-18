@@ -8,6 +8,8 @@ import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.sharing.ExternalNavigator
 import com.example.playlistmaker.util.EmailData
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
 
@@ -45,7 +47,7 @@ class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
 
     private fun listTracksToShare(listTrack: List<Track>): String {
         return listTrack
-            .mapIndexed { index, track -> "${index + 1}. ${track.artistName} - ${track.trackName} (${track.duration})" }
+            .mapIndexed { index, track -> "${index + 1}. ${track.artistName} - ${track.trackName} (${SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)})" }
             .joinToString(separator = "\n")
     }
 

@@ -51,9 +51,6 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        requireArguments().getInt(EXTRA_PLAYLIST_ID).let { playlistId ->
-//            viewModel.getPlaylist(playlistId)
-//        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -156,7 +153,6 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     fun showContent(playlist: Playlist) {
         binding.clPlaylistContent.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
-
         drawPlaylist(playlist)
     }
 
@@ -171,13 +167,18 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
         binding.playlistTitle.text = playlist.title
         binding.playlistDescription.text = playlist.description
-        val str = binding.root.resources.getQuantityString(
+        val strNumTracks = binding.root.resources.getQuantityString(
             R.plurals.tracks,
             playlist.numTracks,
             playlist.numTracks
         )
-        binding.playlistNumTracks.text = str
-        binding.playlistDuration.text = "Посчитать"
+        binding.playlistNumTracks.text = strNumTracks
+        val strDuration = binding.root.resources.getQuantityString(
+            R.plurals.minutes,
+            playlist.totalDurationMinutes,
+            playlist.totalDurationMinutes
+        )
+        binding.playlistDuration.text = strDuration
     }
 
     override fun onResume() {

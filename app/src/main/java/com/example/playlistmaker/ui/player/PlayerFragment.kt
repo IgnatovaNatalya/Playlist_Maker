@@ -25,6 +25,8 @@ import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.viewmodel.PlaybackViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
@@ -162,7 +164,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
         binding.playerTitle.text = track.trackName
         binding.playerBand.text = track.artistName
-        binding.playerDuration.text = track.duration
+        binding.playerDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
         binding.playerAlbum.text = track.collectionName
         binding.playerYear.text = if (track.releaseDate.length > 4) track.releaseDate.substring(
             0,
