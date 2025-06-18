@@ -54,4 +54,8 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
 
+    <string name="share">Поделиться</string>
+    <string name="edit_playlist">Редактировать информацию</string>
+    <string name="delete_playlist">Удалить плейлист</string>
+
 </resources>

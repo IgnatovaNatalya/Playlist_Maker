@@ -1,12 +1,15 @@
 package com.example.playlistmaker.ui.playlist
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -14,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.BitmapImageViewTarget
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistBinding
 import com.example.playlistmaker.domain.model.Playlist
@@ -36,7 +40,9 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         parametersOf(requireArguments().getInt(EXTRA_PLAYLIST_ID))
     }
 
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetTracks: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetMenu: BottomSheetBehavior<LinearLayout>
+
     private lateinit var onTrackClickDebounce: (Track) -> Unit
     private var trackAdapter: TrackAdapter? = null
     private lateinit var trackRecycler: RecyclerView
@@ -57,9 +63,8 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
-            state = BottomSheetBehavior.STATE_HIDDEN
-        }
+        setBottomSheets()
+
         onTrackClickDebounce = debounce<Track>(
             CLICK_DEBOUNCE_DELAY,
             viewLifecycleOwner.lifecycleScope,
@@ -91,9 +96,9 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
         viewModel.playlistTracks.observe(viewLifecycleOwner) { tracks ->
             if (tracks.isNotEmpty())
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                bottomSheetTracks.state = BottomSheetBehavior.STATE_COLLAPSED
             else
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                bottomSheetTracks.state = BottomSheetBehavior.STATE_HIDDEN
 
             trackAdapter?.tracks = tracks
             trackAdapter?.notifyDataSetChanged()
@@ -113,10 +118,26 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         }
 
         binding.btnMenu.setOnClickListener {
-            //еще один Боттом
+            bottomSheetMenu.state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
-        bottomSheetBehavior.addBottomSheetCallback(object :
+        binding.btnMenuShare.setOnClickListener {
+            viewModel.sharePlaylist()
+        }
+
+
+    }
+
+    private fun setBottomSheets() {
+        bottomSheetTracks = BottomSheetBehavior.from(binding.bottomSheetTracks).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        bottomSheetMenu = BottomSheetBehavior.from(binding.bottomSheetMenu).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        bottomSheetTracks.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -130,19 +151,30 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
-    }
 
+        bottomSheetMenu.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> binding.overlay.visibility = View.GONE
+                    else -> binding.overlay.visibility = View.VISIBLE
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
+
+    }
     private fun showToast(toast: String) {
         Toast.makeText(requireContext(), toast, Toast.LENGTH_SHORT).show()
     }
-
 
     private fun renderState(state: PlaylistUiState) {
         when (state) {
             is PlaylistUiState.Loading -> showLoading()
             is PlaylistUiState.Content -> showContent(state.playlist)
         }
-
     }
 
     fun showLoading() {
@@ -154,10 +186,40 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         binding.clPlaylistContent.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
         drawPlaylist(playlist)
+        drawPlaylistBottom(playlist)
+    }
+
+    private fun drawPlaylistBottom(playlist: Playlist) {
+
+        val radiusPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 2F, resources.displayMetrics
+        )
+
+        Glide.with(binding.itemPlaylistLinear.playlistLinearCover)
+            .asBitmap()
+            .load(playlist.path)
+            .centerCrop()
+            .placeholder(R.drawable.album_placeholder)
+            .into(object : BitmapImageViewTarget(binding.itemPlaylistLinear.playlistLinearCover) {
+                override fun setResource(resource: Bitmap?) {
+                    if (resource == null) return
+                    val rounded =
+                        RoundedBitmapDrawableFactory.create(resources, resource)
+                            .apply { cornerRadius = radiusPx }
+                    binding.itemPlaylistLinear.playlistLinearCover.setImageDrawable(rounded)
+                }
+            })
+
+        binding.itemPlaylistLinear.playlistLinearTitle.text = playlist.title
+        val strNumTracks = binding.root.resources.getQuantityString(
+            R.plurals.tracks,
+            playlist.numTracks,
+            playlist.numTracks
+        )
+        binding.itemPlaylistLinear.playlistLinearNumTracks.text = strNumTracks
     }
 
     private fun drawPlaylist(playlist: Playlist) {
-
 
         Glide.with(binding.playlistCover)
             .load(playlist.path)
@@ -183,7 +245,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
     override fun onResume() {
         super.onResume()
-        //bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetMenu.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     override fun onPause() {

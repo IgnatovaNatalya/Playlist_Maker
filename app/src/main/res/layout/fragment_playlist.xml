@@ -148,7 +148,7 @@
         android:visibility="gone" />
 
     <LinearLayout
-        android:id="@+id/bottom_sheet"
+        android:id="@+id/bottom_sheet_tracks"
         android:layout_width="match_parent"
         android:layout_height="365dp"
         android:background="@drawable/rounder_bottom"
@@ -176,6 +176,58 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="4"
             tools:listitem="@layout/item_track" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet_menu"
+        android:layout_width="match_parent"
+        android:layout_height="365dp"
+        android:background="@drawable/rounder_bottom"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="365dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <View
+            android:layout_width="50dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/rounder" />
+
+        <include
+            android:id="@+id/item_playlist_linear"
+            layout="@layout/item_playlist_linear" />
+
+        <TextView
+            android:id="@+id/btn_menu_share"
+            style="@style/SettingsTextStyle"
+            android:paddingHorizontal="@dimen/horizontal_padding"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_height="61dp"
+            android:text="@string/share"/>
+
+        <TextView
+            android:id="@+id/btn_menu_edit"
+            style="@style/SettingsTextStyle"
+            android:paddingHorizontal="@dimen/horizontal_padding"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_height="61dp"
+            android:text="@string/edit_playlist"/>
+
+        <TextView
+            android:id="@+id/btn_menu_delete"
+            style="@style/SettingsTextStyle"
+            android:paddingHorizontal="@dimen/horizontal_padding"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_height="61dp"
+            android:text="@string/delete_playlist"/>
+
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

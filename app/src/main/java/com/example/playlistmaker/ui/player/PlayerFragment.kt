@@ -108,7 +108,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         binding.buttonPlayPause.setOnClickListener { viewModel.onPlayButtonClicked() }
         binding.buttonLike.setOnClickListener { viewModel.onLikeClicked() }
 
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetTracks).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
 
