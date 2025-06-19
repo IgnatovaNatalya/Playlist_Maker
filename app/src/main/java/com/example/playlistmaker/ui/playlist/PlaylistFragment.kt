@@ -60,10 +60,8 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         super.onCreate(savedInstanceState)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
 
         setBottomSheets()
 
@@ -93,21 +91,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         trackRecycler.adapter = trackAdapter
 
         viewModel.playlistUiState.observe(viewLifecycleOwner) { state ->
-            if (state != null) renderState(state)
-            else {
-                val rootNavController = requireActivity().findNavController(R.id.fragment_container)
-                rootNavController.popBackStack()
-            }
-        }
-
-        viewModel.playlistTracks.observe(viewLifecycleOwner) { tracks ->
-            if (tracks.isNotEmpty())
-                bottomSheetTracks.state = BottomSheetBehavior.STATE_COLLAPSED
-            else
-                bottomSheetTracks.state = BottomSheetBehavior.STATE_HIDDEN
-
-            trackAdapter?.tracks = tracks
-            trackAdapter?.notifyDataSetChanged()
+                renderState(state)
         }
 
         viewModel.toastState.observe(viewLifecycleOwner) { toastText ->
@@ -115,8 +99,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         }
 
         binding.playlistToolbar.setNavigationOnClickListener {
-            val rootNavController = requireActivity().findNavController(R.id.fragment_container)
-            rootNavController.popBackStack()
+            findNavController().popBackStack()
         }
 
         binding.btnSharePlaylist.setOnClickListener {
@@ -136,18 +119,15 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.confirm_delete_playlist, playlistTitle))
                 .setNeutralButton(R.string.no) { dialog, which -> }
-                .setPositiveButton(R.string.yes) { dialog, _ -> viewModel.deletePlaylist() }
-                    //rootNavController.popBackStack()
-//                    {
-//                        rootNavController.popBackStack()
-//                        viewModel.deletePlaylist()
-//                    }
-
+                .setPositiveButton(R.string.yes) { dialog, _ -> deleteAndClose() }
                 .show()
         }
-
     }
 
+    private fun deleteAndClose() {
+        viewModel.deletePlaylist()
+        findNavController().popBackStack()
+    }
     private fun setBottomSheets() {
         bottomSheetTracks = BottomSheetBehavior.from(binding.bottomSheetTracks).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
@@ -181,10 +161,8 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
                     else -> binding.overlay.visibility = View.VISIBLE
                 }
             }
-
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
-
     }
 
     private fun showToast(toast: String) {
@@ -194,8 +172,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     private fun renderState(state: PlaylistUiState) {
         when (state) {
             is PlaylistUiState.Loading -> showLoading()
-            is PlaylistUiState.Content -> showContent(state.playlist)
-            PlaylistUiState.Empty -> findNavController().popBackStack()
+            is PlaylistUiState.Content -> showContent(state)
         }
     }
 
@@ -204,12 +181,21 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         binding.progressBar.visibility = View.VISIBLE
     }
 
-    fun showContent(playlist: Playlist) {
+    @SuppressLint("NotifyDataSetChanged")
+    fun showContent(state: PlaylistUiState.Content) {
         binding.clPlaylistContent.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
-        playlistTitle = playlist.title
-        drawPlaylist(playlist)
-        drawPlaylistBottom(playlist)
+        playlistTitle = state.playlist.title
+        drawPlaylist(state.playlist)
+        drawPlaylistBottom(state.playlist)
+
+        if (state.tracks.isNotEmpty())
+            bottomSheetTracks.state = BottomSheetBehavior.STATE_COLLAPSED
+        else
+            bottomSheetTracks.state = BottomSheetBehavior.STATE_HIDDEN
+
+        trackAdapter?.tracks = state.tracks
+        trackAdapter?.notifyDataSetChanged()
     }
 
     private fun drawPlaylistBottom(playlist: Playlist) {

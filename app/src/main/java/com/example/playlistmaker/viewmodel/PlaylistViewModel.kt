@@ -8,6 +8,8 @@ import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.playlists.PlaylistsInteractor
 import com.example.playlistmaker.domain.sharing.SharingInteractor
 import com.example.playlistmaker.util.PlaylistUiState
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class PlaylistViewModel(
@@ -19,15 +21,13 @@ class PlaylistViewModel(
     private val _playlistUiState = MutableLiveData<PlaylistUiState>()
     val playlistUiState: LiveData<PlaylistUiState> = _playlistUiState
 
-    private val _playlistTracks = MutableLiveData<List<Track>>()
-    val playlistTracks: LiveData<List<Track>> = _playlistTracks
-
     private val _toastState = MutableLiveData<String>()
     val toastState: LiveData<String> = _toastState
 
     init {
-        getPlaylist()
-        getListTrack()
+        viewModelScope.launch {
+            getPlaylistAndTracks()
+        }
     }
 
     fun removeTrack(track: Track) {
@@ -43,43 +43,39 @@ class PlaylistViewModel(
         if (state is PlaylistUiState.Content)
             viewModelScope.launch {
                 playlistsInteractor.deletePlaylist(state.playlist)
-                _playlistUiState.value  = PlaylistUiState.Empty
             }
     }
 
     fun sharePlaylist() {
+
         val state = _playlistUiState.value
-        val tracks = _playlistTracks.value
 
-        if (tracks.isNullOrEmpty()) {
-            _toastState.postValue("В этом плейлисте нет списка треков, которым можно поделиться")
-            return
+        if (state is PlaylistUiState.Content) {
+            val tracks = state.tracks
+
+            if (tracks.isEmpty())
+                _toastState.postValue("В этом плейлисте нет списка треков, которым можно поделиться")
+            else
+                shareInteractor.sharePlaylist(state.playlist, tracks)
         }
-
-        if (state !is PlaylistUiState.Content) {
-            return
-        }
-
-        val playlist = state.playlist
-        shareInteractor.sharePlaylist(playlist, tracks)
     }
 
-    private fun getPlaylist() {
+    private fun getPlaylistAndTracks() {
         _playlistUiState.postValue(PlaylistUiState.Loading)
+
         viewModelScope.launch {
-            playlistsInteractor.getPlaylist(playlistId).collect { playlist ->
-                _playlistUiState.postValue(PlaylistUiState.Content(playlist))
-            }
+            val playlist = async { playlistsInteractor.getPlaylist(playlistId) }.await()
+            val tracks = async { playlistsInteractor.getPlaylistTracks(playlistId) }.await()
+
+            _playlistUiState.postValue(
+                PlaylistUiState.Content(
+                    playlist.first(),
+                    tracks.first()
+                )
+            )
         }
     }
 
-    private fun getListTrack() {
-        viewModelScope.launch {
-            playlistsInteractor.getPlaylistTracks(playlistId).collect { listTrack ->
-                _playlistTracks.value = listTrack
-            }
-        }
-    }
 
     private fun clearToast() {
         _toastState.postValue("")

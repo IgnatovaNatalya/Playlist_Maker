@@ -10,8 +10,10 @@ import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.playlists.PlaylistsRepository
 import com.example.playlistmaker.util.AddToPlaylistResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsRepository {
 
@@ -24,8 +26,6 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
         )
         appDatabase.playlistDao().createPlaylist(playlistEntity)
     }
-
-
 
     override suspend fun addToPlaylist(
         playlistId: Int,
@@ -51,10 +51,11 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
         }
     }
 
-    override suspend fun deletePlaylist(playlist: Playlist) {
-        getPlaylistTracks(playlist.id).collect { trackList ->
-            for(track in trackList)
+    override suspend fun deletePlaylist(playlist: Playlist) = withContext(Dispatchers.IO) {
+        getPlaylistTracks(playlist.id).collect { tracks ->
+            tracks.forEach { track ->
                 removeTrackFromPlaylist(track, playlist.id)
+            }
             appDatabase.playlistDao().deletePlaylist(playlist.id)
         }
     }
