@@ -19,7 +19,13 @@ val playlistsModule = module {
     factory<InternalStorageInteractor> { InternalStorageInteractorImpl(get()) }
     factory<InternalStorageRepository> { InternalStorageRepositoryImpl(get()) }
 
-    viewModel { NewPlaylistViewModel(get(), get()) }
+    viewModel { (playlistId: Int?) ->
+        NewPlaylistViewModel(
+            playlistId = playlistId,
+            playlistsInteractor = get(),
+            internalStorageInteractor = get()
+        )
+    }
 
     viewModel { (playlistId: Int) ->
         PlaylistViewModel(

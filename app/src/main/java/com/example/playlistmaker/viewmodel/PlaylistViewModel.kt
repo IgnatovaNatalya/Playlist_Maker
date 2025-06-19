@@ -35,6 +35,7 @@ class PlaylistViewModel(
         if (state is PlaylistUiState.Content)
             viewModelScope.launch {
                 playlistsInteractor.removeTrackFromPlaylist(track, playlistId)
+                getPlaylistAndTracks()
             }
     }
 
@@ -76,6 +77,11 @@ class PlaylistViewModel(
         }
     }
 
+    fun reloadData() {
+        viewModelScope.launch {
+            getPlaylistAndTracks()
+        }
+    }
 
     private fun clearToast() {
         _toastState.postValue("")

@@ -48,9 +48,10 @@
         <TextView
             android:id="@+id/playlist_title"
             style="@style/PlaylistTitleStyle"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/border_width"
+            android:layout_marginHorizontal="@dimen/horizontal_padding"
             android:ellipsize="end"
             android:maxLines="1"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
@@ -164,6 +165,16 @@
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:background="@drawable/rounder" />
+
+        <TextView
+            android:id="@+id/msg_no_tracks"
+            style="@style/SettingsTextStyle"
+            android:paddingHorizontal="@dimen/horizontal_padding"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_height="61dp"
+            android:visibility="visible"
+            android:text="@string/msg_no_tracks"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/playlist_track_recycler"

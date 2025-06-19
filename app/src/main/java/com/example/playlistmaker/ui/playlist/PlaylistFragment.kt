@@ -22,6 +22,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistBinding
 import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.ui.newPlaylist.NewPlaylistFragment
 import com.example.playlistmaker.ui.player.PlayerFragment
 import com.example.playlistmaker.ui.search.SearchFragment.Companion.CLICK_DEBOUNCE_DELAY
 import com.example.playlistmaker.ui.search.TrackAdapter
@@ -112,15 +113,24 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
         binding.btnMenuShare.setOnClickListener {
             viewModel.sharePlaylist()
+            bottomSheetMenu.state = BottomSheetBehavior.STATE_HIDDEN
         }
 
         binding.btnMenuDelete.setOnClickListener {
-
+            bottomSheetMenu.state = BottomSheetBehavior.STATE_HIDDEN
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.confirm_delete_playlist, playlistTitle))
                 .setNeutralButton(R.string.no) { dialog, which -> }
                 .setPositiveButton(R.string.yes) { dialog, _ -> deleteAndClose() }
                 .show()
+        }
+
+        binding.btnMenuEdit.setOnClickListener {
+            requireActivity().findNavController(R.id.fragment_container)
+                .navigate(
+                    R.id.action_playlistFragment_to_newPlaylistFragment,
+                    NewPlaylistFragment.createArgs(requireArguments().getInt(EXTRA_PLAYLIST_ID))
+                )
         }
     }
 
@@ -128,6 +138,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         viewModel.deletePlaylist()
         findNavController().popBackStack()
     }
+
     private fun setBottomSheets() {
         bottomSheetTracks = BottomSheetBehavior.from(binding.bottomSheetTracks).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
@@ -226,6 +237,10 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             playlist.numTracks
         )
         binding.itemPlaylistLinear.playlistLinearNumTracks.text = strNumTracks
+
+        if (playlist.numTracks ==0) binding.msgNoTracks.visibility=View.VISIBLE
+        else binding.msgNoTracks.visibility=View.GONE
+
     }
 
     private fun drawPlaylist(playlist: Playlist) {
@@ -252,8 +267,10 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         binding.playlistDuration.text = strDuration
     }
 
+
     override fun onResume() {
         super.onResume()
+        viewModel.reloadData()
         bottomSheetMenu.state = BottomSheetBehavior.STATE_HIDDEN
     }
 

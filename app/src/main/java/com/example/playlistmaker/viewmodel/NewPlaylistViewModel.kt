@@ -7,21 +7,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.internalStorage.InternalStorageInteractor
 import com.example.playlistmaker.domain.playlists.PlaylistsInteractor
+import com.example.playlistmaker.util.NewPlaylistUiState
 import kotlinx.coroutines.launch
 
 class NewPlaylistViewModel(
+    private val playlistId: Int?,
     private val playlistsInteractor: PlaylistsInteractor,
     private val internalStorageInteractor: InternalStorageInteractor
 ) : ViewModel() {
 
-    private val _playlistCreated = MutableLiveData<Boolean>()
-    val playlistCreated: LiveData<Boolean> =_playlistCreated
+    private val _newPlaylistsState = MutableLiveData<NewPlaylistUiState>()
+    val newPlaylistsState: LiveData<NewPlaylistUiState> = _newPlaylistsState
+
+    private val _playlistSaved = MutableLiveData<Boolean>()
+    val playlistCreated: LiveData<Boolean> = _playlistSaved
+
+    init {
+        getPlaylist()
+    }
 
     fun createPlaylist(title: String, description: String, path: String) {
-        _playlistCreated.postValue(false)
+        _playlistSaved.postValue(false)
         viewModelScope.launch {
-            playlistsInteractor.createPlaylist(title, description, path)
-            _playlistCreated.postValue(true)
+            playlistsInteractor.createPlaylist(playlistId, title, description, path)
+            _playlistSaved.postValue(true)
         }
     }
 
@@ -30,4 +39,16 @@ class NewPlaylistViewModel(
             internalStorageInteractor.saveImage(uri)
         }
     }
+
+
+    private fun getPlaylist() {
+        if (playlistId != null)
+            viewModelScope.launch {
+                playlistsInteractor.getPlaylist(playlistId).collect { playlist ->
+                    _newPlaylistsState.postValue(NewPlaylistUiState.Exist(playlist))
+                }
+            }
+    }
+
+
 }

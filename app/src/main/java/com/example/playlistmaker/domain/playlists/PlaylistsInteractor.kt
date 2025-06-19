@@ -6,7 +6,7 @@ import com.example.playlistmaker.util.AddToPlaylistResult
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistsInteractor {
-    suspend fun createPlaylist(title: String, description: String, path: String)
+    suspend fun createPlaylist(id: Int?, title: String, description: String, path: String)
     suspend fun deletePlaylist(playlist: Playlist)
 
     suspend fun addToPlaylist(playlistId: Int, track: Track): AddToPlaylistResult

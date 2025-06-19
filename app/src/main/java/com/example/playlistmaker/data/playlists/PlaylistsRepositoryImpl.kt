@@ -17,9 +17,9 @@ import kotlinx.coroutines.withContext
 
 class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsRepository {
 
-    override suspend fun createPlaylist(title: String, description: String, path: String) {
+    override suspend fun createPlaylist(id: Int?, title: String, description: String, path: String) {
         val playlistEntity = PlaylistEntity(
-            id = 0,
+            id = id ?: 0,
             title = title,
             description = description,
             path = path
