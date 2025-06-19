@@ -19,7 +19,7 @@ class TrackViewHolder(private val binding: ItemTrackBinding) :
         binding.bandName.text = track.artistName
 
         val radiusPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 2F, itemView.resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, COVER_CORNER_RADIUS_DP_SMALL, itemView.resources.displayMetrics
         ).toInt()
 
         Glide.with(itemView)
@@ -30,6 +30,10 @@ class TrackViewHolder(private val binding: ItemTrackBinding) :
             .into(binding.albumPicture)
 
         binding.songDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
+    }
+
+    companion object {
+        const val COVER_CORNER_RADIUS_DP_SMALL = 2F
     }
 }
 

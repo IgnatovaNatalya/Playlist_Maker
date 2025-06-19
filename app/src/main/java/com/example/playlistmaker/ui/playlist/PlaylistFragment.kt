@@ -1,6 +1,5 @@
 package com.example.playlistmaker.ui.playlist
 
-import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.TypedValue
@@ -148,32 +147,36 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
 
-        bottomSheetTracks.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetTracks = BottomSheetBehavior.from(binding.bottomSheetTracks).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            addBottomSheetCallback(OverlayBottomSheetCallback(
+                hideOverlayStates = setOf(
+                    BottomSheetBehavior.STATE_HIDDEN,
+                    BottomSheetBehavior.STATE_COLLAPSED
+                )
+            ))
+        }
 
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN, BottomSheetBehavior.STATE_COLLAPSED ->
-                        binding.overlay.visibility = View.GONE
+        bottomSheetMenu = BottomSheetBehavior.from(binding.bottomSheetMenu).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+            addBottomSheetCallback(OverlayBottomSheetCallback(
+                hideOverlayStates = setOf(BottomSheetBehavior.STATE_HIDDEN)
+            ))
+        }
+    }
 
-                    else -> binding.overlay.visibility = View.VISIBLE
-                }
+    private inner class OverlayBottomSheetCallback(
+        private val hideOverlayStates: Set<Int>
+    ) : BottomSheetBehavior.BottomSheetCallback() {
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+            binding.overlay.visibility = if (hideOverlayStates.contains(newState)) {
+                View.GONE
+            } else {
+                View.VISIBLE
             }
+        }
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-        })
-
-        bottomSheetMenu.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> binding.overlay.visibility = View.GONE
-                    else -> binding.overlay.visibility = View.VISIBLE
-                }
-            }
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-        })
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
     }
 
     private fun showToast(toast: String) {
@@ -192,7 +195,6 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         binding.progressBar.visibility = View.VISIBLE
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun showContent(state: PlaylistUiState.Content) {
         binding.clPlaylistContent.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
@@ -205,14 +207,13 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         else
             bottomSheetTracks.state = BottomSheetBehavior.STATE_HIDDEN
 
-        trackAdapter?.tracks = state.tracks
-        trackAdapter?.notifyDataSetChanged()
+        trackAdapter?.updateTracks(state.tracks)
     }
 
     private fun drawPlaylistBottom(playlist: Playlist) {
 
         val radiusPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 2F, resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, COVER_CORNER_RADIUS_DP_SMALL, resources.displayMetrics
         )
 
         Glide.with(binding.itemPlaylistLinear.playlistLinearCover)
@@ -281,7 +282,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
     companion object {
         const val EXTRA_PLAYLIST_ID = "EXTRA_PLAYLIST_ID"
-
+        const val COVER_CORNER_RADIUS_DP_SMALL = 2F
         fun createArgs(playlistId: Int): Bundle = bundleOf(EXTRA_PLAYLIST_ID to playlistId)
     }
 }

@@ -1,6 +1,5 @@
 package com.example.playlistmaker.ui.search
 
-import android.annotation.SuppressLint
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.text.Editable
@@ -119,7 +118,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         binding.clearHistoryButton.setOnClickListener { viewModel.onClickHistoryClearButton() }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun observeViewModel() {
 
         lifecycleScope.launch {
@@ -150,28 +148,23 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+
     private fun showHistoryContent(historyTracks: List<Track>) {
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
         setHistoryVisibility(true)
-        historyAdapter?.tracks = historyTracks
-        historyAdapter?.notifyDataSetChanged()
+
+        historyAdapter?.updateTracks(historyTracks)
         binding.searchRecycler.visibility = View.GONE
         binding.progressBar.visibility = View.GONE
-
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun showSearchContent(foundTracks: List<Track>) {
         setPlaceHolder(PlaceholderMessage.MESSAGE_CLEAR)
         setHistoryVisibility(false)
 
-        searchAdapter?.tracks = foundTracks
-        searchAdapter?.notifyDataSetChanged()
-
+        searchAdapter?.updateTracks(foundTracks)
         binding.searchRecycler.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
-
     }
 
     private fun showNotFound() {

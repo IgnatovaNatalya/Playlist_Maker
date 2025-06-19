@@ -150,7 +150,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private fun drawTrack(track: Track) {
 
         val radiusPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 8F, binding.playerAlbumPicture.resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, COVER_CORNER_RADIUS_DP_BIG, binding.playerAlbumPicture.resources.displayMetrics
         ).toInt()
 
         val pictureUrl = track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
@@ -202,7 +202,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     companion object {
         const val EXTRA_TRACK = "EXTRA_TRACK"
         const val CLICK_DEBOUNCE_DELAY = 300L
-
+        const val COVER_CORNER_RADIUS_DP_BIG = 8F
         fun createArgs(track: Track): Bundle = bundleOf(EXTRA_TRACK to track)
     }
 }

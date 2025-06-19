@@ -1,7 +1,6 @@
 package com.example.playlistmaker.data.db.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import kotlinx.coroutines.flow.Flow
@@ -15,8 +14,8 @@ interface TracksPlaylistsDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun addToPlaylist(trackPlaylist: TracksPlaylistsEntity)
 
-    @Delete
-    suspend fun removeFromPlaylist(trackPlaylist: TracksPlaylistsEntity)
+    @Query("DELETE FROM tracks_playlists_table WHERE trackId =:trackId AND playlistId=:playlistId")
+    suspend fun removeFromPlaylist(trackId:Int, playlistId:Int)
 
     @Query("SELECT COUNT(trackId) FROM tracks_playlists_table WHERE playlistId=:playlistId")
     fun countTracks(playlistId:Int): Flow<Int>

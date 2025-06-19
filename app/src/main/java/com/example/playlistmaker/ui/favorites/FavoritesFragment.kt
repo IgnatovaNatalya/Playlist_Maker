@@ -1,6 +1,5 @@
 package com.example.playlistmaker.ui.favorites
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -85,11 +84,8 @@ class FavoritesFragment : BindingFragment<FragmentFavoritesBinding>() {
         binding.placeholderMessage.visibility = View.GONE
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun showContent(state: FavoritesState.Content) {
-        tracksAdapter?.tracks = state.favoriteTracks
-        tracksAdapter?.notifyDataSetChanged()
-
+        tracksAdapter?.updateTracks(state.favoriteTracks)
         binding.favTracksRecycler.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
         binding.placeholderMessage.visibility = View.GONE

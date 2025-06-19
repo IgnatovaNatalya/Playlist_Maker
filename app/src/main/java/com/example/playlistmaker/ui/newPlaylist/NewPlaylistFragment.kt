@@ -90,7 +90,7 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
         binding.playlistToolbar.title = getString(R.string.edit)
         val uri = playlist.path.toUri()
         val radiusPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 8F, resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, COVER_CORNER_RADIUS_DP_BIG, resources.displayMetrics
         )
         imageUri = uri
         loadRoundedImage(uri, radiusPx)
@@ -125,7 +125,7 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
 
     private fun handleImageSelected(uri: Uri) {
         val radiusPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 8F, resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, COVER_CORNER_RADIUS_DP_BIG, resources.displayMetrics
         )
         loadRoundedImage(uri, radiusPx)
         viewModel.saveImage(uri).also { imageUri = uri }
@@ -174,7 +174,7 @@ class NewPlaylistFragment : BindingFragment<FragmentNewPlaylistBinding>() {
 
     companion object {
         const val EXTRA_PLAYLIST_ID = "EXTRA_PLAYLIST_ID"
-
+        const val COVER_CORNER_RADIUS_DP_BIG = 8F
         fun createArgs(playlistId: Int?): Bundle = bundleOf(EXTRA_PLAYLIST_ID to playlistId)
     }
 }

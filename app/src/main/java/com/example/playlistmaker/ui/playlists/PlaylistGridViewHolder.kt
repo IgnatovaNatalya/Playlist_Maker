@@ -16,7 +16,9 @@ class PlaylistGridViewHolder(private val binding: ItemPlaylistGridBinding) :
     fun bind(playlist: Playlist) {
 
         val radiusPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 8F, itemView.resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP,
+            COVER_CORNER_RADIUS_DP_BIG,
+            itemView.resources.displayMetrics
         )
 
         Glide.with(itemView)
@@ -38,6 +40,10 @@ class PlaylistGridViewHolder(private val binding: ItemPlaylistGridBinding) :
 
         val str = binding.root.resources.getQuantityString(R.plurals.tracks, playlist.numTracks,playlist.numTracks)
         binding.numTracks.text = str
+    }
+
+    companion object {
+        const val COVER_CORNER_RADIUS_DP_BIG = 8F
     }
 }
 

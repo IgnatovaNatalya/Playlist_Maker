@@ -33,7 +33,8 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
     ): AddToPlaylistResult {
         val trackEntity = track.toTrackEntity()
         val trackPlaylistEntity = TracksPlaylistsEntity(
-            trackId = track.trackId, playlistId = playlistId
+            trackId = track.trackId, playlistId = playlistId,
+            added = System.currentTimeMillis()
         )
         appDatabase.trackDao().addTrack(trackEntity)
 
@@ -71,8 +72,7 @@ class PlaylistsRepositoryImpl(private val appDatabase: AppDatabase) : PlaylistsR
     }
 
     private suspend fun removeFromPlaylist(track: Track, playlistId: Int,) {
-        val trackPlaylistEntity = TracksPlaylistsEntity(track.trackId, playlistId)
-        appDatabase.tracksPlaylistsDao().removeFromPlaylist(trackPlaylistEntity)
+        appDatabase.tracksPlaylistsDao().removeFromPlaylist(track.trackId, playlistId)
     }
 
     override fun getPlaylists(): Flow<List<Playlist>> {

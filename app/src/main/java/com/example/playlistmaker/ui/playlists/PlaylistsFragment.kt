@@ -61,7 +61,7 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         playlistsRecycler.adapter = playlistsAdapter
 
         val spacingPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 8F, requireContext().resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, SPACING_DP, requireContext().resources.displayMetrics
         ).toInt()
 
         playlistsRecycler.addItemDecoration(GridSpacingItemDecoration(2, spacingPx, false))
@@ -103,6 +103,7 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
     }
 
     companion object {
+        const val SPACING_DP = 8F
         fun newInstance() = PlaylistsFragment()
     }
 }
