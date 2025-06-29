@@ -25,6 +25,8 @@ import com.example.playlistmaker.util.debounce
 import com.example.playlistmaker.viewmodel.PlaybackViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
@@ -106,7 +108,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
         binding.buttonPlayPause.setOnClickListener { viewModel.onPlayButtonClicked() }
         binding.buttonLike.setOnClickListener { viewModel.onLikeClicked() }
 
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet).apply {
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetTracks).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
 
@@ -148,7 +150,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     private fun drawTrack(track: Track) {
 
         val radiusPx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 8F, binding.playerAlbumPicture.resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP, COVER_CORNER_RADIUS_DP_BIG, binding.playerAlbumPicture.resources.displayMetrics
         ).toInt()
 
         val pictureUrl = track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
@@ -162,7 +164,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
 
         binding.playerTitle.text = track.trackName
         binding.playerBand.text = track.artistName
-        binding.playerDuration.text = track.duration
+        binding.playerDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
         binding.playerAlbum.text = track.collectionName
         binding.playerYear.text = if (track.releaseDate.length > 4) track.releaseDate.substring(
             0,
@@ -200,7 +202,7 @@ class PlayerFragment : BindingFragment<FragmentPlayerBinding>() {
     companion object {
         const val EXTRA_TRACK = "EXTRA_TRACK"
         const val CLICK_DEBOUNCE_DELAY = 300L
-
+        const val COVER_CORNER_RADIUS_DP_BIG = 8F
         fun createArgs(track: Track): Bundle = bundleOf(EXTRA_TRACK to track)
     }
 }

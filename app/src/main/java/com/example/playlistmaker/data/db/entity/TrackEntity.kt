@@ -10,7 +10,7 @@ data class TrackEntity (
     val trackId: Int,
     val trackName: String,
     val artistName: String,
-    val duration: String,
+    val trackTimeMillis: Long,
     val artworkUrl100: String?,
     val collectionName: String,
     val releaseDate: String,
@@ -20,7 +20,11 @@ data class TrackEntity (
 )
 
 fun TrackEntity.toTrack() = Track(
-    trackId, trackName, artistName, duration, artworkUrl100,
+    trackId,
+    trackName,
+    artistName,
+    trackTimeMillis,
+    artworkUrl100,
     collectionName, releaseDate, primaryGenreName, country, previewUrl
 )
 

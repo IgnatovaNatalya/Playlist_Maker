@@ -44,7 +44,7 @@ class RootActivity : AppCompatActivity() {
     private fun updateBottomNavVisibility() {
         val currentDestination = navController.currentDestination?.id
         when (currentDestination) {
-            R.id.playerFragment, R.id.newPlaylistFragment -> {
+            R.id.playerFragment, R.id.newPlaylistFragment, R.id.playlistFragment -> {
                 binding.bottomNavigationView.visibility = View.GONE
             }
             else -> {

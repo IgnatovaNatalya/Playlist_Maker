@@ -1,8 +1,6 @@
 package com.example.playlistmaker.data.dto
 
 import com.example.playlistmaker.domain.model.Track
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 data class TrackDto(
     val trackId: Int,
@@ -21,7 +19,7 @@ fun TrackDto.toTrack() = Track(
     trackId,
     trackName,
     artistName,
-    SimpleDateFormat("mm:ss", Locale.getDefault()).format(trackTimeMillis),
+    trackTimeMillis,
     artworkUrl100,
     collectionName,
     releaseDate,
@@ -29,3 +27,5 @@ fun TrackDto.toTrack() = Track(
     country,
     previewUrl
 )
+
+

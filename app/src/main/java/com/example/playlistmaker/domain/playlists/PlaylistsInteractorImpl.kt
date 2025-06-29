@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 class PlaylistsInteractorImpl(private val playlistsRepository: PlaylistsRepository) :
     PlaylistsInteractor {
 
-    override suspend fun createPlaylist(playlist: Playlist) {
-        playlistsRepository.createPlaylist(playlist)
+    override suspend fun createPlaylist(id:Int?, title: String, description: String, path: String) {
+        playlistsRepository.createPlaylist(id, title, description, path)
     }
 
     override suspend fun deletePlaylist(playlist: Playlist) {
@@ -23,15 +23,20 @@ class PlaylistsInteractorImpl(private val playlistsRepository: PlaylistsReposito
         return playlistsRepository.addToPlaylist(playlistId, track)
     }
 
-    override suspend fun removeFromPlaylist(
-        playlistId: Int,
-        track: Track
-    ) {
-        playlistsRepository.removeFromPlaylist(playlistId, track)
-    }
-
     override fun getPlaylists(): Flow<List<Playlist>> {
         return playlistsRepository.getPlaylists()
+    }
+
+    override fun getPlaylist(playlistId: Int): Flow<Playlist> {
+        return playlistsRepository.getPlaylist(playlistId)
+    }
+
+    override fun getPlaylistTracks(playlistId: Int): Flow<List<Track>> {
+        return playlistsRepository.getPlaylistTracks(playlistId)
+    }
+
+    override suspend fun removeTrackFromPlaylist(track: Track, playlistId:Int) {
+        playlistsRepository.removeTrackFromPlaylist(track, playlistId)
     }
 
 }

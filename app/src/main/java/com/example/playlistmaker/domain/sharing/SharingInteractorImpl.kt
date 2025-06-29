@@ -1,12 +1,18 @@
 package com.example.playlistmaker.domain.sharing
 
+import com.example.playlistmaker.domain.model.Playlist
+import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.util.EmailData
 
 class SharingInteractorImpl(
     private val externalNavigator: ExternalNavigator
 ) : SharingInteractor {
+
     override fun shareApp() {
-        externalNavigator.sendLink(getShareAppLink())
+        externalNavigator.shareApp()
+    }
+    override fun sharePlaylist(playlist: Playlist, listTrack:List<Track>) {
+        externalNavigator.sharePlaylist(playlist,listTrack)
     }
 
     override fun openTerms() {
@@ -17,10 +23,6 @@ class SharingInteractorImpl(
         externalNavigator.sendEmail(getSupportEmailData())
     }
 
-    private fun getShareAppLink(): String {
-        return externalNavigator.getShareAppLink()
-    }
-
     private fun getSupportEmailData(): EmailData {
         return externalNavigator.getSupportEmailData()
     }
@@ -28,4 +30,6 @@ class SharingInteractorImpl(
     private fun getTermsLink(): String {
         return externalNavigator.getTermsLink()
     }
+
+
 }
