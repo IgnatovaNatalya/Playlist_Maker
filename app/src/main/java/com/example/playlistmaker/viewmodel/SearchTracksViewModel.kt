@@ -43,7 +43,7 @@ class SearchTracksViewModel(
         trackSearchDebounce(changedText)
     }
 
-    fun searchTracks(queryText: String) {
+    private fun searchTracks(queryText: String) {
         if (queryText.isNotEmpty()) {
             _uiState.value = SearchState.Loading
 
